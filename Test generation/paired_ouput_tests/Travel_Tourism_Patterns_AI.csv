@@ -1,0 +1,218 @@
+﻿Age,Monthly_Income_Lakh,Household_Size,Area_Type,Current_User,Primary_Purpose,Preferred_Channel,Brand_Segment,Monthly_Spend,Usage_Frequency_per_Month,Travel_Distance_km_per_Week,Satisfaction_1to5,Ease_of_Use_1to5,Value_for_Money_1to5,Trust_in_Brand_1to5,Recommend_NPS_0to10,Future_Intent,Open_Ended_Feedback
+35,31.82,1,Urban,No,Family,Offline,Premium,25513.0,14,37.9,1,1,2,4,5,Unlikely,Travel Tourism Patterns is impressive and modern
+35,43.77,5,Urban,Yes,Personal,Online,Premium,60823.0,8,168.5,3,4,4,4,10,Definitely,Travel Tourism Patterns needs serious improvement
+65,55.04,5,Semi-Urban,Yes,Personal,Hybrid,Premium,5524.0,16,414.1,2,1,5,2,5,Definitely,Travel Tourism Patterns needs serious improvement
+67,12.1,4,Semi-Urban,Yes,Family,Hybrid,Luxury,76064.0,16,138.0,1,2,1,3,6,Unlikely,Travel Tourism Patterns feels overpriced for what it offers
+29,30.86,7,Urban,Yes,Leisure,Online,Premium,39156.0,9,307.4,2,5,3,5,6,Definitely,Travel Tourism Patterns feels overpriced for what it offers
+32,59.17,1,Semi-Urban,No,Business,Online,Premium,43365.0,16,494.8,1,1,4,4,1,Definitely,Travel Tourism Patterns is impressive and modern
+27,37.95,7,Rural,Yes,Family,Offline,Premium,73127.0,7,184.9,4,4,3,5,6,Definitely,Travel Tourism Patterns needs serious improvement
+44,51.67,5,Urban,No,Personal,Hybrid,Premium,41967.0,14,315.7,2,2,1,3,5,Definitely,Travel Tourism Patterns feels overpriced for what it offers
+41,53.94,3,Urban,No,Business,Offline,Premium,11162.0,12,307.8,5,5,2,4,2,Definitely,Travel Tourism Patterns feels overpriced for what it offers
+29,8.91,8,Semi-Urban,No,Business,Online,Luxury,46384.0,16,305.3,4,4,3,5,8,Maybe,Travel Tourism Patterns is impressive and modern
+52,31.45,3,Semi-Urban,No,Personal,Offline,Premium,42194.0,17,477.6,5,3,4,4,7,Definitely,Travel Tourism Patterns is impressive and modern
+22,57.9,5,Urban,No,Family,Offline,Mass,41603.0,21,397.2,4,3,3,3,5,Definitely,Travel Tourism Patterns exceeded my expectations
+27,13.21,2,Urban,Yes,Business,Online,Premium,18962.0,14,24.2,2,4,2,3,4,Definitely,I am unsure about long term value of Travel Tourism Patterns
+22,15.36,2,Semi-Urban,Yes,Family,Hybrid,Luxury,16431.0,18,33.4,5,5,2,3,9,Maybe,Travel Tourism Patterns exceeded my expectations
+65,32.83,2,Urban,No,Family,Online,Mass,70453.0,9,39.2,3,1,5,1,4,Definitely,Travel Tourism Patterns is impressive and modern
+32,12.32,6,Rural,Yes,Family,Hybrid,Premium,56487.0,8,195.0,1,1,1,5,9,Definitely,Travel Tourism Patterns feels overpriced for what it offers
+35,52.29,3,Urban,Yes,Business,Offline,Luxury,2559.0,16,231.0,3,3,2,5,2,Definitely,Travel Tourism Patterns is impressive and modern
+55,46.95,6,Semi-Urban,Yes,Leisure,Online,Mass,75506.0,9,407.5,4,4,1,5,8,Definitely,Travel Tourism Patterns needs serious improvement
+26,51.73,8,Urban,No,Personal,Online,Luxury,12681.0,18,325.4,4,2,2,2,6,Definitely,Travel Tourism Patterns feels overpriced for what it offers
+27,27.29,3,Semi-Urban,No,Business,Offline,Mass,66916.0,16,500.0,3,3,3,5,8,Definitely,Travel Tourism Patterns exceeded my expectations
+31,40.58,8,Semi-Urban,No,Personal,Online,Luxury,10454.0,21,401.1,4,4,1,4,2,Unlikely,Travel Tourism Patterns exceeded my expectations
+23,22.99,4,Urban,Yes,Family,Hybrid,Premium,87481.0,14,439.3,5,3,2,2,6,Definitely,Travel Tourism Patterns exceeded my expectations
+54,8.47,7,Semi-Urban,No,Business,Online,Luxury,81245.0,14,107.4,4,3,4,2,6,Definitely,Travel Tourism Patterns feels overpriced for what it offers
+51,47.62,2,Urban,Yes,Business,Hybrid,Mass,18106.0,8,327.9,2,4,3,4,6,Definitely,I am unsure about long term value of Travel Tourism Patterns
+41,58.44,4,Rural,Yes,Business,Online,Mass,2742.0,15,91.5,3,2,3,3,7,Definitely,I am unsure about long term value of Travel Tourism Patterns
+49,20.73,5,Rural,No,Leisure,Hybrid,Luxury,7249.0,15,344.0,4,3,5,3,5,Definitely,I am unsure about long term value of Travel Tourism Patterns
+39,20.82,6,Rural,No,Business,Online,Luxury,73169.0,11,408.6,2,4,2,1,6,Definitely,Travel Tourism Patterns is impressive and modern
+27,16.36,7,Rural,No,Personal,Online,Premium,8757.0,8,164.1,4,5,5,4,5,Definitely,Travel Tourism Patterns is impressive and modern
+63,28.46,6,Semi-Urban,Yes,Business,Online,Premium,70477.0,19,100.3,4,2,2,2,7,Definitely,Travel Tourism Patterns needs serious improvement
+31,25.66,7,Urban,Yes,Family,Hybrid,Mass,74143.0,11,134.0,2,4,1,2,9,Definitely,Travel Tourism Patterns feels overpriced for what it offers
+23,53.67,8,Urban,Yes,Business,Hybrid,Luxury,29008.0,11,409.3,4,5,4,3,3,Maybe,Travel Tourism Patterns needs serious improvement
+59,48.47,5,Rural,Yes,Family,Online,Luxury,66691.0,15,282.6,5,2,3,1,5,Definitely,Travel Tourism Patterns is impressive and modern
+63,53.43,1,Urban,No,Personal,Online,Mass,74187.0,19,277.5,4,4,2,2,4,Maybe,Travel Tourism Patterns feels overpriced for what it offers
+64,55.57,1,Urban,Yes,Business,Hybrid,Premium,70695.0,17,296.8,5,2,2,4,9,Definitely,Travel Tourism Patterns exceeded my expectations
+65,42.36,7,Semi-Urban,No,Business,Online,Luxury,18858.0,17,256.3,4,2,4,3,7,Unlikely,Travel Tourism Patterns feels overpriced for what it offers
+53,40.38,1,Urban,Yes,Business,Hybrid,Mass,41537.0,9,434.4,5,2,3,2,3,Maybe,Travel Tourism Patterns is impressive and modern
+48,30.64,1,Semi-Urban,Yes,Family,Online,Luxury,8005.0,17,263.6,5,4,3,2,5,Unlikely,Travel Tourism Patterns exceeded my expectations
+59,9.56,6,Semi-Urban,No,Family,Online,Mass,48228.0,9,306.1,4,4,3,1,6,Definitely,Travel Tourism Patterns exceeded my expectations
+52,29.55,6,Rural,No,Leisure,Online,Mass,40924.0,15,490.3,3,2,2,5,7,Maybe,Travel Tourism Patterns feels overpriced for what it offers
+24,24.94,8,Urban,No,Business,Hybrid,Mass,81430.0,12,238.6,2,2,2,4,4,Maybe,I am unsure about long term value of Travel Tourism Patterns
+55,25.81,3,Urban,Yes,Business,Hybrid,Luxury,3591.0,17,109.8,5,3,1,4,6,Maybe,Travel Tourism Patterns is impressive and modern
+37,32.58,4,Semi-Urban,No,Leisure,Online,Mass,48661.0,13,290.2,4,1,2,5,8,Maybe,Travel Tourism Patterns is impressive and modern
+55,34.0,6,Urban,No,Personal,Offline,Mass,66443.0,18,358.2,4,4,5,2,7,Definitely,I am unsure about long term value of Travel Tourism Patterns
+62,16.88,3,Urban,No,Business,Hybrid,Luxury,42828.0,13,80.1,4,4,3,1,3,Definitely,Travel Tourism Patterns needs serious improvement
+57,20.11,5,Semi-Urban,Yes,Personal,Hybrid,Premium,22952.0,15,97.8,4,5,1,4,9,Unlikely,Travel Tourism Patterns needs serious improvement
+46,16.18,6,Urban,Yes,Family,Online,Luxury,55666.0,8,31.7,4,2,4,3,5,Definitely,Travel Tourism Patterns is impressive and modern
+68,45.5,2,Urban,No,Business,Hybrid,Premium,88865.0,16,377.3,4,3,4,4,6,Maybe,I am unsure about long term value of Travel Tourism Patterns
+37,58.04,2,Urban,No,Family,Online,Mass,5608.0,19,117.0,5,3,4,5,7,Unlikely,I am unsure about long term value of Travel Tourism Patterns
+54,18.46,7,Urban,No,Business,Offline,Mass,19252.0,18,452.5,2,2,3,4,6,Definitely,Travel Tourism Patterns exceeded my expectations
+69,52.5,8,Semi-Urban,No,Business,Online,Luxury,45173.0,11,267.4,4,4,1,3,7,Maybe,Travel Tourism Patterns needs serious improvement
+28,45.16,4,Urban,Yes,Family,Offline,Luxury,54589.0,15,478.5,4,2,2,5,6,Unlikely,Travel Tourism Patterns needs serious improvement
+29,21.84,4,Semi-Urban,Yes,Leisure,Online,Luxury,56925.0,15,203.9,2,1,2,4,5,Definitely,Travel Tourism Patterns exceeded my expectations
+27,33.87,5,Rural,No,Business,Offline,Premium,7298.0,21,478.8,3,2,1,5,6,Maybe,Travel Tourism Patterns feels overpriced for what it offers
+21,38.55,8,Rural,No,Business,Offline,Premium,12817.0,17,489.3,5,3,1,2,5,Definitely,Travel Tourism Patterns needs serious improvement
+60,47.43,3,Urban,No,Business,Online,Mass,85132.0,20,82.4,3,1,2,3,6,Definitely,Travel Tourism Patterns exceeded my expectations
+61,34.94,7,Semi-Urban,No,Family,Online,Luxury,8631.0,17,80.0,4,5,4,1,4,Maybe,I am unsure about long term value of Travel Tourism Patterns
+36,41.07,8,Semi-Urban,Yes,Personal,Online,Mass,38882.0,7,223.3,2,4,5,3,2,Unlikely,Travel Tourism Patterns feels overpriced for what it offers
+22,22.63,2,Urban,No,Family,Hybrid,Luxury,52798.0,13,218.7,3,1,4,4,7,Unlikely,Travel Tourism Patterns is impressive and modern
+28,11.78,3,Urban,Yes,Family,Hybrid,Premium,29646.0,16,332.0,5,2,2,3,3,Definitely,I am unsure about long term value of Travel Tourism Patterns
+42,8.3,5,Rural,Yes,Family,Online,Premium,24500.0,11,74.1,3,4,5,2,8,Maybe,Travel Tourism Patterns feels overpriced for what it offers
+47,21.05,3,Semi-Urban,Yes,Business,Hybrid,Premium,27538.0,12,383.0,5,1,5,2,5,Maybe,Travel Tourism Patterns exceeded my expectations
+38,41.73,2,Semi-Urban,No,Personal,Hybrid,Premium,26870.0,12,128.0,4,3,2,4,4,Definitely,I am unsure about long term value of Travel Tourism Patterns
+36,9.9,6,Semi-Urban,No,Personal,Hybrid,Mass,35387.0,21,92.3,3,1,3,2,6,Definitely,Travel Tourism Patterns feels overpriced for what it offers
+46,45.64,5,Urban,No,Business,Online,Mass,12215.0,14,401.4,4,3,2,5,3,Maybe,Travel Tourism Patterns is impressive and modern
+42,27.4,3,Urban,Yes,Personal,Offline,Premium,77111.0,20,58.5,4,5,4,4,8,Definitely,I am unsure about long term value of Travel Tourism Patterns
+21,30.75,3,Semi-Urban,No,Family,Online,Luxury,68828.0,15,361.6,5,3,2,3,3,Unlikely,I am unsure about long term value of Travel Tourism Patterns
+52,16.72,8,Urban,No,Business,Offline,Luxury,5001.0,8,73.3,3,4,1,4,6,Definitely,Travel Tourism Patterns needs serious improvement
+66,43.35,7,Urban,Yes,Leisure,Hybrid,Mass,68991.0,15,375.2,4,3,3,4,3,Definitely,Travel Tourism Patterns feels overpriced for what it offers
+42,58.38,3,Urban,No,Personal,Online,Premium,74869.0,20,399.5,4,3,1,5,1,Unlikely,Travel Tourism Patterns feels overpriced for what it offers
+47,27.06,7,Rural,Yes,Business,Offline,Mass,83138.0,15,300.6,4,4,2,2,8,Definitely,Travel Tourism Patterns needs serious improvement
+58,11.36,8,Semi-Urban,No,Business,Online,Premium,55939.0,13,188.9,4,4,3,5,7,Definitely,Travel Tourism Patterns exceeded my expectations
+64,5.94,8,Urban,No,Personal,Online,Mass,77050.0,18,133.4,5,4,4,4,2,Definitely,Travel Tourism Patterns exceeded my expectations
+53,52.64,3,Urban,No,Personal,Online,Premium,68801.0,13,408.3,5,1,3,5,9,Definitely,Travel Tourism Patterns needs serious improvement
+50,43.79,4,Semi-Urban,Yes,Business,Online,Luxury,4236.0,16,71.3,5,4,4,5,5,Unlikely,I am unsure about long term value of Travel Tourism Patterns
+39,51.55,5,Urban,No,Leisure,Hybrid,Premium,73370.0,10,487.7,5,4,3,5,6,Maybe,Travel Tourism Patterns is impressive and modern
+53,26.6,5,Semi-Urban,No,Personal,Offline,Premium,53129.0,12,394.0,3,1,1,5,6,Maybe,Travel Tourism Patterns exceeded my expectations
+45,39.83,3,Rural,Yes,Family,Online,Luxury,59249.0,12,351.4,4,2,4,1,4,Maybe,Travel Tourism Patterns is impressive and modern
+26,26.33,3,Rural,Yes,Family,Online,Premium,79874.0,18,494.5,5,4,3,5,7,Definitely,Travel Tourism Patterns feels overpriced for what it offers
+68,23.08,7,Rural,Yes,Leisure,Hybrid,Luxury,2917.0,10,350.6,5,3,4,5,4,Definitely,Travel Tourism Patterns feels overpriced for what it offers
+49,37.47,6,Urban,Yes,Business,Offline,Premium,11495.0,20,69.9,2,4,5,5,8,Definitely,Travel Tourism Patterns exceeded my expectations
+35,17.02,4,Urban,Yes,Family,Online,Mass,52494.0,18,174.8,5,4,5,2,8,Definitely,I am unsure about long term value of Travel Tourism Patterns
+32,45.09,6,Semi-Urban,No,Family,Online,Luxury,38049.0,13,301.0,3,4,5,5,6,Definitely,Travel Tourism Patterns feels overpriced for what it offers
+58,39.85,8,Semi-Urban,Yes,Family,Online,Premium,38788.0,13,296.2,4,3,2,5,6,Unlikely,Travel Tourism Patterns is impressive and modern
+35,27.36,7,Urban,No,Personal,Hybrid,Mass,29474.0,18,24.8,4,3,4,3,10,Definitely,I am unsure about long term value of Travel Tourism Patterns
+51,20.69,2,Urban,Yes,Leisure,Online,Luxury,74032.0,19,144.8,5,4,5,2,8,Definitely,Travel Tourism Patterns exceeded my expectations
+21,24.79,4,Urban,No,Leisure,Online,Mass,11113.0,17,373.4,5,5,4,4,2,Unlikely,Travel Tourism Patterns feels overpriced for what it offers
+40,22.13,8,Semi-Urban,No,Personal,Offline,Premium,48901.0,18,336.6,5,3,4,5,3,Definitely,Travel Tourism Patterns exceeded my expectations
+49,24.87,3,Urban,No,Family,Offline,Premium,42323.0,17,450.8,5,4,4,5,7,Definitely,I am unsure about long term value of Travel Tourism Patterns
+68,5.88,7,Urban,No,Personal,Online,Premium,50515.0,13,480.9,3,3,2,5,5,Definitely,I am unsure about long term value of Travel Tourism Patterns
+31,23.72,3,Semi-Urban,No,Family,Online,Luxury,6449.0,17,437.4,3,2,1,4,8,Unlikely,I am unsure about long term value of Travel Tourism Patterns
+29,34.74,3,Urban,Yes,Leisure,Online,Luxury,61291.0,18,285.5,3,5,2,3,7,Definitely,Travel Tourism Patterns needs serious improvement
+36,31.53,3,Semi-Urban,No,Leisure,Offline,Premium,3190.0,12,280.6,2,4,5,5,10,Definitely,Travel Tourism Patterns needs serious improvement
+36,12.77,8,Urban,Yes,Business,Online,Premium,48449.0,19,197.4,5,5,1,4,0,Definitely,Travel Tourism Patterns is impressive and modern
+53,57.08,8,Urban,No,Leisure,Online,Premium,25365.0,14,451.4,4,4,2,4,6,Definitely,I am unsure about long term value of Travel Tourism Patterns
+39,15.14,4,Semi-Urban,Yes,Business,Online,Mass,29548.0,22,418.7,5,2,3,4,6,Definitely,I am unsure about long term value of Travel Tourism Patterns
+45,36.79,3,Rural,Yes,Family,Hybrid,Premium,66979.0,15,393.9,5,4,3,5,6,Definitely,Travel Tourism Patterns feels overpriced for what it offers
+54,25.42,2,Urban,Yes,Leisure,Online,Mass,88758.0,12,393.6,5,4,4,5,9,Unlikely,Travel Tourism Patterns is impressive and modern
+59,42.03,1,Semi-Urban,No,Business,Online,Luxury,43831.0,14,427.5,5,3,2,3,6,Maybe,Travel Tourism Patterns is impressive and modern
+44,28.97,7,Rural,Yes,Business,Offline,Premium,60917.0,16,461.1,4,4,2,2,8,Unlikely,Travel Tourism Patterns exceeded my expectations
+69,7.26,2,Urban,No,Leisure,Online,Luxury,23864.0,15,414.1,3,4,4,3,7,Definitely,I am unsure about long term value of Travel Tourism Patterns
+52,39.86,6,Urban,No,Business,Offline,Mass,50752.0,19,411.2,3,1,4,5,6,Unlikely,Travel Tourism Patterns feels overpriced for what it offers
+59,55.91,3,Rural,Yes,Family,Hybrid,Premium,10799.0,17,337.0,3,5,2,4,7,Definitely,Travel Tourism Patterns exceeded my expectations
+23,52.82,4,Semi-Urban,Yes,Leisure,Online,Mass,76821.0,19,239.9,1,4,2,1,4,Unlikely,Travel Tourism Patterns needs serious improvement
+33,23.06,6,Rural,No,Personal,Online,Premium,42103.0,18,284.4,4,4,3,4,3,Maybe,I am unsure about long term value of Travel Tourism Patterns
+50,22.88,3,Semi-Urban,No,Business,Online,Premium,33809.0,15,277.0,4,2,3,4,10,Definitely,Travel Tourism Patterns is impressive and modern
+43,37.32,8,Urban,Yes,Business,Offline,Premium,47179.0,16,415.6,2,5,4,2,5,Unlikely,I am unsure about long term value of Travel Tourism Patterns
+50,15.82,6,Urban,Yes,Personal,Offline,Luxury,82339.0,18,147.7,5,4,3,2,5,Definitely,I am unsure about long term value of Travel Tourism Patterns
+32,39.52,4,Semi-Urban,No,Family,Online,Premium,70328.0,13,194.3,5,1,3,2,4,Maybe,Travel Tourism Patterns needs serious improvement
+65,49.06,8,Semi-Urban,Yes,Family,Hybrid,Premium,15440.0,26,287.4,2,4,2,4,7,Definitely,Travel Tourism Patterns feels overpriced for what it offers
+58,16.19,6,Semi-Urban,Yes,Leisure,Offline,Mass,69584.0,18,492.8,3,3,1,4,10,Maybe,Travel Tourism Patterns feels overpriced for what it offers
+44,57.69,7,Semi-Urban,Yes,Business,Online,Premium,36572.0,23,254.9,3,3,5,4,9,Definitely,Travel Tourism Patterns feels overpriced for what it offers
+44,32.68,1,Urban,Yes,Family,Online,Premium,36761.0,18,80.7,4,5,4,4,6,Definitely,Travel Tourism Patterns exceeded my expectations
+50,16.97,7,Urban,No,Leisure,Online,Premium,68687.0,16,343.6,5,5,1,4,9,Definitely,Travel Tourism Patterns feels overpriced for what it offers
+37,8.68,5,Urban,No,Family,Offline,Premium,42452.0,13,315.8,4,1,2,5,6,Unlikely,Travel Tourism Patterns exceeded my expectations
+35,20.76,2,Urban,Yes,Business,Online,Mass,8378.0,13,426.4,4,4,3,5,3,Unlikely,Travel Tourism Patterns needs serious improvement
+56,31.04,1,Semi-Urban,No,Business,Offline,Luxury,23716.0,18,430.3,3,2,2,4,4,Maybe,I am unsure about long term value of Travel Tourism Patterns
+44,31.32,3,Urban,No,Personal,Hybrid,Luxury,80727.0,17,144.4,4,1,1,3,4,Unlikely,Travel Tourism Patterns exceeded my expectations
+52,16.24,4,Urban,Yes,Business,Online,Premium,54092.0,18,41.8,3,2,3,5,9,Definitely,Travel Tourism Patterns needs serious improvement
+44,19.2,7,Semi-Urban,No,Family,Online,Mass,77875.0,16,396.8,4,1,2,2,10,Definitely,Travel Tourism Patterns exceeded my expectations
+23,42.31,6,Semi-Urban,No,Family,Offline,Premium,28853.0,11,333.1,3,4,4,3,4,Maybe,Travel Tourism Patterns needs serious improvement
+65,47.62,4,Urban,No,Family,Offline,Premium,62628.0,20,87.9,1,4,5,5,6,Maybe,Travel Tourism Patterns feels overpriced for what it offers
+21,10.93,5,Semi-Urban,No,Leisure,Online,Luxury,71106.0,14,493.1,4,2,3,5,10,Definitely,Travel Tourism Patterns feels overpriced for what it offers
+40,41.63,7,Semi-Urban,No,Personal,Online,Premium,18094.0,6,464.4,3,2,4,4,8,Unlikely,Travel Tourism Patterns needs serious improvement
+41,55.4,6,Urban,Yes,Family,Online,Luxury,4052.0,16,367.1,4,2,5,1,6,Definitely,Travel Tourism Patterns is impressive and modern
+32,6.94,1,Urban,No,Business,Hybrid,Premium,57829.0,12,45.8,4,4,2,4,6,Unlikely,Travel Tourism Patterns needs serious improvement
+56,38.72,2,Rural,No,Personal,Hybrid,Premium,52766.0,18,122.4,5,3,5,5,9,Definitely,Travel Tourism Patterns exceeded my expectations
+64,37.05,7,Semi-Urban,Yes,Personal,Hybrid,Premium,5505.0,14,175.8,5,1,3,5,1,Definitely,Travel Tourism Patterns needs serious improvement
+41,17.97,6,Urban,Yes,Business,Online,Premium,38150.0,13,46.8,4,3,1,5,9,Maybe,I am unsure about long term value of Travel Tourism Patterns
+39,50.36,4,Semi-Urban,No,Leisure,Online,Mass,51581.0,18,417.1,4,1,2,3,2,Definitely,Travel Tourism Patterns is impressive and modern
+39,5.36,2,Semi-Urban,No,Leisure,Online,Luxury,20663.0,20,56.8,3,4,3,5,9,Unlikely,Travel Tourism Patterns needs serious improvement
+57,56.1,7,Urban,Yes,Personal,Online,Luxury,10495.0,18,118.6,4,3,5,5,2,Maybe,Travel Tourism Patterns is impressive and modern
+22,37.9,3,Rural,Yes,Business,Hybrid,Luxury,72514.0,9,173.1,4,3,1,5,10,Maybe,Travel Tourism Patterns is impressive and modern
+53,32.0,4,Semi-Urban,No,Business,Online,Premium,83402.0,11,179.3,3,4,3,4,0,Maybe,Travel Tourism Patterns needs serious improvement
+57,45.71,6,Urban,No,Personal,Online,Luxury,41379.0,12,147.3,4,3,2,4,10,Definitely,Travel Tourism Patterns needs serious improvement
+30,56.82,4,Rural,No,Personal,Offline,Premium,13790.0,14,489.7,3,3,2,4,2,Unlikely,Travel Tourism Patterns feels overpriced for what it offers
+52,50.2,1,Urban,Yes,Leisure,Offline,Premium,39074.0,11,481.2,5,4,1,4,3,Definitely,Travel Tourism Patterns needs serious improvement
+50,36.23,5,Semi-Urban,Yes,Family,Hybrid,Mass,26563.0,17,317.7,3,3,4,1,10,Definitely,Travel Tourism Patterns needs serious improvement
+37,11.93,3,Semi-Urban,No,Business,Offline,Premium,45164.0,11,80.1,4,5,2,5,8,Unlikely,Travel Tourism Patterns feels overpriced for what it offers
+50,25.94,6,Semi-Urban,Yes,Family,Online,Premium,2794.0,16,359.2,3,3,2,5,8,Definitely,Travel Tourism Patterns feels overpriced for what it offers
+34,53.02,7,Semi-Urban,No,Personal,Online,Premium,78293.0,17,488.2,3,5,2,5,6,Definitely,I am unsure about long term value of Travel Tourism Patterns
+25,51.82,5,Urban,No,Business,Offline,Luxury,7113.0,10,499.2,3,5,3,3,2,Unlikely,Travel Tourism Patterns needs serious improvement
+56,28.08,7,Urban,Yes,Business,Hybrid,Premium,39828.0,12,316.0,4,5,2,2,3,Unlikely,Travel Tourism Patterns exceeded my expectations
+33,31.02,6,Semi-Urban,Yes,Business,Online,Mass,60180.0,11,110.5,4,2,1,3,9,Definitely,Travel Tourism Patterns is impressive and modern
+36,42.64,7,Rural,No,Leisure,Online,Luxury,59301.0,14,419.2,4,2,2,4,5,Maybe,Travel Tourism Patterns feels overpriced for what it offers
+33,29.16,1,Urban,No,Personal,Online,Luxury,28242.0,13,318.9,5,5,2,3,8,Maybe,Travel Tourism Patterns needs serious improvement
+49,9.92,2,Urban,Yes,Personal,Online,Premium,45962.0,15,237.0,2,5,1,5,7,Definitely,Travel Tourism Patterns exceeded my expectations
+44,45.12,1,Urban,No,Leisure,Online,Premium,45728.0,15,92.0,3,4,1,4,6,Unlikely,Travel Tourism Patterns is impressive and modern
+38,40.75,6,Semi-Urban,No,Business,Online,Luxury,13551.0,27,135.1,3,4,5,4,9,Maybe,Travel Tourism Patterns needs serious improvement
+59,15.93,1,Urban,Yes,Leisure,Online,Mass,34772.0,13,297.8,4,5,5,5,7,Definitely,Travel Tourism Patterns exceeded my expectations
+28,49.15,1,Urban,No,Family,Online,Luxury,12497.0,10,145.1,3,1,3,2,8,Unlikely,Travel Tourism Patterns is impressive and modern
+25,49.91,6,Urban,No,Family,Online,Premium,7024.0,25,249.4,3,5,2,5,8,Definitely,Travel Tourism Patterns exceeded my expectations
+68,18.59,4,Semi-Urban,Yes,Business,Online,Mass,6897.0,11,363.5,2,3,2,5,4,Maybe,Travel Tourism Patterns feels overpriced for what it offers
+34,12.78,3,Semi-Urban,Yes,Personal,Online,Premium,40278.0,12,493.9,4,1,2,5,5,Maybe,Travel Tourism Patterns needs serious improvement
+23,15.79,2,Rural,Yes,Business,Hybrid,Luxury,66206.0,17,41.1,4,4,2,2,8,Unlikely,Travel Tourism Patterns exceeded my expectations
+26,32.13,8,Semi-Urban,Yes,Family,Offline,Premium,88640.0,14,402.4,4,4,4,2,8,Unlikely,Travel Tourism Patterns exceeded my expectations
+65,22.56,5,Semi-Urban,Yes,Personal,Online,Premium,52267.0,12,81.4,4,4,2,3,7,Unlikely,Travel Tourism Patterns needs serious improvement
+37,42.04,6,Semi-Urban,Yes,Family,Online,Luxury,28342.0,17,472.9,3,3,5,3,10,Maybe,Travel Tourism Patterns is impressive and modern
+63,33.67,2,Rural,Yes,Family,Online,Premium,20225.0,16,389.6,4,2,2,4,9,Maybe,Travel Tourism Patterns needs serious improvement
+62,41.91,7,Rural,Yes,Personal,Offline,Premium,63145.0,14,211.0,2,4,1,2,8,Definitely,Travel Tourism Patterns exceeded my expectations
+49,17.14,4,Semi-Urban,Yes,Personal,Online,Mass,6556.0,6,266.0,5,1,3,3,4,Definitely,I am unsure about long term value of Travel Tourism Patterns
+42,37.51,4,Semi-Urban,No,Business,Online,Premium,25082.0,18,344.8,2,4,5,3,5,Definitely,Travel Tourism Patterns is impressive and modern
+61,53.58,5,Rural,No,Family,Hybrid,Premium,62592.0,14,289.3,5,5,4,5,5,Maybe,Travel Tourism Patterns exceeded my expectations
+63,37.1,8,Urban,Yes,Family,Online,Mass,41162.0,10,490.4,1,5,1,3,2,Maybe,I am unsure about long term value of Travel Tourism Patterns
+54,42.89,4,Semi-Urban,No,Personal,Online,Premium,46019.0,11,499.3,4,3,3,3,8,Definitely,Travel Tourism Patterns is impressive and modern
+26,57.26,6,Urban,Yes,Personal,Online,Luxury,87842.0,18,47.4,5,2,3,1,6,Definitely,Travel Tourism Patterns feels overpriced for what it offers
+63,53.76,7,Semi-Urban,No,Personal,Online,Mass,37607.0,13,369.4,4,1,4,2,7,Definitely,Travel Tourism Patterns needs serious improvement
+61,17.37,7,Semi-Urban,Yes,Personal,Online,Mass,54372.0,15,378.5,4,3,2,4,7,Unlikely,Travel Tourism Patterns is impressive and modern
+47,49.9,5,Urban,No,Business,Hybrid,Premium,89878.0,18,399.3,2,4,2,4,0,Definitely,Travel Tourism Patterns is impressive and modern
+69,58.9,4,Urban,No,Leisure,Online,Premium,62400.0,16,460.2,4,1,2,5,1,Definitely,Travel Tourism Patterns exceeded my expectations
+34,48.38,1,Semi-Urban,No,Business,Online,Luxury,47272.0,15,304.8,4,2,2,4,5,Definitely,I am unsure about long term value of Travel Tourism Patterns
+40,12.08,7,Semi-Urban,No,Leisure,Offline,Luxury,30502.0,12,142.2,4,4,1,3,7,Definitely,Travel Tourism Patterns is impressive and modern
+47,39.11,4,Semi-Urban,Yes,Personal,Online,Premium,87928.0,16,342.4,3,1,3,3,6,Unlikely,Travel Tourism Patterns needs serious improvement
+23,40.9,5,Urban,Yes,Business,Offline,Mass,27857.0,16,175.0,3,5,3,5,9,Definitely,Travel Tourism Patterns is impressive and modern
+37,13.11,8,Semi-Urban,No,Personal,Online,Premium,12193.0,22,184.4,5,4,4,4,4,Definitely,Travel Tourism Patterns is impressive and modern
+24,35.53,5,Rural,No,Leisure,Offline,Luxury,83475.0,12,314.2,5,3,3,3,3,Definitely,Travel Tourism Patterns exceeded my expectations
+62,55.77,5,Rural,No,Personal,Online,Premium,30072.0,15,158.7,5,1,3,1,3,Maybe,Travel Tourism Patterns is impressive and modern
+33,21.25,3,Urban,Yes,Business,Online,Premium,53822.0,13,353.4,4,2,2,3,4,Definitely,I am unsure about long term value of Travel Tourism Patterns
+21,49.41,2,Rural,Yes,Personal,Online,Premium,58840.0,16,429.5,5,5,4,5,4,Definitely,Travel Tourism Patterns exceeded my expectations
+61,40.39,2,Semi-Urban,No,Personal,Online,Mass,24960.0,21,493.0,3,4,4,5,5,Unlikely,Travel Tourism Patterns feels overpriced for what it offers
+41,42.1,1,Semi-Urban,No,Business,Online,Luxury,39260.0,15,100.8,4,1,2,2,7,Definitely,Travel Tourism Patterns feels overpriced for what it offers
+23,21.47,7,Urban,No,Personal,Offline,Premium,15683.0,15,238.6,3,5,3,4,4,Unlikely,Travel Tourism Patterns exceeded my expectations
+67,46.64,5,Semi-Urban,No,Personal,Hybrid,Luxury,79840.0,24,375.5,4,3,4,2,6,Definitely,I am unsure about long term value of Travel Tourism Patterns
+45,40.02,6,Urban,No,Leisure,Offline,Premium,53438.0,16,297.1,3,4,3,4,6,Definitely,Travel Tourism Patterns exceeded my expectations
+62,33.83,8,Semi-Urban,No,Personal,Hybrid,Luxury,80344.0,20,51.0,2,4,3,2,5,Maybe,Travel Tourism Patterns exceeded my expectations
+64,31.98,7,Semi-Urban,No,Leisure,Online,Luxury,24627.0,12,187.1,1,5,2,5,6,Definitely,Travel Tourism Patterns exceeded my expectations
+21,21.88,6,Semi-Urban,Yes,Leisure,Online,Luxury,57791.0,18,401.0,3,5,3,4,5,Definitely,Travel Tourism Patterns exceeded my expectations
+34,16.12,6,Urban,No,Business,Offline,Premium,21180.0,14,256.6,5,4,1,3,10,Maybe,Travel Tourism Patterns is impressive and modern
+54,47.19,6,Urban,No,Personal,Offline,Premium,27436.0,17,353.3,4,2,2,5,2,Definitely,Travel Tourism Patterns needs serious improvement
+60,15.97,3,Semi-Urban,Yes,Personal,Online,Premium,33781.0,13,327.4,4,5,5,4,8,Unlikely,Travel Tourism Patterns feels overpriced for what it offers
+23,14.21,3,Semi-Urban,No,Personal,Online,Premium,50349.0,11,472.8,5,5,3,3,5,Definitely,I am unsure about long term value of Travel Tourism Patterns
+62,51.82,6,Semi-Urban,Yes,Business,Hybrid,Premium,50908.0,16,431.9,4,4,3,4,4,Maybe,Travel Tourism Patterns is impressive and modern
+29,9.4,3,Urban,Yes,Personal,Hybrid,Luxury,19629.0,6,185.0,4,5,3,5,9,Definitely,Travel Tourism Patterns feels overpriced for what it offers
+25,13.43,5,Semi-Urban,No,Personal,Online,Mass,6054.0,23,258.9,4,4,1,3,6,Definitely,Travel Tourism Patterns needs serious improvement
+45,10.01,3,Semi-Urban,No,Business,Offline,Premium,69945.0,8,248.7,2,2,3,3,6,Unlikely,Travel Tourism Patterns exceeded my expectations
+53,57.7,3,Rural,No,Business,Online,Premium,48293.0,23,153.9,4,3,1,4,6,Maybe,Travel Tourism Patterns needs serious improvement
+25,10.77,2,Semi-Urban,Yes,Business,Online,Luxury,29566.0,12,318.1,4,3,4,3,6,Unlikely,Travel Tourism Patterns feels overpriced for what it offers
+32,5.33,8,Rural,No,Business,Offline,Premium,6643.0,11,145.1,1,3,2,3,7,Definitely,Travel Tourism Patterns feels overpriced for what it offers
+59,38.68,8,Urban,No,Business,Offline,Premium,11204.0,13,96.6,2,5,2,4,8,Definitely,Travel Tourism Patterns is impressive and modern
+31,44.24,4,Rural,Yes,Family,Offline,Mass,39275.0,10,72.9,4,5,3,5,8,Definitely,Travel Tourism Patterns is impressive and modern
+53,14.77,4,Semi-Urban,No,Leisure,Offline,Premium,44577.0,15,157.5,5,3,2,5,6,Maybe,I am unsure about long term value of Travel Tourism Patterns
+36,24.18,4,Semi-Urban,No,Leisure,Online,Premium,35218.0,23,247.1,4,5,3,5,7,Definitely,Travel Tourism Patterns exceeded my expectations
+23,22.04,5,Urban,No,Family,Hybrid,Premium,51853.0,22,75.5,4,5,4,4,8,Definitely,Travel Tourism Patterns needs serious improvement
+25,44.81,1,Urban,No,Personal,Online,Mass,73637.0,18,344.4,5,3,3,1,7,Definitely,Travel Tourism Patterns exceeded my expectations
+60,26.68,7,Semi-Urban,Yes,Leisure,Hybrid,Premium,61587.0,16,437.7,2,5,5,4,4,Maybe,Travel Tourism Patterns needs serious improvement
+39,34.07,8,Rural,Yes,Business,Online,Mass,78298.0,16,225.0,2,2,2,5,7,Definitely,Travel Tourism Patterns exceeded my expectations
+68,47.7,8,Urban,No,Personal,Hybrid,Luxury,56191.0,13,439.2,4,4,2,5,7,Definitely,Travel Tourism Patterns feels overpriced for what it offers
+31,32.13,1,Urban,Yes,Business,Online,Luxury,11243.0,14,92.5,2,4,4,2,2,Definitely,Travel Tourism Patterns feels overpriced for what it offers
+41,44.91,7,Rural,Yes,Business,Offline,Mass,15195.0,13,57.2,2,3,4,5,7,Definitely,Travel Tourism Patterns exceeded my expectations
+29,36.16,2,Urban,No,Personal,Online,Mass,36365.0,12,410.7,5,1,5,3,9,Definitely,I am unsure about long term value of Travel Tourism Patterns
+63,44.2,1,Semi-Urban,No,Business,Online,Luxury,26983.0,16,487.9,3,1,3,2,6,Maybe,Travel Tourism Patterns feels overpriced for what it offers
+38,9.99,1,Semi-Urban,Yes,Family,Online,Premium,59398.0,14,183.5,4,5,3,3,3,Definitely,I am unsure about long term value of Travel Tourism Patterns
+32,58.8,4,Semi-Urban,Yes,Leisure,Online,Mass,57073.0,13,335.5,3,4,3,2,7,Definitely,Travel Tourism Patterns feels overpriced for what it offers
+63,9.78,4,Urban,Yes,Personal,Online,Luxury,42708.0,10,334.2,2,2,2,3,4,Definitely,Travel Tourism Patterns is impressive and modern
+59,39.99,5,Semi-Urban,Yes,Leisure,Online,Luxury,58640.0,10,349.0,3,5,2,3,6,Definitely,Travel Tourism Patterns is impressive and modern
+43,6.27,1,Urban,No,Personal,Online,Mass,82183.0,14,294.7,4,5,2,4,7,Definitely,Travel Tourism Patterns exceeded my expectations
+58,33.44,5,Urban,Yes,Personal,Online,Mass,45271.0,12,143.1,4,3,3,4,6,Definitely,Travel Tourism Patterns needs serious improvement
+60,10.28,8,Urban,No,Business,Hybrid,Luxury,32560.0,12,58.8,3,4,4,4,5,Definitely,Travel Tourism Patterns is impressive and modern

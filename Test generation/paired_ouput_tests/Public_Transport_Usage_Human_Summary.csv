@@ -1,0 +1,61 @@
+﻿Context,Question_ID,Question_Text,Option,Count
+Public_Transport_Usage,Q1,What is your age?,MEAN,40.23
+Public_Transport_Usage,Q1,What is your age?,MEDIAN,40.0
+Public_Transport_Usage,Q1,What is your age?,STD,13.68
+Public_Transport_Usage,Q2,What is your monthly income (in Lakhs)?,MEAN,20.25
+Public_Transport_Usage,Q2,What is your monthly income (in Lakhs)?,MEDIAN,19.66
+Public_Transport_Usage,Q2,What is your monthly income (in Lakhs)?,STD,10.61
+Public_Transport_Usage,Q3,How many people live in your household?,MEAN,3.45
+Public_Transport_Usage,Q3,How many people live in your household?,MEDIAN,3.0
+Public_Transport_Usage,Q3,How many people live in your household?,STD,1.68
+Public_Transport_Usage,Q4,What type of area do you live in?,Rural,20.0
+Public_Transport_Usage,Q4,What type of area do you live in?,Semi-Urban,80.0
+Public_Transport_Usage,Q4,What type of area do you live in?,Urban,136.0
+Public_Transport_Usage,Q5,Do you currently use this product/service?,No,76.0
+Public_Transport_Usage,Q5,Do you currently use this product/service?,Yes,160.0
+Public_Transport_Usage,Q6,What is your primary purpose of usage?,Business,61.0
+Public_Transport_Usage,Q6,What is your primary purpose of usage?,Family,56.0
+Public_Transport_Usage,Q6,What is your primary purpose of usage?,Leisure,49.0
+Public_Transport_Usage,Q6,What is your primary purpose of usage?,Personal,70.0
+Public_Transport_Usage,Q7,What is your preferred interaction channel?,Hybrid,72.0
+Public_Transport_Usage,Q7,What is your preferred interaction channel?,Offline,81.0
+Public_Transport_Usage,Q7,What is your preferred interaction channel?,Online,83.0
+Public_Transport_Usage,Q8,Which brand segment do you prefer?,Luxury,48.0
+Public_Transport_Usage,Q8,Which brand segment do you prefer?,Mass,116.0
+Public_Transport_Usage,Q8,Which brand segment do you prefer?,Premium,72.0
+Public_Transport_Usage,Q9,How much do you spend monthly on this category?,MEAN,24198.27
+Public_Transport_Usage,Q9,How much do you spend monthly on this category?,MEDIAN,23855.0
+Public_Transport_Usage,Q9,How much do you spend monthly on this category?,STD,14357.75
+Public_Transport_Usage,Q10,How many times do you use it per month?,MEAN,8.09
+Public_Transport_Usage,Q10,How many times do you use it per month?,MEDIAN,8.0
+Public_Transport_Usage,Q10,How many times do you use it per month?,STD,2.7
+Public_Transport_Usage,Q11,How far do you travel weekly (km)?,MEAN,162.43
+Public_Transport_Usage,Q11,How far do you travel weekly (km)?,MEDIAN,164.05
+Public_Transport_Usage,Q11,How far do you travel weekly (km)?,STD,84.29
+Public_Transport_Usage,Q12,Overall satisfaction (1-5),1,33.0
+Public_Transport_Usage,Q12,Overall satisfaction (1-5),2,40.0
+Public_Transport_Usage,Q12,Overall satisfaction (1-5),3,58.0
+Public_Transport_Usage,Q12,Overall satisfaction (1-5),4,45.0
+Public_Transport_Usage,Q12,Overall satisfaction (1-5),5,60.0
+Public_Transport_Usage,Q13,Ease of use (1-5),1,47.0
+Public_Transport_Usage,Q13,Ease of use (1-5),2,48.0
+Public_Transport_Usage,Q13,Ease of use (1-5),3,43.0
+Public_Transport_Usage,Q13,Ease of use (1-5),4,51.0
+Public_Transport_Usage,Q13,Ease of use (1-5),5,47.0
+Public_Transport_Usage,Q14,Value for money (1-5),1,45.0
+Public_Transport_Usage,Q14,Value for money (1-5),2,48.0
+Public_Transport_Usage,Q14,Value for money (1-5),3,65.0
+Public_Transport_Usage,Q14,Value for money (1-5),4,34.0
+Public_Transport_Usage,Q14,Value for money (1-5),5,44.0
+Public_Transport_Usage,Q15,Trust in brand (1-5),1,47.0
+Public_Transport_Usage,Q15,Trust in brand (1-5),2,50.0
+Public_Transport_Usage,Q15,Trust in brand (1-5),3,51.0
+Public_Transport_Usage,Q15,Trust in brand (1-5),4,43.0
+Public_Transport_Usage,Q15,Trust in brand (1-5),5,45.0
+Public_Transport_Usage,Q16,Likelihood to recommend (0-10),MEAN,5.24
+Public_Transport_Usage,Q16,Likelihood to recommend (0-10),MEDIAN,5.0
+Public_Transport_Usage,Q16,Likelihood to recommend (0-10),STD,3.01
+Public_Transport_Usage,Q17,Future intent to use,Definitely,84.0
+Public_Transport_Usage,Q17,Future intent to use,Maybe,97.0
+Public_Transport_Usage,Q17,Future intent to use,Unlikely,55.0
+Public_Transport_Usage,Q18,Any additional feedback?,TOTAL_RESPONSES,236.0

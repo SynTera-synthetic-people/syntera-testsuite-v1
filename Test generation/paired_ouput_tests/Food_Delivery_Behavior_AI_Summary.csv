@@ -1,0 +1,61 @@
+﻿Context,Question_ID,Question_Text,Option,Count
+Food_Delivery_Behavior,Q1,What is your age?,MEAN,45.89
+Food_Delivery_Behavior,Q1,What is your age?,MEDIAN,47.0
+Food_Delivery_Behavior,Q1,What is your age?,STD,14.13
+Food_Delivery_Behavior,Q2,What is your monthly income (in Lakhs)?,MEAN,31.59
+Food_Delivery_Behavior,Q2,What is your monthly income (in Lakhs)?,MEDIAN,30.1
+Food_Delivery_Behavior,Q2,What is your monthly income (in Lakhs)?,STD,15.95
+Food_Delivery_Behavior,Q3,How many people live in your household?,MEAN,4.6
+Food_Delivery_Behavior,Q3,How many people live in your household?,MEDIAN,5.0
+Food_Delivery_Behavior,Q3,How many people live in your household?,STD,2.3
+Food_Delivery_Behavior,Q4,What type of area do you live in?,Rural,46.0
+Food_Delivery_Behavior,Q4,What type of area do you live in?,Semi-Urban,118.0
+Food_Delivery_Behavior,Q4,What type of area do you live in?,Urban,98.0
+Food_Delivery_Behavior,Q5,Do you currently use this product/service?,No,129.0
+Food_Delivery_Behavior,Q5,Do you currently use this product/service?,Yes,133.0
+Food_Delivery_Behavior,Q6,What is your primary purpose of usage?,Business,94.0
+Food_Delivery_Behavior,Q6,What is your primary purpose of usage?,Family,60.0
+Food_Delivery_Behavior,Q6,What is your primary purpose of usage?,Leisure,59.0
+Food_Delivery_Behavior,Q6,What is your primary purpose of usage?,Personal,49.0
+Food_Delivery_Behavior,Q7,What is your preferred interaction channel?,Hybrid,50.0
+Food_Delivery_Behavior,Q7,What is your preferred interaction channel?,Offline,55.0
+Food_Delivery_Behavior,Q7,What is your preferred interaction channel?,Online,157.0
+Food_Delivery_Behavior,Q8,Which brand segment do you prefer?,Luxury,75.0
+Food_Delivery_Behavior,Q8,Which brand segment do you prefer?,Mass,57.0
+Food_Delivery_Behavior,Q8,Which brand segment do you prefer?,Premium,130.0
+Food_Delivery_Behavior,Q9,How much do you spend monthly on this category?,MEAN,44139.44
+Food_Delivery_Behavior,Q9,How much do you spend monthly on this category?,MEDIAN,42153.0
+Food_Delivery_Behavior,Q9,How much do you spend monthly on this category?,STD,25473.98
+Food_Delivery_Behavior,Q10,How many times do you use it per month?,MEAN,14.01
+Food_Delivery_Behavior,Q10,How many times do you use it per month?,MEDIAN,14.0
+Food_Delivery_Behavior,Q10,How many times do you use it per month?,STD,3.9
+Food_Delivery_Behavior,Q11,How far do you travel weekly (km)?,MEAN,254.31
+Food_Delivery_Behavior,Q11,How far do you travel weekly (km)?,MEDIAN,249.15
+Food_Delivery_Behavior,Q11,How far do you travel weekly (km)?,STD,138.8
+Food_Delivery_Behavior,Q12,Overall satisfaction (1-5),1,11.0
+Food_Delivery_Behavior,Q12,Overall satisfaction (1-5),2,23.0
+Food_Delivery_Behavior,Q12,Overall satisfaction (1-5),3,59.0
+Food_Delivery_Behavior,Q12,Overall satisfaction (1-5),4,106.0
+Food_Delivery_Behavior,Q12,Overall satisfaction (1-5),5,63.0
+Food_Delivery_Behavior,Q13,Ease of use (1-5),1,23.0
+Food_Delivery_Behavior,Q13,Ease of use (1-5),2,41.0
+Food_Delivery_Behavior,Q13,Ease of use (1-5),3,75.0
+Food_Delivery_Behavior,Q13,Ease of use (1-5),4,74.0
+Food_Delivery_Behavior,Q13,Ease of use (1-5),5,49.0
+Food_Delivery_Behavior,Q14,Value for money (1-5),1,47.0
+Food_Delivery_Behavior,Q14,Value for money (1-5),2,61.0
+Food_Delivery_Behavior,Q14,Value for money (1-5),3,76.0
+Food_Delivery_Behavior,Q14,Value for money (1-5),4,44.0
+Food_Delivery_Behavior,Q14,Value for money (1-5),5,34.0
+Food_Delivery_Behavior,Q15,Trust in brand (1-5),1,14.0
+Food_Delivery_Behavior,Q15,Trust in brand (1-5),2,26.0
+Food_Delivery_Behavior,Q15,Trust in brand (1-5),3,53.0
+Food_Delivery_Behavior,Q15,Trust in brand (1-5),4,83.0
+Food_Delivery_Behavior,Q15,Trust in brand (1-5),5,86.0
+Food_Delivery_Behavior,Q16,Likelihood to recommend (0-10),MEAN,5.97
+Food_Delivery_Behavior,Q16,Likelihood to recommend (0-10),MEDIAN,6.0
+Food_Delivery_Behavior,Q16,Likelihood to recommend (0-10),STD,2.44
+Food_Delivery_Behavior,Q17,Future intent to use,Definitely,139.0
+Food_Delivery_Behavior,Q17,Future intent to use,Maybe,68.0
+Food_Delivery_Behavior,Q17,Future intent to use,Unlikely,55.0
+Food_Delivery_Behavior,Q18,Any additional feedback?,TOTAL_RESPONSES,262.0

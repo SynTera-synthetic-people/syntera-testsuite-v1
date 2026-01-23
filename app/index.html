@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SynTera Test Suite</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div id="app" class="app-shell">
+            <aside class="sidebar" style="position: relative;">
+                <button class="sidebar-toggle" onclick="toggleSidebar()" title="Toggle sidebar">☰</button>
+                <div class="brand">
+                    <div class="brand-mark">SP</div>
+                    <div>
+                        <h1>SynTera</h1>
+                        <p>Synthetic People Test Suite</p>
+                    </div>
+                </div>
+                <div class="user-auth-section" style="margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(55, 65, 81, 0.5);">
+                    <div id="user-info-display" style="display: none;">
+                        <div style="font-size: 0.75rem; color: #9ca3af; margin-bottom: 4px;">Logged in as</div>
+                        <div id="username-display" style="font-size: 0.85rem; color: #e5e7eb; font-weight: 600; margin-bottom: 8px;"></div>
+                        <div id="user-role-display" style="font-size: 0.7rem; color: #6b7280; margin-bottom: 8px;"></div>
+                        <button onclick="logout()" class="btn-logout" style="width: 100%; padding: 6px; font-size: 0.75rem; background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.4); color: #fca5a5; border-radius: 6px; cursor: pointer;">Logout</button>
+                    </div>
+                    <div id="login-form-display" style="display: none;">
+                        <label class="field-label" style="font-size: 0.75rem;">
+                            Username
+                            <input type="text" id="login-username" placeholder="user or super" style="margin-top: 4px; width: 100%;" />
+                        </label>
+                        <label class="field-label" style="font-size: 0.75rem;">
+                            Password
+                            <input type="password" id="login-password" placeholder="password" style="margin-top: 4px; width: 100%;" />
+                        </label>
+                        <button onclick="handleLogin()" class="btn-primary" style="width: 100%; margin-top: 8px; padding: 8px; font-size: 0.8rem;">Login</button>
+                        <div style="font-size: 0.65rem; color: #6b7280; margin-top: 8px; text-align: center;">
+                            Default: user/user123 or super/super123
+                        </div>
+                    </div>
+                </div>
+                <p class="sidebar-label">Workspace</p>
+                <ul class="nav-list">
+                    <li><button onclick="showSection('reports'); loadDashboard();" id="nav-dashboard-reports" class="nav-item">Dashboard & Reports</button></li>
+                    <li><button onclick="showSection('surveys')" id="nav-surveys" class="nav-item">Surveys</button></li>
+                    <li><button onclick="showSection('validation')" id="nav-validation" class="nav-item">Validation Runs</button></li>
+                    <li><button onclick="showSection('results')" id="nav-results" class="nav-item">Test Results</button></li>
+                    <li><button onclick="showSection('industry-surveys')" id="nav-industry-surveys" class="nav-item active">Industry Surveys</button></li>
+                </ul>
+            </aside>
+        <main class="main">
+            <header class="top-bar">
+                <div>
+                    <h2 id="section-title">Dashboard & Reports</h2>
+                    <p class="subtitle" id="section-subtitle">Metrics, statistics, and validation reports for all completed surveys</p>
+                </div>
+            </header>
+            <section id="reports" class="section active">
+                <div class="section-header-row">
+                    <div>
+                        <h2>Dashboard & Reports</h2>
+                        <p class="subtitle">Metrics, statistics, and validation reports for all completed surveys.</p>
+                    </div>
+                </div>
+                
+                <!-- Dashboard Stats Section -->
+                <div id="dashboard-stats-container" style="margin-bottom: 32px;">
+                    <div class="stats">
+                        <div class="stat-card"><h3>Total Surveys</h3><p id="total-surveys">0</p></div>
+                        <div class="stat-card"><h3>Validated</h3><p id="validated-surveys">0</p></div>
+                        <div class="stat-card"><h3>Avg Accuracy</h3><p id="avg-accuracy">0%</p></div>
+                    </div>
+                </div>
+                
+                <!-- Reports Section -->
+                <div class="reports-section-header">
+                    <h3>Validation Reports</h3>
+                </div>
+                <div id="reports-list" class="reports-grid-2x2"></div>
+                <div id="reports-pagination" class="pagination-container"></div>
+            </section>
+            <section id="surveys" class="section">
+                <div class="section-header-row">
+                    <div>
+                        <h2>Surveys</h2>
+                        <p class="subtitle">Each survey represents one experiment run.</p>
+                    </div>
+                    <button onclick="createNewSurvey()" class="btn-primary">New Survey Comparison</button>
+                </div>
+                <div id="surveys-list" class="cards-grid"></div>
+                <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid rgba(148, 163, 184, 0.2);">
+                    <button onclick="showSection('validation')" class="btn-primary">→ Go to Validation Runs</button>
+                </div>
+            </section>
+            <section id="validation" class="section">
+                <div class="section-header-row">
+                    <div>
+                        <h2>Validation Runs</h2>
+                        <p class="subtitle">Compare two questionnaires via file upload or manual data entry.</p>
+                    </div>
+                </div>
+                <div class="validation-tabs">
+                    <button class="tab-btn active" onclick="switchTab('files')" id="tab-files">📁 File Upload</button>
+                    <button class="tab-btn" onclick="switchTab('manual')" id="tab-manual">✏️ Manual Entry</button>
+                </div>
+                <div id="tab-content-files" class="tab-content active">
+                    <div class="two-column">
+                        <div class="panel">
+                            <h3>1. Upload questionnaire files</h3>
+                            <p class="help-text">Upload Excel (.xlsx, .xls) or CSV files containing survey responses.</p>
+                            <label class="field-label">Questionnaire 1 (Synthetic/File A)
+                                <input type="file" id="file-synthetic" accept=".xlsx,.xls,.csv" />
+                                <small class="file-info" id="file-synthetic-info">No file selected</small>
+                            </label>
+                            <label class="field-label">Questionnaire 2 (Real/File B)
+                                <input type="file" id="file-real" accept=".xlsx,.xls,.csv" />
+                                <small class="file-info" id="file-real-info">No file selected</small>
+                            </label>
+                            <label class="field-label">Survey ID (optional)
+                                <input id="file-survey-id" type="text" placeholder="Paste survey ID from Surveys panel (leave empty to create new)" />
+                            </label>
+                            <label class="field-label">Extraction Method
+                                <select id="extraction-method">
+                                    <option value="totals">Totals (sum per column)</option>
+                                    <option value="all">All responses (individual values)</option>
+                                </select>
+                            </label>
+                            <button class="btn-primary full-width" onclick="compareFiles()">Compare Files</button>
+                        </div>
+                        <div class="panel">
+                            <h3>2. Ready to compare</h3>
+                            <p class="help-text">Click "Compare Files" to run the validation. Results will appear on the Test Results page.</p>
+                        </div>
+                    </div>
+                </div>
+                <div id="tab-content-manual" class="tab-content">
+                    <div class="two-column">
+                        <div class="panel">
+                            <h3>1. Select survey &amp; data</h3>
+                            <label class="field-label">Survey ID
+                                <input id="validation-survey-id" type="text" placeholder="Paste survey ID from Surveys panel" />
+                            </label>
+                            <label class="field-label">Synthetic responses (JSON array)
+                                <textarea id="synthetic-input" rows="4" placeholder="[42, 33, 18, 7]"></textarea>
+                            </label>
+                            <label class="field-label">Real responses (JSON array)
+                                <textarea id="real-input" rows="4" placeholder="[40, 35, 20, 5]"></textarea>
+                            </label>
+                            <button class="btn-primary full-width" onclick="runValidation()">Run Validation</button>
+                        </div>
+                        <div class="panel">
+                            <h3>2. Ready to validate</h3>
+                            <p class="help-text">Click "Run Validation" to start. Results will appear on the Test Results page.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section id="results" class="section">
+                <div class="section-header-row">
+                    <div>
+                        <h2>Test Results</h2>
+                        <p class="subtitle">Compare synthetic vs real survey responses question-by-question.</p>
+                    </div>
+                    <button onclick="showSection('validation')" class="btn-primary">← Run New Validation</button>
+                </div>
+                <div id="results-content">
+                    <div class="empty-results-state">
+                        <div class="empty-icon">📊</div>
+                        <h3>No Results Yet</h3>
+                        <p>Run a validation from the Validation Runs page to see results here.</p>
+                        <button onclick="showSection('validation')" class="btn-primary">Go to Validation Runs</button>
+                    </div>
+                </div>
+            </section>
+            <section id="industry-surveys" class="section">
+                <div class="section-header-row">
+                    <div>
+                        <h2>Industry Survey Reports</h2>
+                        <p class="subtitle">Explore standard surveys across different industry domains with validation reports and PDF data.</p>
+                    </div>
+                </div>
+                <div id="industry-surveys-list" class="cards-grid"></div>
+        </main>
+    </div>
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
+

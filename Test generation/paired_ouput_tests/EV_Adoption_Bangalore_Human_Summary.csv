@@ -1,0 +1,61 @@
+﻿Context,Question_ID,Question_Text,Option,Count
+EV_Adoption_Bangalore,Q1,What is your age?,MEAN,41.27
+EV_Adoption_Bangalore,Q1,What is your age?,MEDIAN,43.0
+EV_Adoption_Bangalore,Q1,What is your age?,STD,13.67
+EV_Adoption_Bangalore,Q2,What is your monthly income (in Lakhs)?,MEAN,21.66
+EV_Adoption_Bangalore,Q2,What is your monthly income (in Lakhs)?,MEDIAN,21.27
+EV_Adoption_Bangalore,Q2,What is your monthly income (in Lakhs)?,STD,10.68
+EV_Adoption_Bangalore,Q3,How many people live in your household?,MEAN,3.44
+EV_Adoption_Bangalore,Q3,How many people live in your household?,MEDIAN,3.0
+EV_Adoption_Bangalore,Q3,How many people live in your household?,STD,1.73
+EV_Adoption_Bangalore,Q4,What type of area do you live in?,Rural,23.0
+EV_Adoption_Bangalore,Q4,What type of area do you live in?,Semi-Urban,61.0
+EV_Adoption_Bangalore,Q4,What type of area do you live in?,Urban,122.0
+EV_Adoption_Bangalore,Q5,Do you currently use this product/service?,No,76.0
+EV_Adoption_Bangalore,Q5,Do you currently use this product/service?,Yes,130.0
+EV_Adoption_Bangalore,Q6,What is your primary purpose of usage?,Business,49.0
+EV_Adoption_Bangalore,Q6,What is your primary purpose of usage?,Family,58.0
+EV_Adoption_Bangalore,Q6,What is your primary purpose of usage?,Leisure,39.0
+EV_Adoption_Bangalore,Q6,What is your primary purpose of usage?,Personal,60.0
+EV_Adoption_Bangalore,Q7,What is your preferred interaction channel?,Hybrid,72.0
+EV_Adoption_Bangalore,Q7,What is your preferred interaction channel?,Offline,67.0
+EV_Adoption_Bangalore,Q7,What is your preferred interaction channel?,Online,67.0
+EV_Adoption_Bangalore,Q8,Which brand segment do you prefer?,Luxury,29.0
+EV_Adoption_Bangalore,Q8,Which brand segment do you prefer?,Mass,104.0
+EV_Adoption_Bangalore,Q8,Which brand segment do you prefer?,Premium,73.0
+EV_Adoption_Bangalore,Q9,How much do you spend monthly on this category?,MEAN,24763.41
+EV_Adoption_Bangalore,Q9,How much do you spend monthly on this category?,MEDIAN,24660.5
+EV_Adoption_Bangalore,Q9,How much do you spend monthly on this category?,STD,13718.79
+EV_Adoption_Bangalore,Q10,How many times do you use it per month?,MEAN,7.94
+EV_Adoption_Bangalore,Q10,How many times do you use it per month?,MEDIAN,8.0
+EV_Adoption_Bangalore,Q10,How many times do you use it per month?,STD,2.9
+EV_Adoption_Bangalore,Q11,How far do you travel weekly (km)?,MEAN,156.64
+EV_Adoption_Bangalore,Q11,How far do you travel weekly (km)?,MEDIAN,159.4
+EV_Adoption_Bangalore,Q11,How far do you travel weekly (km)?,STD,83.09
+EV_Adoption_Bangalore,Q12,Overall satisfaction (1-5),1,42.0
+EV_Adoption_Bangalore,Q12,Overall satisfaction (1-5),2,34.0
+EV_Adoption_Bangalore,Q12,Overall satisfaction (1-5),3,32.0
+EV_Adoption_Bangalore,Q12,Overall satisfaction (1-5),4,49.0
+EV_Adoption_Bangalore,Q12,Overall satisfaction (1-5),5,49.0
+EV_Adoption_Bangalore,Q13,Ease of use (1-5),1,45.0
+EV_Adoption_Bangalore,Q13,Ease of use (1-5),2,46.0
+EV_Adoption_Bangalore,Q13,Ease of use (1-5),3,43.0
+EV_Adoption_Bangalore,Q13,Ease of use (1-5),4,34.0
+EV_Adoption_Bangalore,Q13,Ease of use (1-5),5,38.0
+EV_Adoption_Bangalore,Q14,Value for money (1-5),1,46.0
+EV_Adoption_Bangalore,Q14,Value for money (1-5),2,36.0
+EV_Adoption_Bangalore,Q14,Value for money (1-5),3,41.0
+EV_Adoption_Bangalore,Q14,Value for money (1-5),4,43.0
+EV_Adoption_Bangalore,Q14,Value for money (1-5),5,40.0
+EV_Adoption_Bangalore,Q15,Trust in brand (1-5),1,55.0
+EV_Adoption_Bangalore,Q15,Trust in brand (1-5),2,46.0
+EV_Adoption_Bangalore,Q15,Trust in brand (1-5),3,35.0
+EV_Adoption_Bangalore,Q15,Trust in brand (1-5),4,38.0
+EV_Adoption_Bangalore,Q15,Trust in brand (1-5),5,32.0
+EV_Adoption_Bangalore,Q16,Likelihood to recommend (0-10),MEAN,4.92
+EV_Adoption_Bangalore,Q16,Likelihood to recommend (0-10),MEDIAN,5.0
+EV_Adoption_Bangalore,Q16,Likelihood to recommend (0-10),STD,3.11
+EV_Adoption_Bangalore,Q17,Future intent to use,Definitely,77.0
+EV_Adoption_Bangalore,Q17,Future intent to use,Maybe,93.0
+EV_Adoption_Bangalore,Q17,Future intent to use,Unlikely,36.0
+EV_Adoption_Bangalore,Q18,Any additional feedback?,TOTAL_RESPONSES,206.0

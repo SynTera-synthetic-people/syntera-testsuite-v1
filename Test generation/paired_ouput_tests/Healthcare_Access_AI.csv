@@ -1,0 +1,259 @@
+﻿Age,Monthly_Income_Lakh,Household_Size,Area_Type,Current_User,Primary_Purpose,Preferred_Channel,Brand_Segment,Monthly_Spend,Usage_Frequency_per_Month,Travel_Distance_km_per_Week,Satisfaction_1to5,Ease_of_Use_1to5,Value_for_Money_1to5,Trust_in_Brand_1to5,Recommend_NPS_0to10,Future_Intent,Open_Ended_Feedback
+28,35.87,6,Semi-Urban,No,Family,Offline,Luxury,27672.0,16,193.5,4,3,3,4,9,Maybe,Healthcare Access is impressive and modern
+30,55.82,5,Semi-Urban,No,Business,Online,Premium,82872.0,14,62.9,3,3,5,3,7,Definitely,Healthcare Access feels overpriced for what it offers
+57,46.61,4,Semi-Urban,Yes,Personal,Online,Luxury,28156.0,15,432.2,2,1,5,4,6,Definitely,Healthcare Access needs serious improvement
+52,7.76,5,Rural,No,Leisure,Hybrid,Mass,87383.0,14,210.7,4,3,4,5,1,Definitely,Healthcare Access is impressive and modern
+47,14.71,8,Semi-Urban,Yes,Business,Online,Mass,75272.0,11,83.6,3,1,5,4,7,Maybe,Healthcare Access is impressive and modern
+51,7.1,3,Semi-Urban,No,Leisure,Online,Premium,62214.0,11,330.3,5,5,5,2,10,Definitely,I am unsure about long term value of Healthcare Access
+23,8.8,3,Semi-Urban,No,Business,Online,Premium,54653.0,23,447.1,5,3,2,5,8,Definitely,Healthcare Access feels overpriced for what it offers
+59,23.64,4,Urban,No,Business,Offline,Mass,21781.0,16,433.3,4,4,5,4,7,Definitely,Healthcare Access feels overpriced for what it offers
+26,45.03,7,Semi-Urban,No,Leisure,Online,Mass,66275.0,9,286.1,4,5,2,4,6,Unlikely,Healthcare Access needs serious improvement
+37,18.44,3,Urban,No,Leisure,Hybrid,Premium,32548.0,16,62.3,3,1,1,5,4,Maybe,Healthcare Access feels overpriced for what it offers
+30,26.58,4,Urban,Yes,Personal,Online,Premium,44737.0,18,354.4,5,3,5,2,7,Definitely,Healthcare Access is impressive and modern
+41,26.66,8,Urban,No,Leisure,Hybrid,Mass,11158.0,4,312.2,4,1,2,4,3,Definitely,Healthcare Access needs serious improvement
+49,37.47,8,Semi-Urban,No,Business,Online,Premium,28062.0,11,120.9,4,1,3,5,9,Definitely,Healthcare Access feels overpriced for what it offers
+49,54.11,5,Rural,No,Family,Online,Premium,48563.0,17,452.3,5,1,5,4,5,Definitely,Healthcare Access needs serious improvement
+40,59.08,5,Urban,Yes,Business,Offline,Premium,43188.0,18,61.6,1,3,1,5,5,Maybe,Healthcare Access feels overpriced for what it offers
+35,38.25,1,Semi-Urban,Yes,Family,Offline,Luxury,32229.0,13,199.1,4,3,2,5,4,Maybe,Healthcare Access feels overpriced for what it offers
+22,32.78,4,Urban,No,Business,Online,Premium,43530.0,16,65.4,4,1,3,3,6,Unlikely,I am unsure about long term value of Healthcare Access
+53,42.5,2,Urban,Yes,Leisure,Online,Luxury,67553.0,18,457.7,3,3,4,3,7,Unlikely,Healthcare Access feels overpriced for what it offers
+32,41.74,4,Rural,No,Personal,Hybrid,Mass,42421.0,16,37.0,2,2,4,4,5,Definitely,Healthcare Access needs serious improvement
+33,33.82,5,Urban,No,Personal,Online,Mass,46542.0,14,224.4,4,3,4,4,7,Unlikely,Healthcare Access is impressive and modern
+64,45.53,6,Urban,Yes,Leisure,Hybrid,Luxury,63701.0,18,433.7,4,4,1,2,7,Maybe,I am unsure about long term value of Healthcare Access
+64,32.02,5,Urban,No,Business,Offline,Luxury,76062.0,11,140.7,3,4,2,3,5,Definitely,Healthcare Access feels overpriced for what it offers
+59,59.81,3,Urban,No,Family,Offline,Premium,48364.0,16,70.4,5,3,4,5,5,Unlikely,Healthcare Access feels overpriced for what it offers
+59,7.69,1,Urban,Yes,Leisure,Online,Premium,85439.0,9,81.0,3,4,4,4,9,Unlikely,Healthcare Access needs serious improvement
+58,29.38,2,Urban,Yes,Leisure,Online,Luxury,33103.0,12,214.4,4,3,2,3,0,Unlikely,I am unsure about long term value of Healthcare Access
+65,26.84,7,Semi-Urban,Yes,Personal,Online,Luxury,24225.0,15,225.7,3,4,2,5,7,Definitely,Healthcare Access feels overpriced for what it offers
+41,47.37,1,Urban,Yes,Family,Online,Luxury,62992.0,14,364.7,1,2,2,5,6,Definitely,Healthcare Access is impressive and modern
+61,15.5,4,Semi-Urban,No,Leisure,Online,Premium,17466.0,8,134.2,4,2,4,4,7,Unlikely,Healthcare Access is impressive and modern
+36,28.87,6,Rural,No,Personal,Online,Luxury,81197.0,10,356.9,4,4,5,5,6,Definitely,Healthcare Access feels overpriced for what it offers
+54,43.39,8,Urban,Yes,Business,Online,Luxury,36019.0,14,499.5,5,5,1,4,2,Maybe,Healthcare Access is impressive and modern
+47,38.18,4,Semi-Urban,No,Family,Online,Luxury,63437.0,17,434.8,4,4,2,5,10,Maybe,I am unsure about long term value of Healthcare Access
+63,34.98,5,Urban,No,Business,Online,Luxury,52176.0,8,325.1,3,1,2,3,2,Maybe,Healthcare Access feels overpriced for what it offers
+23,28.92,3,Urban,No,Personal,Offline,Luxury,6786.0,11,471.2,4,2,5,3,3,Definitely,Healthcare Access needs serious improvement
+29,46.36,2,Rural,No,Business,Offline,Premium,64399.0,16,495.7,3,3,5,3,6,Definitely,I am unsure about long term value of Healthcare Access
+64,40.55,7,Semi-Urban,Yes,Personal,Hybrid,Premium,71520.0,14,293.7,3,4,3,2,9,Unlikely,Healthcare Access is impressive and modern
+54,53.11,6,Urban,Yes,Family,Online,Premium,88458.0,17,151.3,5,2,1,4,5,Definitely,Healthcare Access feels overpriced for what it offers
+39,45.31,3,Urban,Yes,Personal,Offline,Luxury,38619.0,18,459.2,4,4,1,4,7,Maybe,I am unsure about long term value of Healthcare Access
+58,12.72,2,Urban,No,Family,Online,Premium,46258.0,17,425.2,3,4,2,1,6,Maybe,Healthcare Access is impressive and modern
+46,39.07,6,Rural,No,Leisure,Offline,Mass,78988.0,6,60.6,4,4,5,5,5,Definitely,Healthcare Access feels overpriced for what it offers
+43,7.45,1,Semi-Urban,No,Leisure,Online,Premium,25689.0,10,469.5,5,4,1,5,7,Definitely,Healthcare Access exceeded my expectations
+38,26.31,7,Urban,No,Business,Offline,Luxury,18645.0,12,195.8,5,4,4,4,6,Maybe,Healthcare Access needs serious improvement
+65,27.66,5,Urban,Yes,Business,Online,Luxury,13696.0,11,174.6,4,2,1,5,7,Definitely,Healthcare Access is impressive and modern
+66,52.02,3,Urban,No,Family,Online,Mass,88086.0,17,184.8,4,4,3,5,4,Definitely,Healthcare Access is impressive and modern
+60,14.92,4,Rural,Yes,Family,Online,Mass,25792.0,12,173.6,5,5,4,2,9,Unlikely,Healthcare Access exceeded my expectations
+61,40.39,7,Semi-Urban,No,Family,Online,Premium,68651.0,7,267.7,4,5,3,4,3,Maybe,Healthcare Access exceeded my expectations
+65,15.58,5,Urban,Yes,Business,Online,Premium,41571.0,13,298.3,4,1,4,5,7,Unlikely,I am unsure about long term value of Healthcare Access
+69,57.18,2,Urban,Yes,Family,Offline,Mass,23171.0,21,224.3,4,4,4,3,9,Definitely,Healthcare Access needs serious improvement
+58,34.12,7,Urban,Yes,Leisure,Offline,Luxury,82373.0,15,218.0,3,5,2,2,2,Maybe,Healthcare Access needs serious improvement
+30,43.95,6,Urban,No,Business,Online,Premium,42815.0,13,373.9,1,4,2,3,1,Definitely,Healthcare Access is impressive and modern
+63,40.56,7,Semi-Urban,No,Leisure,Offline,Premium,51804.0,13,21.5,5,2,4,3,5,Definitely,Healthcare Access exceeded my expectations
+30,21.7,5,Urban,Yes,Business,Online,Luxury,21579.0,13,474.5,5,5,1,5,8,Unlikely,Healthcare Access needs serious improvement
+41,54.57,4,Rural,Yes,Business,Online,Premium,30525.0,22,362.9,5,3,3,5,7,Definitely,Healthcare Access feels overpriced for what it offers
+58,39.5,4,Semi-Urban,Yes,Family,Offline,Premium,67797.0,18,359.5,3,1,5,2,8,Definitely,Healthcare Access needs serious improvement
+58,33.07,8,Urban,Yes,Business,Offline,Premium,32188.0,20,222.5,3,3,4,5,5,Unlikely,Healthcare Access is impressive and modern
+67,34.06,2,Semi-Urban,Yes,Leisure,Offline,Luxury,46524.0,12,483.6,3,2,4,3,10,Unlikely,Healthcare Access needs serious improvement
+27,53.99,5,Urban,No,Personal,Online,Mass,12063.0,17,20.2,4,2,1,4,5,Unlikely,I am unsure about long term value of Healthcare Access
+32,8.25,3,Urban,No,Family,Hybrid,Luxury,76806.0,12,56.7,3,3,4,3,8,Definitely,Healthcare Access exceeded my expectations
+61,26.4,5,Rural,No,Family,Hybrid,Premium,66907.0,10,406.0,5,4,5,3,5,Definitely,Healthcare Access is impressive and modern
+53,51.29,7,Semi-Urban,Yes,Leisure,Online,Luxury,68946.0,9,374.6,4,5,3,3,4,Definitely,Healthcare Access is impressive and modern
+45,7.06,4,Urban,No,Personal,Hybrid,Luxury,17680.0,12,150.3,4,4,2,5,5,Maybe,Healthcare Access exceeded my expectations
+48,40.15,6,Urban,Yes,Leisure,Online,Mass,45574.0,12,305.5,5,5,3,3,4,Definitely,Healthcare Access exceeded my expectations
+44,27.18,8,Urban,Yes,Family,Online,Premium,4424.0,14,275.4,5,3,4,5,3,Definitely,Healthcare Access exceeded my expectations
+68,16.25,2,Urban,Yes,Leisure,Hybrid,Mass,29728.0,10,273.0,4,3,4,2,5,Maybe,Healthcare Access is impressive and modern
+51,38.63,1,Urban,No,Business,Online,Premium,32626.0,14,305.9,3,4,2,4,3,Maybe,Healthcare Access exceeded my expectations
+38,50.71,1,Urban,No,Family,Online,Luxury,82405.0,17,497.0,5,4,2,5,6,Definitely,Healthcare Access exceeded my expectations
+43,30.7,6,Semi-Urban,No,Business,Online,Mass,89365.0,11,493.9,3,4,4,2,1,Unlikely,Healthcare Access is impressive and modern
+27,13.07,5,Rural,Yes,Leisure,Online,Premium,56362.0,23,491.2,3,3,3,4,6,Definitely,Healthcare Access is impressive and modern
+28,21.84,4,Urban,No,Business,Online,Luxury,47476.0,11,283.4,5,3,3,4,10,Unlikely,I am unsure about long term value of Healthcare Access
+35,58.97,5,Semi-Urban,No,Business,Online,Luxury,40728.0,18,172.7,3,3,2,3,5,Unlikely,Healthcare Access needs serious improvement
+58,11.11,2,Urban,Yes,Personal,Online,Premium,3610.0,15,288.9,4,1,3,2,3,Definitely,Healthcare Access feels overpriced for what it offers
+48,13.84,3,Urban,Yes,Leisure,Online,Luxury,72410.0,15,318.9,4,5,1,5,5,Definitely,Healthcare Access is impressive and modern
+47,59.46,1,Semi-Urban,No,Personal,Online,Premium,61121.0,24,169.5,4,4,1,3,8,Definitely,Healthcare Access feels overpriced for what it offers
+41,53.52,5,Rural,No,Family,Offline,Premium,59137.0,14,323.7,5,4,3,3,5,Unlikely,I am unsure about long term value of Healthcare Access
+64,43.89,4,Urban,No,Family,Offline,Mass,73196.0,14,318.6,5,2,2,5,5,Definitely,Healthcare Access needs serious improvement
+47,13.3,6,Semi-Urban,No,Personal,Hybrid,Premium,83669.0,15,453.7,3,4,4,5,8,Maybe,Healthcare Access needs serious improvement
+67,18.23,8,Rural,No,Business,Online,Premium,36279.0,14,134.0,2,5,4,3,4,Maybe,Healthcare Access needs serious improvement
+67,14.91,7,Semi-Urban,No,Business,Online,Premium,39523.0,8,354.9,5,2,4,5,6,Definitely,I am unsure about long term value of Healthcare Access
+62,39.7,7,Urban,No,Business,Offline,Mass,87812.0,19,236.4,4,3,5,5,2,Unlikely,Healthcare Access exceeded my expectations
+61,26.94,1,Urban,Yes,Personal,Online,Mass,60469.0,13,82.4,3,3,1,2,3,Unlikely,Healthcare Access needs serious improvement
+34,7.63,1,Rural,No,Family,Offline,Mass,76919.0,11,171.8,4,3,2,4,4,Definitely,Healthcare Access needs serious improvement
+41,21.02,3,Urban,Yes,Leisure,Online,Luxury,21498.0,14,47.5,1,4,2,1,6,Definitely,I am unsure about long term value of Healthcare Access
+34,52.34,5,Semi-Urban,Yes,Leisure,Online,Luxury,29903.0,23,173.3,3,3,4,5,8,Definitely,Healthcare Access exceeded my expectations
+69,48.78,3,Urban,Yes,Family,Online,Mass,36461.0,8,53.1,4,4,3,3,5,Unlikely,Healthcare Access needs serious improvement
+63,40.37,4,Semi-Urban,No,Business,Online,Mass,29890.0,11,464.2,4,3,2,3,5,Definitely,Healthcare Access needs serious improvement
+26,9.7,4,Urban,Yes,Personal,Online,Luxury,79814.0,14,68.8,3,2,1,5,5,Unlikely,Healthcare Access exceeded my expectations
+32,53.55,8,Semi-Urban,No,Leisure,Online,Mass,47013.0,15,412.3,4,5,4,5,5,Definitely,Healthcare Access is impressive and modern
+48,34.4,8,Urban,No,Leisure,Hybrid,Luxury,85921.0,11,454.9,5,2,3,4,6,Definitely,Healthcare Access is impressive and modern
+69,32.2,5,Semi-Urban,No,Family,Hybrid,Premium,30276.0,19,244.5,4,4,3,5,9,Maybe,Healthcare Access needs serious improvement
+49,56.37,1,Urban,Yes,Business,Offline,Premium,5278.0,13,45.9,4,1,5,5,1,Definitely,Healthcare Access feels overpriced for what it offers
+57,5.49,2,Urban,No,Family,Hybrid,Luxury,14149.0,21,306.0,4,5,4,5,7,Unlikely,Healthcare Access exceeded my expectations
+58,35.57,3,Semi-Urban,No,Personal,Offline,Mass,21102.0,12,132.7,4,5,1,5,9,Definitely,Healthcare Access exceeded my expectations
+23,48.52,7,Rural,Yes,Business,Online,Mass,58317.0,15,104.8,5,3,3,5,6,Unlikely,Healthcare Access feels overpriced for what it offers
+53,8.5,1,Rural,Yes,Business,Offline,Luxury,17936.0,14,292.0,3,2,3,5,7,Unlikely,Healthcare Access exceeded my expectations
+66,24.64,6,Urban,No,Business,Online,Luxury,35572.0,9,191.1,2,4,4,5,7,Unlikely,I am unsure about long term value of Healthcare Access
+32,58.76,4,Semi-Urban,Yes,Business,Offline,Premium,71994.0,17,370.6,4,3,1,5,5,Definitely,Healthcare Access exceeded my expectations
+32,16.65,7,Semi-Urban,Yes,Leisure,Online,Luxury,12979.0,12,303.8,2,4,3,5,3,Definitely,Healthcare Access exceeded my expectations
+31,34.21,4,Semi-Urban,No,Business,Hybrid,Luxury,9082.0,12,418.1,4,5,3,4,4,Definitely,Healthcare Access exceeded my expectations
+48,46.03,1,Semi-Urban,No,Business,Online,Mass,49517.0,11,48.0,3,4,5,4,2,Unlikely,Healthcare Access is impressive and modern
+55,26.47,1,Rural,No,Business,Online,Premium,63430.0,14,132.8,3,5,4,1,8,Definitely,I am unsure about long term value of Healthcare Access
+54,27.43,6,Urban,Yes,Family,Hybrid,Mass,82164.0,12,292.2,4,2,3,1,6,Definitely,Healthcare Access exceeded my expectations
+42,8.48,4,Semi-Urban,Yes,Business,Hybrid,Mass,60254.0,9,442.6,5,5,3,5,8,Unlikely,I am unsure about long term value of Healthcare Access
+59,15.46,3,Urban,Yes,Leisure,Hybrid,Luxury,85264.0,13,410.4,4,2,4,4,5,Definitely,I am unsure about long term value of Healthcare Access
+43,53.43,3,Rural,No,Personal,Offline,Mass,23518.0,8,346.2,3,2,4,5,8,Definitely,I am unsure about long term value of Healthcare Access
+32,50.01,1,Semi-Urban,No,Leisure,Offline,Mass,32080.0,16,295.6,5,5,4,5,5,Maybe,Healthcare Access feels overpriced for what it offers
+39,21.76,5,Semi-Urban,Yes,Business,Online,Premium,75859.0,10,323.1,4,4,4,4,3,Unlikely,Healthcare Access exceeded my expectations
+51,25.99,4,Rural,No,Business,Online,Mass,73373.0,17,122.5,3,4,4,2,6,Definitely,Healthcare Access is impressive and modern
+33,29.22,2,Semi-Urban,No,Leisure,Online,Mass,60510.0,14,305.7,4,5,1,4,9,Unlikely,Healthcare Access is impressive and modern
+39,24.03,4,Semi-Urban,Yes,Business,Online,Mass,46530.0,16,257.0,3,4,2,2,6,Definitely,Healthcare Access is impressive and modern
+56,40.97,8,Rural,No,Personal,Online,Luxury,3559.0,15,204.5,3,2,2,4,6,Unlikely,Healthcare Access is impressive and modern
+42,5.71,3,Urban,Yes,Business,Online,Luxury,26679.0,12,446.1,5,4,3,4,6,Definitely,Healthcare Access exceeded my expectations
+64,53.41,3,Rural,No,Leisure,Online,Luxury,15934.0,18,418.1,4,1,2,5,6,Definitely,Healthcare Access is impressive and modern
+50,21.54,2,Urban,No,Personal,Online,Luxury,6503.0,14,56.8,4,2,2,4,4,Unlikely,I am unsure about long term value of Healthcare Access
+24,52.98,3,Semi-Urban,No,Personal,Offline,Luxury,70295.0,17,493.2,3,4,2,2,6,Definitely,Healthcare Access feels overpriced for what it offers
+33,29.99,2,Urban,Yes,Personal,Online,Mass,13555.0,17,130.4,3,5,5,3,6,Definitely,Healthcare Access needs serious improvement
+40,47.7,3,Urban,Yes,Family,Online,Luxury,33452.0,11,123.4,5,4,2,5,8,Definitely,Healthcare Access is impressive and modern
+59,50.42,6,Semi-Urban,Yes,Leisure,Online,Premium,88016.0,14,473.0,3,3,1,4,3,Maybe,Healthcare Access needs serious improvement
+26,21.57,2,Urban,Yes,Personal,Online,Mass,38006.0,15,233.5,4,5,1,4,7,Definitely,Healthcare Access needs serious improvement
+64,40.22,5,Rural,No,Leisure,Hybrid,Premium,14453.0,9,406.6,4,5,2,3,7,Definitely,Healthcare Access needs serious improvement
+32,38.41,4,Urban,No,Leisure,Offline,Premium,62699.0,8,158.3,1,3,5,5,5,Definitely,I am unsure about long term value of Healthcare Access
+36,31.18,8,Urban,No,Leisure,Online,Mass,73275.0,12,439.1,5,2,5,5,6,Definitely,Healthcare Access is impressive and modern
+65,30.83,8,Rural,Yes,Personal,Online,Mass,26565.0,8,419.5,2,2,3,3,7,Maybe,Healthcare Access exceeded my expectations
+37,21.79,3,Semi-Urban,No,Business,Online,Premium,73223.0,23,269.3,4,3,3,5,6,Unlikely,I am unsure about long term value of Healthcare Access
+28,22.06,1,Semi-Urban,Yes,Leisure,Offline,Luxury,25894.0,9,358.4,5,1,4,3,5,Maybe,Healthcare Access exceeded my expectations
+53,35.15,2,Urban,No,Personal,Hybrid,Premium,62994.0,15,482.7,4,3,1,5,8,Definitely,Healthcare Access is impressive and modern
+64,6.77,2,Semi-Urban,Yes,Personal,Online,Luxury,12983.0,16,237.0,5,4,2,4,10,Maybe,I am unsure about long term value of Healthcare Access
+59,56.35,2,Urban,No,Leisure,Offline,Mass,39648.0,23,257.2,4,4,3,4,4,Definitely,Healthcare Access needs serious improvement
+32,40.75,3,Rural,Yes,Business,Online,Premium,47803.0,19,366.9,4,5,4,3,9,Unlikely,I am unsure about long term value of Healthcare Access
+46,29.39,4,Semi-Urban,Yes,Business,Offline,Mass,65825.0,11,205.5,5,3,4,5,6,Maybe,I am unsure about long term value of Healthcare Access
+39,8.4,1,Rural,No,Leisure,Online,Luxury,59203.0,12,481.4,5,1,2,3,6,Definitely,Healthcare Access is impressive and modern
+33,39.65,2,Semi-Urban,No,Business,Online,Luxury,77094.0,18,39.4,4,3,5,5,9,Definitely,Healthcare Access needs serious improvement
+30,5.98,7,Semi-Urban,No,Family,Online,Premium,18218.0,17,213.6,4,5,3,2,9,Maybe,Healthcare Access needs serious improvement
+54,42.39,2,Semi-Urban,Yes,Business,Online,Luxury,60190.0,16,362.6,4,1,4,3,4,Maybe,Healthcare Access feels overpriced for what it offers
+51,8.99,2,Semi-Urban,Yes,Personal,Offline,Luxury,13242.0,17,226.1,3,2,2,4,5,Definitely,Healthcare Access feels overpriced for what it offers
+47,41.09,6,Urban,Yes,Family,Hybrid,Mass,44071.0,17,144.4,2,4,1,5,9,Definitely,Healthcare Access exceeded my expectations
+23,27.32,2,Urban,No,Business,Online,Premium,48161.0,23,218.5,3,3,1,4,6,Maybe,Healthcare Access feels overpriced for what it offers
+64,41.44,1,Urban,Yes,Family,Online,Luxury,4399.0,15,443.1,5,4,5,3,5,Definitely,Healthcare Access is impressive and modern
+25,12.62,2,Semi-Urban,No,Leisure,Online,Premium,8191.0,13,282.6,4,3,1,5,10,Definitely,I am unsure about long term value of Healthcare Access
+25,11.46,6,Semi-Urban,No,Personal,Online,Premium,75856.0,14,180.9,5,4,3,4,4,Definitely,Healthcare Access needs serious improvement
+57,18.61,1,Semi-Urban,No,Business,Online,Premium,27237.0,11,342.3,4,4,2,3,7,Definitely,I am unsure about long term value of Healthcare Access
+27,27.63,1,Rural,No,Business,Online,Premium,32461.0,18,313.7,3,1,2,4,6,Definitely,Healthcare Access is impressive and modern
+60,18.92,2,Semi-Urban,No,Business,Offline,Mass,58356.0,14,289.0,3,3,2,5,6,Maybe,I am unsure about long term value of Healthcare Access
+68,9.51,5,Urban,Yes,Business,Offline,Premium,21423.0,20,207.8,4,3,1,5,3,Definitely,Healthcare Access needs serious improvement
+62,22.88,8,Urban,Yes,Business,Online,Luxury,18972.0,14,54.7,5,5,1,5,4,Maybe,Healthcare Access feels overpriced for what it offers
+33,43.82,1,Urban,Yes,Leisure,Offline,Luxury,39096.0,12,318.0,5,4,1,5,3,Maybe,Healthcare Access exceeded my expectations
+54,37.07,8,Urban,No,Family,Hybrid,Premium,7192.0,10,221.5,5,4,1,5,8,Definitely,Healthcare Access needs serious improvement
+56,57.98,5,Urban,Yes,Business,Online,Premium,82693.0,14,225.8,5,3,1,4,7,Unlikely,Healthcare Access needs serious improvement
+54,28.98,1,Semi-Urban,No,Leisure,Online,Mass,84730.0,13,132.4,4,4,3,1,8,Unlikely,Healthcare Access needs serious improvement
+23,23.3,6,Urban,Yes,Personal,Offline,Luxury,41442.0,8,139.7,3,1,1,5,7,Maybe,Healthcare Access needs serious improvement
+30,43.15,7,Urban,No,Leisure,Offline,Premium,20413.0,13,398.0,3,1,2,5,3,Maybe,Healthcare Access is impressive and modern
+63,27.66,3,Rural,No,Business,Online,Premium,43411.0,14,250.1,4,3,3,3,10,Definitely,Healthcare Access needs serious improvement
+55,39.01,2,Rural,No,Business,Hybrid,Mass,10794.0,13,72.5,3,4,1,4,4,Unlikely,I am unsure about long term value of Healthcare Access
+57,57.05,3,Semi-Urban,Yes,Family,Online,Mass,37006.0,9,42.0,5,4,5,5,5,Unlikely,Healthcare Access is impressive and modern
+26,32.46,8,Urban,No,Leisure,Online,Mass,8483.0,18,127.9,3,3,3,4,7,Maybe,Healthcare Access feels overpriced for what it offers
+41,32.4,8,Rural,No,Personal,Offline,Luxury,64143.0,10,254.0,2,5,5,5,3,Definitely,I am unsure about long term value of Healthcare Access
+65,47.63,1,Semi-Urban,Yes,Business,Hybrid,Premium,26263.0,20,316.3,5,3,1,4,3,Maybe,I am unsure about long term value of Healthcare Access
+25,46.58,3,Urban,No,Business,Hybrid,Premium,47818.0,19,89.0,4,4,1,4,9,Definitely,I am unsure about long term value of Healthcare Access
+23,33.39,2,Semi-Urban,Yes,Leisure,Hybrid,Luxury,3191.0,11,228.3,3,5,3,1,5,Definitely,I am unsure about long term value of Healthcare Access
+40,8.56,8,Urban,Yes,Family,Online,Mass,48168.0,17,54.8,5,4,2,5,7,Maybe,Healthcare Access is impressive and modern
+50,58.94,7,Rural,Yes,Personal,Online,Mass,2288.0,12,38.1,4,4,3,3,9,Unlikely,Healthcare Access feels overpriced for what it offers
+32,25.75,2,Rural,Yes,Leisure,Online,Mass,83417.0,18,434.4,4,3,3,5,10,Definitely,Healthcare Access feels overpriced for what it offers
+55,22.42,7,Urban,No,Business,Online,Premium,46102.0,12,336.0,5,1,3,3,4,Definitely,Healthcare Access needs serious improvement
+52,58.99,1,Semi-Urban,Yes,Personal,Offline,Luxury,10806.0,9,394.9,3,5,4,3,3,Definitely,Healthcare Access exceeded my expectations
+39,52.97,1,Urban,No,Personal,Online,Luxury,32013.0,14,107.3,5,5,1,4,8,Unlikely,Healthcare Access is impressive and modern
+35,23.16,5,Rural,No,Business,Online,Premium,6054.0,14,174.6,4,3,3,5,4,Maybe,Healthcare Access feels overpriced for what it offers
+30,21.96,4,Urban,No,Business,Offline,Premium,48719.0,19,233.0,3,4,2,4,7,Maybe,Healthcare Access is impressive and modern
+46,44.65,7,Urban,Yes,Leisure,Online,Luxury,12766.0,8,335.9,4,3,3,4,6,Definitely,Healthcare Access is impressive and modern
+26,23.39,8,Urban,No,Personal,Online,Premium,43633.0,14,276.7,5,5,1,4,7,Definitely,Healthcare Access needs serious improvement
+68,18.83,8,Urban,Yes,Leisure,Hybrid,Mass,28885.0,16,284.7,5,5,3,5,7,Definitely,Healthcare Access feels overpriced for what it offers
+67,58.88,7,Rural,No,Leisure,Offline,Luxury,69019.0,17,95.3,5,1,3,5,9,Definitely,Healthcare Access exceeded my expectations
+46,36.11,3,Rural,No,Business,Offline,Luxury,44438.0,13,247.9,3,4,5,3,4,Maybe,Healthcare Access exceeded my expectations
+22,46.94,5,Urban,Yes,Personal,Offline,Premium,76640.0,11,415.4,3,4,4,5,7,Definitely,Healthcare Access exceeded my expectations
+69,44.22,7,Urban,Yes,Leisure,Online,Premium,84839.0,19,264.5,4,1,1,5,5,Definitely,I am unsure about long term value of Healthcare Access
+68,46.55,8,Semi-Urban,No,Personal,Online,Premium,87318.0,15,115.9,4,3,3,5,5,Maybe,Healthcare Access feels overpriced for what it offers
+52,54.69,3,Semi-Urban,Yes,Business,Online,Premium,24897.0,14,218.4,5,2,4,2,1,Definitely,I am unsure about long term value of Healthcare Access
+23,32.54,8,Urban,Yes,Business,Hybrid,Mass,69546.0,12,382.3,4,5,3,4,7,Definitely,I am unsure about long term value of Healthcare Access
+39,46.44,2,Semi-Urban,Yes,Leisure,Online,Premium,40554.0,12,84.8,3,1,2,5,10,Definitely,I am unsure about long term value of Healthcare Access
+56,48.82,1,Urban,No,Business,Offline,Mass,39503.0,16,298.6,3,5,2,3,8,Maybe,Healthcare Access needs serious improvement
+40,57.05,3,Urban,Yes,Business,Online,Premium,78404.0,14,483.4,2,5,2,3,4,Definitely,Healthcare Access needs serious improvement
+50,44.22,4,Semi-Urban,No,Leisure,Offline,Mass,14819.0,9,202.5,2,1,1,3,7,Definitely,Healthcare Access is impressive and modern
+57,54.09,8,Semi-Urban,No,Leisure,Online,Luxury,44047.0,18,40.9,4,4,4,5,5,Maybe,Healthcare Access is impressive and modern
+65,10.23,2,Semi-Urban,No,Business,Offline,Mass,54174.0,10,323.9,3,4,3,5,8,Maybe,Healthcare Access feels overpriced for what it offers
+40,11.94,6,Semi-Urban,No,Business,Hybrid,Premium,7819.0,17,42.6,5,5,2,3,9,Definitely,Healthcare Access feels overpriced for what it offers
+54,13.71,2,Semi-Urban,No,Leisure,Offline,Mass,78077.0,20,112.0,4,4,3,5,5,Definitely,Healthcare Access needs serious improvement
+64,12.96,5,Urban,Yes,Leisure,Offline,Mass,29662.0,13,43.2,5,4,2,4,0,Unlikely,Healthcare Access is impressive and modern
+37,9.81,4,Semi-Urban,Yes,Family,Online,Premium,59800.0,14,101.9,4,5,2,5,5,Definitely,Healthcare Access is impressive and modern
+62,11.74,2,Rural,No,Business,Online,Mass,83671.0,15,430.4,4,2,4,4,4,Maybe,I am unsure about long term value of Healthcare Access
+43,59.78,4,Semi-Urban,No,Personal,Online,Premium,65338.0,17,372.7,4,3,4,4,7,Unlikely,Healthcare Access exceeded my expectations
+61,19.97,1,Semi-Urban,No,Business,Online,Mass,79969.0,8,184.1,5,5,3,5,5,Definitely,Healthcare Access exceeded my expectations
+29,31.29,6,Urban,Yes,Leisure,Offline,Premium,8120.0,18,450.6,5,2,4,4,1,Definitely,Healthcare Access exceeded my expectations
+47,50.19,7,Urban,No,Personal,Hybrid,Luxury,45361.0,16,339.3,4,5,2,3,6,Definitely,Healthcare Access needs serious improvement
+37,11.51,4,Urban,No,Family,Online,Luxury,51705.0,18,234.9,4,4,1,2,9,Definitely,Healthcare Access exceeded my expectations
+61,22.46,5,Semi-Urban,Yes,Business,Offline,Premium,62635.0,14,52.8,3,3,3,5,6,Definitely,Healthcare Access exceeded my expectations
+66,13.76,5,Urban,No,Leisure,Offline,Luxury,12284.0,13,370.7,4,3,2,3,5,Definitely,I am unsure about long term value of Healthcare Access
+37,8.44,3,Rural,Yes,Business,Hybrid,Luxury,59797.0,16,200.3,5,2,4,5,3,Maybe,Healthcare Access feels overpriced for what it offers
+69,57.84,8,Semi-Urban,No,Family,Offline,Premium,14847.0,13,165.4,2,1,2,4,5,Unlikely,Healthcare Access needs serious improvement
+22,52.21,6,Semi-Urban,Yes,Family,Offline,Luxury,7950.0,13,158.4,4,3,3,2,5,Definitely,Healthcare Access is impressive and modern
+35,53.36,1,Semi-Urban,Yes,Business,Online,Premium,43300.0,12,23.7,4,5,3,5,10,Maybe,I am unsure about long term value of Healthcare Access
+31,52.78,1,Semi-Urban,No,Business,Online,Mass,54833.0,8,376.5,5,4,4,5,1,Definitely,Healthcare Access exceeded my expectations
+57,13.5,4,Semi-Urban,No,Business,Online,Luxury,86314.0,14,89.7,1,3,4,2,4,Definitely,Healthcare Access is impressive and modern
+61,48.17,5,Semi-Urban,Yes,Business,Hybrid,Mass,63479.0,12,269.9,2,3,1,2,2,Definitely,I am unsure about long term value of Healthcare Access
+29,45.03,5,Urban,Yes,Business,Online,Premium,54042.0,13,27.7,1,2,2,5,9,Maybe,Healthcare Access needs serious improvement
+34,55.9,5,Urban,Yes,Business,Online,Premium,20882.0,11,321.4,3,5,4,4,6,Unlikely,Healthcare Access exceeded my expectations
+28,17.06,7,Rural,No,Leisure,Hybrid,Premium,15380.0,11,197.4,4,1,2,5,8,Unlikely,Healthcare Access needs serious improvement
+63,27.77,1,Semi-Urban,Yes,Leisure,Hybrid,Premium,55440.0,13,322.8,2,3,3,4,7,Definitely,I am unsure about long term value of Healthcare Access
+32,21.22,5,Semi-Urban,No,Personal,Offline,Mass,21620.0,17,63.1,4,4,1,4,9,Definitely,Healthcare Access is impressive and modern
+27,19.19,3,Semi-Urban,No,Business,Online,Premium,64181.0,15,147.8,5,4,3,3,1,Definitely,Healthcare Access feels overpriced for what it offers
+23,40.88,2,Semi-Urban,No,Business,Online,Mass,12074.0,12,72.9,1,3,2,4,4,Definitely,Healthcare Access exceeded my expectations
+46,14.02,5,Semi-Urban,Yes,Family,Online,Mass,31888.0,15,330.1,1,5,4,3,7,Definitely,Healthcare Access needs serious improvement
+23,30.56,3,Rural,Yes,Business,Offline,Luxury,70032.0,15,72.1,5,4,2,5,7,Definitely,Healthcare Access is impressive and modern
+66,40.57,3,Semi-Urban,Yes,Business,Online,Luxury,75131.0,9,316.2,4,3,2,4,7,Definitely,Healthcare Access is impressive and modern
+24,12.17,2,Rural,Yes,Business,Online,Premium,32381.0,12,84.7,2,5,1,5,7,Definitely,Healthcare Access feels overpriced for what it offers
+52,19.13,8,Semi-Urban,No,Personal,Offline,Mass,20191.0,12,472.8,3,2,3,5,7,Definitely,I am unsure about long term value of Healthcare Access
+66,58.21,1,Rural,Yes,Family,Online,Premium,86322.0,19,219.9,5,3,5,5,9,Maybe,Healthcare Access feels overpriced for what it offers
+34,48.75,5,Semi-Urban,Yes,Personal,Online,Premium,68975.0,15,80.8,3,5,1,4,9,Maybe,Healthcare Access feels overpriced for what it offers
+23,42.23,6,Semi-Urban,No,Business,Offline,Luxury,73021.0,11,40.1,5,5,1,3,1,Unlikely,I am unsure about long term value of Healthcare Access
+33,52.08,3,Urban,No,Leisure,Offline,Mass,21602.0,13,178.1,3,3,2,4,6,Definitely,I am unsure about long term value of Healthcare Access
+28,5.77,8,Semi-Urban,Yes,Business,Hybrid,Premium,39351.0,13,447.9,3,2,4,5,6,Definitely,I am unsure about long term value of Healthcare Access
+58,5.33,3,Urban,No,Business,Online,Premium,8002.0,16,89.0,5,4,5,5,5,Definitely,Healthcare Access is impressive and modern
+22,13.47,7,Semi-Urban,No,Personal,Online,Luxury,11627.0,18,399.6,1,5,1,3,1,Definitely,Healthcare Access is impressive and modern
+58,32.24,2,Semi-Urban,No,Business,Online,Mass,21444.0,11,220.3,3,4,4,5,6,Maybe,Healthcare Access exceeded my expectations
+66,36.35,6,Urban,No,Business,Online,Mass,28685.0,15,405.4,4,4,2,2,10,Definitely,Healthcare Access exceeded my expectations
+51,11.25,8,Semi-Urban,Yes,Personal,Hybrid,Luxury,89752.0,13,439.7,4,3,1,4,2,Maybe,Healthcare Access feels overpriced for what it offers
+59,8.98,3,Semi-Urban,No,Business,Hybrid,Premium,39144.0,11,499.0,1,4,1,4,8,Maybe,Healthcare Access feels overpriced for what it offers
+47,50.56,5,Semi-Urban,No,Family,Hybrid,Luxury,63413.0,20,52.7,4,5,5,4,4,Maybe,Healthcare Access exceeded my expectations
+37,30.55,1,Semi-Urban,No,Business,Online,Luxury,81591.0,18,402.2,3,3,4,4,7,Maybe,Healthcare Access needs serious improvement
+55,59.59,3,Semi-Urban,Yes,Business,Offline,Premium,23653.0,13,53.5,1,2,2,2,5,Maybe,Healthcare Access feels overpriced for what it offers
+66,17.61,1,Semi-Urban,Yes,Leisure,Online,Mass,14736.0,15,171.1,3,3,5,5,5,Definitely,Healthcare Access needs serious improvement
+44,40.6,3,Semi-Urban,Yes,Family,Online,Premium,23407.0,7,330.2,5,3,1,5,9,Maybe,Healthcare Access needs serious improvement
+21,49.24,3,Rural,No,Personal,Online,Luxury,79653.0,16,234.7,3,3,2,4,10,Definitely,I am unsure about long term value of Healthcare Access
+49,53.0,8,Urban,No,Leisure,Online,Luxury,60580.0,15,291.3,4,1,3,3,5,Definitely,Healthcare Access is impressive and modern
+46,21.85,5,Semi-Urban,No,Family,Online,Premium,41717.0,13,483.8,3,3,5,3,7,Definitely,Healthcare Access exceeded my expectations
+64,15.63,8,Urban,Yes,Business,Online,Premium,74185.0,12,413.0,2,5,3,2,7,Definitely,Healthcare Access is impressive and modern
+55,17.44,1,Rural,Yes,Family,Hybrid,Premium,22832.0,16,194.6,3,3,4,4,2,Definitely,Healthcare Access exceeded my expectations
+64,41.67,6,Semi-Urban,No,Business,Offline,Premium,23047.0,13,308.0,4,5,5,4,1,Unlikely,Healthcare Access is impressive and modern
+44,33.73,4,Semi-Urban,No,Business,Offline,Luxury,51915.0,19,43.3,3,4,1,4,8,Definitely,Healthcare Access exceeded my expectations
+66,37.94,5,Urban,No,Business,Online,Luxury,71526.0,17,237.4,4,3,2,4,5,Definitely,Healthcare Access is impressive and modern
+53,6.13,1,Rural,No,Personal,Offline,Premium,24841.0,13,312.0,5,3,1,5,5,Definitely,I am unsure about long term value of Healthcare Access
+46,26.5,1,Rural,Yes,Leisure,Offline,Premium,20483.0,22,363.1,2,4,4,2,10,Unlikely,Healthcare Access needs serious improvement
+57,22.06,1,Urban,No,Business,Online,Luxury,43710.0,13,452.7,4,3,3,4,2,Definitely,Healthcare Access exceeded my expectations
+59,52.51,7,Semi-Urban,No,Business,Offline,Premium,13810.0,20,155.9,1,5,1,5,4,Definitely,Healthcare Access needs serious improvement
+46,47.69,4,Rural,Yes,Business,Hybrid,Premium,67807.0,24,453.0,1,2,2,5,9,Definitely,Healthcare Access exceeded my expectations
+58,28.63,5,Semi-Urban,No,Leisure,Offline,Premium,52805.0,10,337.5,2,1,3,5,6,Maybe,Healthcare Access exceeded my expectations
+58,39.68,7,Semi-Urban,Yes,Leisure,Online,Mass,47104.0,15,57.3,4,2,3,4,7,Maybe,I am unsure about long term value of Healthcare Access
+31,7.62,4,Semi-Urban,No,Family,Online,Mass,78759.0,16,202.6,1,4,4,5,1,Maybe,Healthcare Access is impressive and modern
+49,40.05,3,Semi-Urban,No,Business,Online,Mass,66465.0,15,248.8,4,5,1,5,9,Maybe,Healthcare Access exceeded my expectations
+49,10.35,2,Semi-Urban,Yes,Business,Hybrid,Mass,15136.0,14,189.2,1,2,3,5,3,Definitely,Healthcare Access is impressive and modern
+23,44.27,4,Semi-Urban,No,Leisure,Hybrid,Premium,38998.0,17,75.7,4,4,1,2,4,Definitely,I am unsure about long term value of Healthcare Access
+29,36.56,3,Semi-Urban,No,Personal,Online,Mass,30272.0,14,284.8,4,2,4,4,3,Unlikely,Healthcare Access feels overpriced for what it offers
+55,21.53,4,Rural,No,Family,Offline,Premium,72582.0,14,83.2,3,4,3,5,6,Definitely,Healthcare Access needs serious improvement
+26,25.4,1,Rural,Yes,Business,Online,Mass,65275.0,12,459.2,4,1,4,5,8,Definitely,Healthcare Access exceeded my expectations
+29,9.96,2,Semi-Urban,No,Business,Online,Premium,43537.0,10,435.3,3,4,1,4,4,Maybe,I am unsure about long term value of Healthcare Access
+28,22.75,2,Semi-Urban,Yes,Personal,Hybrid,Premium,74481.0,14,248.1,3,4,3,3,3,Maybe,Healthcare Access is impressive and modern
+47,58.18,6,Semi-Urban,Yes,Family,Online,Luxury,38086.0,12,52.5,5,1,4,4,6,Definitely,Healthcare Access exceeded my expectations
+54,31.74,3,Urban,Yes,Business,Online,Premium,72713.0,14,285.1,3,4,4,4,10,Definitely,Healthcare Access is impressive and modern
+44,31.08,7,Semi-Urban,Yes,Personal,Online,Mass,4823.0,13,304.3,5,4,4,4,0,Definitely,Healthcare Access feels overpriced for what it offers
+68,39.61,7,Semi-Urban,No,Family,Online,Premium,13846.0,16,446.4,3,4,2,5,6,Maybe,Healthcare Access exceeded my expectations
+25,31.64,6,Urban,Yes,Business,Hybrid,Luxury,68526.0,18,52.4,3,4,2,3,7,Definitely,Healthcare Access needs serious improvement
+30,24.55,4,Semi-Urban,Yes,Leisure,Hybrid,Premium,12066.0,12,352.2,2,4,2,4,8,Definitely,Healthcare Access exceeded my expectations

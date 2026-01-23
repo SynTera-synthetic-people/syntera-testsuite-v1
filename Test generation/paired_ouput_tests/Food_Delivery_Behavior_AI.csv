@@ -1,0 +1,263 @@
+﻿Age,Monthly_Income_Lakh,Household_Size,Area_Type,Current_User,Primary_Purpose,Preferred_Channel,Brand_Segment,Monthly_Spend,Usage_Frequency_per_Month,Travel_Distance_km_per_Week,Satisfaction_1to5,Ease_of_Use_1to5,Value_for_Money_1to5,Trust_in_Brand_1to5,Recommend_NPS_0to10,Future_Intent,Open_Ended_Feedback
+27,23.55,4,Semi-Urban,No,Business,Offline,Mass,10550.0,13,419.1,4,3,3,3,7,Unlikely,Food Delivery Behavior feels overpriced for what it offers
+43,13.0,1,Semi-Urban,No,Business,Online,Luxury,70779.0,11,322.2,4,4,5,5,8,Definitely,I am unsure about long term value of Food Delivery Behavior
+55,38.2,7,Rural,No,Business,Online,Premium,40716.0,13,154.0,5,5,3,4,2,Definitely,I am unsure about long term value of Food Delivery Behavior
+49,40.1,6,Semi-Urban,No,Leisure,Online,Premium,37691.0,15,383.4,2,3,1,3,5,Unlikely,I am unsure about long term value of Food Delivery Behavior
+42,29.94,2,Semi-Urban,Yes,Leisure,Online,Luxury,82993.0,15,85.2,5,2,5,5,4,Unlikely,I am unsure about long term value of Food Delivery Behavior
+36,44.61,8,Urban,Yes,Business,Offline,Mass,89293.0,11,329.7,4,3,3,4,5,Definitely,Food Delivery Behavior needs serious improvement
+49,52.72,6,Semi-Urban,No,Leisure,Online,Mass,69266.0,12,495.0,3,5,2,5,5,Definitely,I am unsure about long term value of Food Delivery Behavior
+26,47.71,5,Urban,No,Business,Hybrid,Premium,71748.0,9,92.0,3,2,3,5,5,Unlikely,Food Delivery Behavior needs serious improvement
+38,18.29,1,Urban,No,Business,Online,Luxury,20332.0,14,88.1,5,3,2,1,5,Unlikely,Food Delivery Behavior is impressive and modern
+49,22.62,4,Semi-Urban,No,Business,Online,Mass,18916.0,22,244.6,4,3,1,5,8,Maybe,Food Delivery Behavior needs serious improvement
+45,25.92,7,Semi-Urban,No,Leisure,Online,Mass,88300.0,5,328.5,4,5,4,5,7,Definitely,Food Delivery Behavior feels overpriced for what it offers
+65,16.21,6,Rural,Yes,Leisure,Online,Premium,63168.0,15,32.7,3,4,2,4,5,Maybe,Food Delivery Behavior is impressive and modern
+22,24.87,2,Urban,Yes,Personal,Hybrid,Luxury,62430.0,16,259.8,3,4,4,5,3,Definitely,Food Delivery Behavior feels overpriced for what it offers
+64,18.09,8,Semi-Urban,Yes,Business,Hybrid,Premium,27185.0,13,59.9,4,1,5,4,6,Unlikely,Food Delivery Behavior exceeded my expectations
+52,59.77,6,Urban,No,Leisure,Online,Premium,80010.0,21,135.8,3,4,3,4,9,Definitely,Food Delivery Behavior exceeded my expectations
+56,48.08,3,Rural,Yes,Family,Offline,Premium,5911.0,17,362.0,3,3,3,5,3,Maybe,Food Delivery Behavior needs serious improvement
+52,52.3,4,Semi-Urban,No,Family,Online,Mass,26164.0,11,374.7,3,4,5,5,8,Definitely,Food Delivery Behavior feels overpriced for what it offers
+61,55.72,5,Urban,No,Personal,Online,Luxury,17852.0,11,370.3,2,4,3,2,7,Definitely,Food Delivery Behavior exceeded my expectations
+40,41.58,2,Semi-Urban,No,Business,Online,Premium,64576.0,25,51.3,4,4,2,4,7,Maybe,Food Delivery Behavior exceeded my expectations
+57,14.68,4,Rural,Yes,Business,Hybrid,Luxury,64951.0,11,397.6,3,5,5,5,9,Definitely,Food Delivery Behavior exceeded my expectations
+62,46.72,1,Rural,Yes,Personal,Online,Premium,49056.0,18,227.5,5,3,1,2,10,Unlikely,Food Delivery Behavior is impressive and modern
+58,5.86,1,Urban,Yes,Business,Online,Mass,2463.0,14,248.1,4,3,2,5,4,Maybe,Food Delivery Behavior is impressive and modern
+53,11.23,1,Semi-Urban,No,Leisure,Online,Premium,78890.0,13,221.5,4,4,2,4,8,Definitely,I am unsure about long term value of Food Delivery Behavior
+25,6.63,8,Semi-Urban,Yes,Family,Hybrid,Luxury,86092.0,6,431.4,4,4,4,4,7,Maybe,Food Delivery Behavior feels overpriced for what it offers
+26,12.45,4,Semi-Urban,No,Personal,Offline,Premium,19803.0,13,346.4,4,2,5,3,6,Maybe,Food Delivery Behavior exceeded my expectations
+42,46.36,5,Semi-Urban,No,Leisure,Online,Premium,76116.0,10,260.0,4,1,3,3,7,Definitely,Food Delivery Behavior feels overpriced for what it offers
+41,53.7,1,Semi-Urban,Yes,Leisure,Hybrid,Premium,87649.0,9,420.5,3,4,2,4,10,Definitely,I am unsure about long term value of Food Delivery Behavior
+39,20.34,4,Rural,Yes,Family,Hybrid,Mass,30774.0,8,406.6,1,2,2,4,6,Definitely,Food Delivery Behavior needs serious improvement
+63,11.55,4,Rural,No,Business,Offline,Luxury,18285.0,20,22.4,4,5,3,4,9,Definitely,I am unsure about long term value of Food Delivery Behavior
+35,20.01,7,Semi-Urban,No,Business,Hybrid,Premium,88024.0,16,249.9,2,4,1,3,7,Definitely,Food Delivery Behavior exceeded my expectations
+54,40.59,5,Semi-Urban,No,Family,Offline,Premium,7257.0,7,40.3,2,5,3,4,6,Unlikely,Food Delivery Behavior needs serious improvement
+67,24.26,2,Semi-Urban,Yes,Leisure,Online,Premium,26285.0,11,167.4,4,5,3,5,7,Maybe,Food Delivery Behavior needs serious improvement
+27,57.86,2,Urban,Yes,Business,Online,Luxury,67299.0,13,405.8,4,4,4,4,7,Definitely,I am unsure about long term value of Food Delivery Behavior
+37,12.2,4,Semi-Urban,Yes,Business,Online,Mass,56327.0,13,473.1,5,3,3,4,6,Maybe,Food Delivery Behavior exceeded my expectations
+64,59.47,2,Semi-Urban,No,Family,Hybrid,Premium,62237.0,7,136.2,5,3,1,1,7,Maybe,Food Delivery Behavior needs serious improvement
+64,5.68,8,Urban,Yes,Leisure,Hybrid,Luxury,64312.0,16,30.3,3,5,3,4,7,Definitely,I am unsure about long term value of Food Delivery Behavior
+25,29.84,3,Rural,No,Family,Online,Mass,62381.0,9,213.1,5,4,1,5,8,Definitely,I am unsure about long term value of Food Delivery Behavior
+59,18.85,8,Rural,No,Family,Online,Luxury,32117.0,9,180.9,5,2,2,4,5,Maybe,Food Delivery Behavior exceeded my expectations
+22,36.15,5,Rural,No,Family,Hybrid,Premium,29412.0,14,344.9,3,4,2,5,0,Definitely,I am unsure about long term value of Food Delivery Behavior
+47,10.31,4,Semi-Urban,Yes,Family,Offline,Premium,39705.0,8,257.6,5,3,1,4,7,Unlikely,I am unsure about long term value of Food Delivery Behavior
+65,53.17,2,Semi-Urban,No,Leisure,Online,Premium,73076.0,14,211.4,4,1,1,2,6,Definitely,I am unsure about long term value of Food Delivery Behavior
+44,12.51,6,Rural,No,Personal,Online,Luxury,84568.0,16,130.2,2,3,1,3,2,Maybe,Food Delivery Behavior feels overpriced for what it offers
+61,37.31,2,Urban,Yes,Business,Online,Luxury,42062.0,11,417.7,2,2,2,5,7,Maybe,Food Delivery Behavior is impressive and modern
+67,6.83,5,Semi-Urban,Yes,Leisure,Hybrid,Premium,9547.0,14,139.2,4,5,2,4,9,Definitely,Food Delivery Behavior feels overpriced for what it offers
+48,22.1,8,Rural,No,Business,Hybrid,Premium,84570.0,16,46.3,4,2,1,5,6,Definitely,I am unsure about long term value of Food Delivery Behavior
+67,13.23,8,Semi-Urban,No,Family,Hybrid,Premium,9078.0,13,291.0,5,3,2,4,9,Maybe,Food Delivery Behavior is impressive and modern
+21,58.78,6,Rural,Yes,Business,Online,Premium,16002.0,14,172.3,3,4,3,3,8,Unlikely,Food Delivery Behavior needs serious improvement
+41,5.66,1,Semi-Urban,No,Business,Hybrid,Mass,78356.0,6,362.0,4,5,4,5,3,Maybe,Food Delivery Behavior feels overpriced for what it offers
+48,24.38,2,Urban,Yes,Personal,Online,Luxury,50530.0,8,58.8,3,3,2,4,8,Unlikely,Food Delivery Behavior feels overpriced for what it offers
+23,21.65,6,Urban,Yes,Family,Online,Luxury,33036.0,14,483.8,4,4,3,5,6,Definitely,Food Delivery Behavior feels overpriced for what it offers
+50,41.16,5,Semi-Urban,Yes,Business,Online,Luxury,83920.0,11,109.7,5,3,3,4,9,Definitely,Food Delivery Behavior exceeded my expectations
+21,8.1,6,Urban,No,Business,Hybrid,Premium,86525.0,20,191.4,4,2,4,5,4,Maybe,I am unsure about long term value of Food Delivery Behavior
+65,49.58,7,Semi-Urban,No,Business,Offline,Luxury,31107.0,16,250.9,4,3,1,5,3,Definitely,Food Delivery Behavior needs serious improvement
+67,30.66,1,Urban,Yes,Family,Online,Luxury,78421.0,13,447.3,5,4,3,4,4,Definitely,Food Delivery Behavior needs serious improvement
+65,29.9,6,Rural,Yes,Business,Hybrid,Premium,61711.0,13,366.8,2,4,3,4,2,Maybe,Food Delivery Behavior needs serious improvement
+38,17.47,8,Urban,Yes,Family,Online,Luxury,26155.0,11,89.5,5,3,3,5,5,Unlikely,I am unsure about long term value of Food Delivery Behavior
+69,31.95,7,Semi-Urban,Yes,Family,Hybrid,Mass,84846.0,13,230.5,4,2,3,4,5,Definitely,Food Delivery Behavior is impressive and modern
+53,25.01,8,Semi-Urban,No,Leisure,Offline,Mass,7550.0,12,280.6,4,2,5,5,6,Definitely,Food Delivery Behavior feels overpriced for what it offers
+35,18.48,4,Rural,Yes,Family,Offline,Mass,29979.0,12,357.0,5,5,5,4,6,Unlikely,I am unsure about long term value of Food Delivery Behavior
+44,14.28,7,Semi-Urban,Yes,Family,Offline,Mass,36871.0,17,294.5,4,4,3,1,3,Definitely,Food Delivery Behavior feels overpriced for what it offers
+56,45.06,1,Rural,Yes,Leisure,Online,Premium,62777.0,13,239.5,4,4,2,5,7,Definitely,I am unsure about long term value of Food Delivery Behavior
+54,12.81,2,Semi-Urban,Yes,Personal,Hybrid,Luxury,5382.0,15,387.5,4,3,4,5,4,Maybe,Food Delivery Behavior feels overpriced for what it offers
+46,14.24,4,Urban,No,Business,Online,Premium,80300.0,17,201.5,2,3,3,4,3,Definitely,I am unsure about long term value of Food Delivery Behavior
+60,36.74,8,Semi-Urban,No,Business,Online,Premium,60001.0,14,493.8,3,2,5,5,7,Definitely,Food Delivery Behavior is impressive and modern
+42,17.43,4,Semi-Urban,Yes,Family,Online,Premium,26202.0,18,474.9,5,2,3,5,1,Definitely,Food Delivery Behavior needs serious improvement
+36,30.27,1,Semi-Urban,Yes,Leisure,Online,Premium,59934.0,9,359.5,3,2,1,2,5,Definitely,Food Delivery Behavior feels overpriced for what it offers
+60,35.41,8,Semi-Urban,No,Business,Online,Premium,49249.0,7,443.7,4,5,2,4,3,Maybe,I am unsure about long term value of Food Delivery Behavior
+62,20.09,4,Semi-Urban,No,Business,Hybrid,Premium,31592.0,19,208.7,3,5,4,4,9,Definitely,Food Delivery Behavior is impressive and modern
+36,23.9,8,Urban,Yes,Personal,Online,Luxury,4516.0,10,299.1,3,4,4,5,8,Definitely,Food Delivery Behavior is impressive and modern
+25,16.56,7,Urban,Yes,Leisure,Online,Premium,50497.0,12,150.9,4,2,4,3,2,Maybe,Food Delivery Behavior needs serious improvement
+26,30.32,7,Rural,Yes,Business,Offline,Premium,9232.0,13,445.1,4,3,5,1,7,Unlikely,I am unsure about long term value of Food Delivery Behavior
+62,59.58,8,Semi-Urban,Yes,Business,Offline,Luxury,73296.0,12,246.1,4,3,3,3,5,Unlikely,Food Delivery Behavior feels overpriced for what it offers
+44,24.95,1,Urban,Yes,Leisure,Online,Premium,9790.0,14,277.3,5,3,1,3,4,Unlikely,Food Delivery Behavior exceeded my expectations
+50,40.93,1,Urban,Yes,Business,Offline,Premium,39729.0,20,435.0,5,3,3,3,5,Definitely,Food Delivery Behavior is impressive and modern
+57,39.97,6,Urban,Yes,Business,Online,Luxury,40241.0,11,402.7,3,5,1,4,8,Definitely,Food Delivery Behavior is impressive and modern
+52,48.26,7,Rural,Yes,Leisure,Online,Luxury,50946.0,14,174.4,4,4,5,5,2,Maybe,Food Delivery Behavior needs serious improvement
+39,44.16,1,Urban,Yes,Family,Online,Mass,5477.0,15,62.0,5,1,4,2,7,Definitely,I am unsure about long term value of Food Delivery Behavior
+65,5.65,8,Semi-Urban,No,Business,Offline,Premium,19937.0,14,97.8,1,3,5,4,9,Maybe,Food Delivery Behavior exceeded my expectations
+48,22.01,7,Urban,No,Family,Online,Premium,19556.0,13,182.8,4,2,2,4,6,Definitely,Food Delivery Behavior exceeded my expectations
+67,52.86,5,Semi-Urban,Yes,Business,Online,Premium,54709.0,13,166.5,3,3,1,4,9,Definitely,Food Delivery Behavior exceeded my expectations
+28,34.68,2,Urban,No,Business,Offline,Premium,25200.0,9,38.4,2,5,3,3,9,Definitely,I am unsure about long term value of Food Delivery Behavior
+63,10.73,4,Urban,No,Personal,Offline,Premium,14689.0,14,227.4,5,4,1,3,7,Definitely,Food Delivery Behavior feels overpriced for what it offers
+21,20.19,3,Semi-Urban,No,Personal,Online,Luxury,3615.0,17,70.8,5,1,3,4,6,Maybe,Food Delivery Behavior is impressive and modern
+24,20.59,6,Semi-Urban,No,Business,Online,Mass,75968.0,13,126.0,3,3,3,5,8,Maybe,I am unsure about long term value of Food Delivery Behavior
+42,53.02,2,Semi-Urban,No,Business,Offline,Luxury,87496.0,12,398.0,5,3,4,1,9,Definitely,Food Delivery Behavior exceeded my expectations
+42,35.44,3,Urban,No,Business,Hybrid,Premium,63887.0,18,257.5,2,4,2,3,7,Unlikely,Food Delivery Behavior is impressive and modern
+50,38.46,1,Semi-Urban,No,Leisure,Online,Premium,38319.0,13,199.0,4,3,4,5,4,Definitely,Food Delivery Behavior is impressive and modern
+47,25.19,4,Urban,Yes,Family,Online,Premium,12737.0,21,109.0,4,1,3,4,8,Unlikely,Food Delivery Behavior exceeded my expectations
+47,8.32,6,Semi-Urban,Yes,Leisure,Offline,Luxury,43809.0,8,435.8,4,4,5,5,10,Maybe,Food Delivery Behavior exceeded my expectations
+33,9.14,2,Urban,Yes,Personal,Offline,Luxury,42244.0,13,453.8,5,2,1,5,6,Maybe,Food Delivery Behavior is impressive and modern
+59,28.12,3,Urban,Yes,Family,Offline,Premium,38949.0,11,269.0,4,4,1,3,7,Unlikely,Food Delivery Behavior needs serious improvement
+47,14.76,3,Urban,Yes,Personal,Offline,Premium,35291.0,9,462.2,4,2,4,5,6,Unlikely,Food Delivery Behavior is impressive and modern
+59,10.73,3,Semi-Urban,Yes,Leisure,Online,Premium,45714.0,17,243.1,5,2,2,3,3,Definitely,Food Delivery Behavior feels overpriced for what it offers
+58,19.42,2,Semi-Urban,No,Business,Offline,Premium,8440.0,13,71.5,1,3,2,3,5,Definitely,Food Delivery Behavior feels overpriced for what it offers
+28,45.81,5,Semi-Urban,Yes,Family,Online,Mass,5370.0,12,28.2,4,1,5,5,3,Definitely,Food Delivery Behavior needs serious improvement
+32,9.02,1,Semi-Urban,No,Business,Online,Premium,7629.0,11,81.6,4,3,2,4,7,Definitely,I am unsure about long term value of Food Delivery Behavior
+44,29.65,4,Urban,No,Business,Hybrid,Premium,19600.0,14,318.9,5,5,2,3,7,Maybe,Food Delivery Behavior is impressive and modern
+38,50.43,3,Urban,No,Leisure,Hybrid,Mass,26470.0,16,174.0,4,3,1,5,1,Maybe,Food Delivery Behavior feels overpriced for what it offers
+35,19.74,8,Urban,No,Business,Offline,Premium,16912.0,9,331.2,5,3,2,1,2,Definitely,Food Delivery Behavior is impressive and modern
+36,21.6,6,Urban,No,Business,Online,Premium,24169.0,13,263.8,4,4,3,4,4,Definitely,Food Delivery Behavior needs serious improvement
+53,53.63,2,Urban,Yes,Leisure,Offline,Premium,18354.0,12,179.8,3,2,2,1,8,Maybe,Food Delivery Behavior exceeded my expectations
+30,40.75,6,Urban,Yes,Leisure,Offline,Luxury,15265.0,23,125.0,5,3,4,4,3,Definitely,Food Delivery Behavior needs serious improvement
+67,48.87,8,Rural,No,Personal,Online,Mass,27782.0,9,58.9,4,5,3,4,4,Maybe,Food Delivery Behavior needs serious improvement
+44,20.91,3,Semi-Urban,Yes,Business,Offline,Luxury,36981.0,12,395.5,4,1,4,5,9,Definitely,Food Delivery Behavior needs serious improvement
+65,59.82,8,Semi-Urban,No,Family,Online,Premium,67495.0,21,413.1,5,5,1,5,6,Definitely,Food Delivery Behavior feels overpriced for what it offers
+39,12.75,8,Semi-Urban,Yes,Business,Online,Mass,86088.0,16,279.9,4,5,4,4,7,Unlikely,Food Delivery Behavior needs serious improvement
+47,57.91,2,Rural,No,Business,Offline,Luxury,82869.0,12,95.4,4,5,5,3,6,Definitely,Food Delivery Behavior exceeded my expectations
+65,54.62,6,Semi-Urban,No,Family,Hybrid,Premium,43882.0,11,146.5,4,2,4,5,5,Maybe,Food Delivery Behavior exceeded my expectations
+61,35.35,5,Urban,No,Leisure,Hybrid,Premium,42598.0,19,478.5,4,3,2,4,4,Definitely,Food Delivery Behavior exceeded my expectations
+51,37.19,3,Rural,Yes,Family,Offline,Premium,13061.0,18,128.5,4,4,2,4,7,Definitely,I am unsure about long term value of Food Delivery Behavior
+41,47.63,7,Semi-Urban,No,Business,Online,Luxury,87513.0,12,47.3,4,1,1,3,6,Unlikely,Food Delivery Behavior needs serious improvement
+36,21.87,3,Semi-Urban,Yes,Leisure,Online,Luxury,68889.0,13,284.0,5,4,3,1,6,Maybe,Food Delivery Behavior exceeded my expectations
+43,34.01,4,Semi-Urban,No,Personal,Online,Luxury,76586.0,15,145.7,4,5,1,4,7,Unlikely,I am unsure about long term value of Food Delivery Behavior
+34,54.63,2,Semi-Urban,No,Family,Offline,Luxury,22606.0,9,479.6,3,5,4,4,6,Unlikely,Food Delivery Behavior needs serious improvement
+43,8.75,2,Semi-Urban,Yes,Personal,Online,Mass,37296.0,14,295.9,4,3,5,2,1,Definitely,Food Delivery Behavior needs serious improvement
+61,54.8,5,Semi-Urban,No,Business,Online,Premium,11033.0,23,483.6,1,3,1,2,8,Unlikely,Food Delivery Behavior is impressive and modern
+38,45.08,8,Urban,Yes,Leisure,Hybrid,Luxury,84792.0,14,397.1,4,3,2,3,5,Definitely,Food Delivery Behavior needs serious improvement
+56,47.34,3,Semi-Urban,Yes,Family,Online,Luxury,27153.0,14,367.1,2,2,5,2,9,Definitely,Food Delivery Behavior is impressive and modern
+32,8.56,4,Rural,No,Personal,Online,Premium,54449.0,17,418.6,2,3,3,2,9,Maybe,Food Delivery Behavior feels overpriced for what it offers
+57,15.33,6,Semi-Urban,No,Business,Online,Luxury,15395.0,14,310.3,5,4,3,4,4,Definitely,Food Delivery Behavior feels overpriced for what it offers
+31,55.89,1,Urban,No,Business,Online,Mass,72646.0,10,25.3,5,4,4,5,10,Unlikely,I am unsure about long term value of Food Delivery Behavior
+25,11.82,4,Semi-Urban,No,Business,Online,Premium,18398.0,12,208.4,4,5,2,5,9,Definitely,Food Delivery Behavior is impressive and modern
+41,39.72,6,Urban,No,Business,Offline,Premium,73226.0,7,125.1,3,3,5,5,10,Definitely,Food Delivery Behavior feels overpriced for what it offers
+52,48.05,4,Rural,No,Family,Online,Premium,37355.0,17,228.5,5,4,4,3,7,Definitely,Food Delivery Behavior feels overpriced for what it offers
+49,17.72,6,Semi-Urban,No,Business,Hybrid,Luxury,52843.0,12,245.9,5,4,1,1,9,Definitely,Food Delivery Behavior feels overpriced for what it offers
+27,43.43,4,Urban,No,Personal,Online,Luxury,25734.0,16,81.4,4,5,1,4,7,Definitely,Food Delivery Behavior needs serious improvement
+56,8.61,7,Semi-Urban,Yes,Personal,Online,Premium,79684.0,15,31.2,4,5,5,4,9,Definitely,Food Delivery Behavior is impressive and modern
+60,32.43,4,Semi-Urban,Yes,Personal,Offline,Luxury,68868.0,12,86.3,3,3,3,5,7,Maybe,Food Delivery Behavior feels overpriced for what it offers
+47,23.39,8,Urban,Yes,Business,Online,Premium,33176.0,20,431.6,4,5,1,2,9,Unlikely,Food Delivery Behavior is impressive and modern
+26,40.52,3,Urban,No,Family,Online,Premium,53512.0,17,382.8,4,3,1,5,6,Definitely,Food Delivery Behavior exceeded my expectations
+58,53.9,4,Semi-Urban,No,Business,Online,Premium,13351.0,18,403.5,5,5,1,4,8,Definitely,Food Delivery Behavior exceeded my expectations
+24,11.9,6,Rural,No,Business,Online,Luxury,16122.0,17,152.6,3,4,5,5,9,Definitely,Food Delivery Behavior needs serious improvement
+66,29.77,6,Urban,No,Leisure,Hybrid,Premium,48964.0,14,133.3,4,2,3,4,6,Definitely,Food Delivery Behavior exceeded my expectations
+55,28.28,2,Semi-Urban,Yes,Business,Online,Mass,58373.0,11,37.9,3,5,3,5,1,Definitely,I am unsure about long term value of Food Delivery Behavior
+30,22.81,6,Semi-Urban,No,Personal,Online,Premium,51054.0,20,246.7,2,2,5,4,3,Definitely,Food Delivery Behavior is impressive and modern
+58,31.41,2,Urban,No,Leisure,Online,Mass,51228.0,16,203.6,1,5,3,4,10,Maybe,Food Delivery Behavior feels overpriced for what it offers
+50,53.44,7,Urban,No,Personal,Online,Premium,67322.0,12,421.2,4,4,3,5,9,Definitely,I am unsure about long term value of Food Delivery Behavior
+62,58.55,7,Urban,No,Family,Online,Mass,81412.0,18,347.3,3,4,5,4,6,Definitely,I am unsure about long term value of Food Delivery Behavior
+29,5.16,8,Rural,Yes,Leisure,Online,Premium,36109.0,15,89.3,5,2,1,5,10,Unlikely,Food Delivery Behavior exceeded my expectations
+36,45.65,6,Rural,No,Business,Online,Premium,49250.0,12,493.8,5,1,5,2,4,Maybe,Food Delivery Behavior is impressive and modern
+24,38.83,4,Urban,No,Business,Online,Mass,80586.0,18,389.9,4,5,1,2,3,Definitely,Food Delivery Behavior feels overpriced for what it offers
+46,59.7,6,Semi-Urban,No,Family,Online,Luxury,42857.0,17,365.7,5,3,3,4,7,Maybe,I am unsure about long term value of Food Delivery Behavior
+49,9.95,8,Rural,No,Personal,Online,Premium,41173.0,7,124.0,3,5,2,4,5,Maybe,Food Delivery Behavior needs serious improvement
+48,49.62,7,Semi-Urban,Yes,Family,Offline,Premium,69453.0,9,454.5,5,4,5,4,5,Maybe,Food Delivery Behavior feels overpriced for what it offers
+31,56.37,2,Urban,No,Business,Online,Luxury,79202.0,16,247.5,5,4,3,1,8,Unlikely,Food Delivery Behavior exceeded my expectations
+48,55.17,7,Urban,Yes,Family,Online,Premium,66915.0,4,162.9,3,4,1,5,3,Definitely,Food Delivery Behavior is impressive and modern
+64,35.83,8,Semi-Urban,Yes,Family,Online,Luxury,10811.0,16,334.3,5,1,2,2,8,Maybe,Food Delivery Behavior needs serious improvement
+52,23.02,3,Semi-Urban,No,Family,Hybrid,Premium,42900.0,12,121.6,3,3,2,5,5,Unlikely,Food Delivery Behavior feels overpriced for what it offers
+44,40.19,7,Semi-Urban,Yes,Business,Offline,Premium,20653.0,15,455.6,1,4,3,3,10,Maybe,Food Delivery Behavior feels overpriced for what it offers
+62,21.83,7,Semi-Urban,No,Leisure,Hybrid,Luxury,29927.0,18,430.1,3,5,3,3,8,Unlikely,I am unsure about long term value of Food Delivery Behavior
+59,27.67,1,Urban,Yes,Business,Online,Premium,43250.0,13,243.2,5,4,4,3,7,Definitely,Food Delivery Behavior feels overpriced for what it offers
+27,29.51,8,Urban,Yes,Business,Online,Premium,21495.0,10,111.5,4,3,4,5,4,Unlikely,Food Delivery Behavior is impressive and modern
+38,21.61,4,Rural,Yes,Family,Offline,Premium,47402.0,20,258.3,4,5,3,4,10,Unlikely,Food Delivery Behavior is impressive and modern
+23,23.8,6,Rural,Yes,Personal,Online,Premium,58608.0,12,91.6,3,4,3,4,1,Maybe,Food Delivery Behavior feels overpriced for what it offers
+64,5.4,2,Semi-Urban,Yes,Family,Online,Luxury,78991.0,12,149.5,2,4,2,4,4,Definitely,I am unsure about long term value of Food Delivery Behavior
+66,21.34,2,Urban,Yes,Business,Online,Premium,20609.0,12,251.7,5,4,5,5,1,Unlikely,Food Delivery Behavior needs serious improvement
+40,30.98,7,Semi-Urban,Yes,Business,Online,Luxury,29330.0,18,30.1,4,4,1,3,10,Unlikely,Food Delivery Behavior needs serious improvement
+54,14.52,8,Semi-Urban,Yes,Leisure,Online,Premium,37710.0,15,387.5,1,4,2,3,9,Definitely,I am unsure about long term value of Food Delivery Behavior
+50,49.31,3,Semi-Urban,Yes,Leisure,Online,Mass,21760.0,18,114.5,3,4,3,4,10,Definitely,Food Delivery Behavior exceeded my expectations
+29,34.57,8,Rural,Yes,Family,Offline,Premium,31220.0,16,436.0,3,2,5,4,7,Unlikely,Food Delivery Behavior is impressive and modern
+30,48.66,7,Urban,Yes,Leisure,Online,Luxury,79735.0,9,30.7,4,4,3,2,1,Maybe,Food Delivery Behavior exceeded my expectations
+26,12.05,6,Semi-Urban,Yes,Business,Online,Premium,14202.0,17,275.4,5,3,4,4,9,Definitely,I am unsure about long term value of Food Delivery Behavior
+37,50.13,3,Urban,No,Personal,Offline,Luxury,41050.0,18,392.8,4,4,1,4,6,Unlikely,Food Delivery Behavior exceeded my expectations
+35,57.7,1,Semi-Urban,Yes,Business,Online,Premium,29365.0,13,134.2,3,2,3,5,5,Definitely,I am unsure about long term value of Food Delivery Behavior
+53,24.38,6,Semi-Urban,No,Business,Offline,Luxury,8790.0,9,359.6,2,2,2,5,5,Unlikely,Food Delivery Behavior needs serious improvement
+33,20.62,5,Semi-Urban,Yes,Business,Offline,Mass,10459.0,6,366.0,3,5,4,4,5,Maybe,Food Delivery Behavior needs serious improvement
+62,40.58,5,Urban,No,Family,Online,Mass,71069.0,13,326.2,5,3,2,4,8,Unlikely,Food Delivery Behavior exceeded my expectations
+64,39.98,6,Semi-Urban,Yes,Personal,Online,Mass,77005.0,10,194.8,4,4,3,2,4,Definitely,Food Delivery Behavior exceeded my expectations
+42,11.19,5,Rural,No,Personal,Offline,Luxury,67244.0,12,396.8,3,3,1,5,4,Unlikely,Food Delivery Behavior is impressive and modern
+36,55.97,1,Semi-Urban,Yes,Personal,Online,Premium,49452.0,9,321.6,1,3,2,2,7,Maybe,Food Delivery Behavior needs serious improvement
+54,31.35,4,Urban,No,Leisure,Online,Premium,69994.0,11,303.4,4,3,1,5,5,Definitely,Food Delivery Behavior is impressive and modern
+23,47.04,7,Rural,No,Leisure,Online,Luxury,15377.0,22,413.2,4,5,2,3,0,Definitely,Food Delivery Behavior exceeded my expectations
+28,24.76,5,Urban,Yes,Leisure,Hybrid,Mass,70658.0,14,137.4,3,3,1,3,9,Maybe,I am unsure about long term value of Food Delivery Behavior
+40,19.38,7,Urban,Yes,Family,Hybrid,Premium,39266.0,19,131.6,4,3,2,3,5,Maybe,Food Delivery Behavior needs serious improvement
+67,11.12,5,Semi-Urban,No,Personal,Online,Premium,68028.0,13,205.5,4,2,2,5,8,Unlikely,I am unsure about long term value of Food Delivery Behavior
+44,20.1,6,Urban,No,Leisure,Online,Premium,22042.0,20,55.1,4,3,2,5,6,Maybe,Food Delivery Behavior is impressive and modern
+38,59.64,2,Semi-Urban,No,Leisure,Online,Mass,75264.0,9,181.9,5,5,1,5,3,Unlikely,Food Delivery Behavior is impressive and modern
+43,41.19,8,Semi-Urban,No,Personal,Online,Premium,51994.0,15,215.0,3,4,2,5,7,Maybe,Food Delivery Behavior feels overpriced for what it offers
+21,49.15,2,Urban,Yes,Business,Online,Premium,2646.0,18,257.6,5,3,3,2,4,Definitely,Food Delivery Behavior needs serious improvement
+22,57.72,4,Semi-Urban,No,Family,Online,Mass,47696.0,18,141.9,4,2,4,4,5,Definitely,Food Delivery Behavior needs serious improvement
+25,9.34,6,Urban,Yes,Leisure,Offline,Mass,29305.0,18,455.3,1,3,3,3,1,Definitely,Food Delivery Behavior is impressive and modern
+38,14.06,3,Semi-Urban,No,Personal,Online,Mass,7060.0,22,156.8,5,4,2,5,0,Definitely,I am unsure about long term value of Food Delivery Behavior
+36,56.04,1,Urban,No,Leisure,Hybrid,Premium,41363.0,15,428.7,4,1,4,4,6,Definitely,Food Delivery Behavior needs serious improvement
+30,36.05,5,Urban,Yes,Personal,Online,Mass,29409.0,21,233.6,5,4,2,4,2,Maybe,Food Delivery Behavior is impressive and modern
+49,39.92,8,Urban,No,Business,Online,Premium,19986.0,18,364.7,3,4,4,1,4,Definitely,Food Delivery Behavior feels overpriced for what it offers
+55,28.52,6,Urban,Yes,Family,Offline,Luxury,32723.0,14,73.2,4,1,2,5,9,Maybe,Food Delivery Behavior exceeded my expectations
+45,49.79,7,Urban,Yes,Business,Online,Luxury,17805.0,12,281.4,5,4,3,5,2,Definitely,Food Delivery Behavior needs serious improvement
+62,33.45,7,Semi-Urban,No,Business,Online,Luxury,28383.0,16,481.2,3,3,3,5,5,Definitely,Food Delivery Behavior exceeded my expectations
+44,50.44,6,Semi-Urban,No,Business,Online,Premium,12149.0,12,339.8,4,2,5,5,7,Definitely,I am unsure about long term value of Food Delivery Behavior
+33,59.57,1,Urban,Yes,Personal,Hybrid,Premium,9420.0,9,413.7,5,3,1,4,9,Maybe,Food Delivery Behavior feels overpriced for what it offers
+41,40.57,2,Urban,No,Business,Online,Premium,82082.0,10,145.3,4,2,5,1,1,Definitely,Food Delivery Behavior needs serious improvement
+62,34.08,1,Semi-Urban,Yes,Personal,Online,Luxury,81443.0,11,404.1,5,5,3,5,4,Definitely,Food Delivery Behavior exceeded my expectations
+63,25.08,2,Semi-Urban,Yes,Personal,Hybrid,Luxury,74864.0,12,188.6,4,4,5,2,5,Definitely,Food Delivery Behavior exceeded my expectations
+59,15.71,1,Semi-Urban,No,Business,Online,Premium,22269.0,13,252.8,3,5,3,3,5,Maybe,Food Delivery Behavior is impressive and modern
+54,41.12,8,Rural,Yes,Personal,Online,Premium,65878.0,13,110.2,4,4,3,2,5,Maybe,Food Delivery Behavior exceeded my expectations
+39,8.45,7,Rural,Yes,Leisure,Online,Luxury,53895.0,12,253.1,3,1,4,4,4,Definitely,I am unsure about long term value of Food Delivery Behavior
+48,57.6,2,Urban,Yes,Business,Online,Mass,6509.0,17,267.5,3,3,4,4,4,Definitely,Food Delivery Behavior exceeded my expectations
+47,40.62,1,Urban,Yes,Business,Online,Luxury,81164.0,11,318.7,4,5,3,3,3,Definitely,I am unsure about long term value of Food Delivery Behavior
+46,57.76,5,Rural,Yes,Family,Online,Premium,89822.0,17,436.9,1,3,3,5,3,Definitely,I am unsure about long term value of Food Delivery Behavior
+31,19.98,5,Urban,No,Personal,Online,Premium,64367.0,13,166.3,1,3,3,5,7,Unlikely,Food Delivery Behavior is impressive and modern
+69,57.06,4,Semi-Urban,Yes,Leisure,Offline,Premium,22373.0,14,492.4,2,3,2,3,5,Definitely,Food Delivery Behavior feels overpriced for what it offers
+55,38.67,1,Rural,Yes,Personal,Online,Mass,50788.0,11,426.9,4,2,4,5,5,Definitely,I am unsure about long term value of Food Delivery Behavior
+40,49.56,3,Semi-Urban,Yes,Leisure,Online,Mass,11625.0,12,213.4,4,1,1,5,6,Definitely,Food Delivery Behavior exceeded my expectations
+32,14.84,4,Urban,Yes,Personal,Hybrid,Premium,28293.0,12,128.8,4,2,1,4,3,Maybe,Food Delivery Behavior exceeded my expectations
+48,32.51,1,Semi-Urban,Yes,Family,Online,Premium,65119.0,20,54.3,3,3,4,3,8,Unlikely,I am unsure about long term value of Food Delivery Behavior
+22,36.29,3,Urban,Yes,Business,Online,Mass,28495.0,19,132.5,3,2,3,3,10,Definitely,Food Delivery Behavior exceeded my expectations
+21,26.61,5,Rural,Yes,Leisure,Offline,Luxury,14954.0,16,444.6,3,4,2,5,4,Maybe,Food Delivery Behavior needs serious improvement
+29,18.93,7,Urban,Yes,Personal,Hybrid,Premium,2657.0,17,160.2,3,4,3,4,5,Definitely,Food Delivery Behavior is impressive and modern
+42,54.76,7,Semi-Urban,Yes,Family,Online,Premium,52381.0,14,86.2,4,4,4,5,7,Unlikely,Food Delivery Behavior exceeded my expectations
+60,9.68,5,Semi-Urban,No,Business,Offline,Premium,87243.0,16,30.9,2,1,2,5,2,Definitely,Food Delivery Behavior is impressive and modern
+47,13.47,7,Urban,Yes,Personal,Offline,Mass,44604.0,14,162.9,4,4,3,3,9,Definitely,I am unsure about long term value of Food Delivery Behavior
+29,22.63,6,Urban,Yes,Personal,Offline,Luxury,20710.0,15,123.8,4,3,4,3,3,Maybe,I am unsure about long term value of Food Delivery Behavior
+27,55.59,5,Urban,No,Personal,Offline,Premium,42769.0,11,69.1,3,5,2,2,8,Unlikely,I am unsure about long term value of Food Delivery Behavior
+56,36.03,6,Semi-Urban,No,Business,Offline,Mass,54983.0,21,476.5,2,4,3,1,5,Unlikely,Food Delivery Behavior is impressive and modern
+68,25.52,7,Rural,No,Business,Hybrid,Mass,72520.0,24,148.5,4,1,1,2,5,Maybe,Food Delivery Behavior exceeded my expectations
+58,27.15,8,Urban,No,Leisure,Hybrid,Premium,41836.0,13,23.0,4,1,4,3,3,Definitely,Food Delivery Behavior needs serious improvement
+22,51.08,8,Urban,No,Family,Online,Premium,17220.0,20,473.3,5,4,4,5,7,Definitely,Food Delivery Behavior is impressive and modern
+63,6.47,3,Semi-Urban,No,Personal,Hybrid,Premium,18545.0,12,297.7,3,3,3,3,8,Maybe,Food Delivery Behavior needs serious improvement
+25,5.62,2,Urban,No,Business,Online,Premium,81176.0,17,59.8,5,3,1,4,10,Definitely,Food Delivery Behavior exceeded my expectations
+37,7.53,1,Semi-Urban,No,Personal,Offline,Luxury,22789.0,15,35.1,3,3,3,3,5,Maybe,Food Delivery Behavior exceeded my expectations
+57,30.81,4,Urban,Yes,Family,Hybrid,Luxury,66066.0,17,71.8,2,1,3,4,7,Definitely,Food Delivery Behavior is impressive and modern
+55,36.97,6,Semi-Urban,Yes,Business,Online,Premium,25667.0,18,303.9,2,3,5,5,6,Definitely,Food Delivery Behavior feels overpriced for what it offers
+28,39.35,4,Urban,No,Personal,Online,Luxury,65409.0,17,49.7,3,3,2,3,7,Maybe,Food Delivery Behavior needs serious improvement
+63,45.21,8,Urban,No,Business,Hybrid,Mass,8896.0,21,292.7,4,5,1,3,3,Definitely,I am unsure about long term value of Food Delivery Behavior
+23,15.43,7,Semi-Urban,Yes,Leisure,Online,Premium,20251.0,14,333.2,3,2,2,5,7,Definitely,Food Delivery Behavior needs serious improvement
+23,19.43,5,Urban,Yes,Leisure,Online,Mass,37966.0,15,90.8,4,4,2,4,8,Maybe,Food Delivery Behavior exceeded my expectations
+21,18.39,2,Rural,No,Family,Online,Mass,47348.0,14,254.4,3,4,1,2,9,Definitely,Food Delivery Behavior exceeded my expectations
+44,13.2,6,Semi-Urban,No,Business,Online,Premium,33060.0,13,482.7,3,1,5,5,6,Unlikely,Food Delivery Behavior is impressive and modern
+65,18.44,1,Urban,No,Business,Hybrid,Luxury,52469.0,12,421.5,5,5,2,3,4,Definitely,Food Delivery Behavior feels overpriced for what it offers
+50,38.75,6,Rural,No,Leisure,Online,Mass,30633.0,11,367.2,4,4,3,4,8,Maybe,I am unsure about long term value of Food Delivery Behavior
+62,25.15,8,Urban,Yes,Leisure,Hybrid,Mass,61703.0,18,268.5,4,3,3,3,10,Definitely,Food Delivery Behavior needs serious improvement
+46,47.24,1,Semi-Urban,Yes,Leisure,Hybrid,Luxury,46986.0,23,209.3,3,4,3,4,5,Definitely,Food Delivery Behavior feels overpriced for what it offers
+58,34.5,4,Semi-Urban,Yes,Business,Offline,Premium,64050.0,7,236.7,2,5,5,5,9,Unlikely,I am unsure about long term value of Food Delivery Behavior
+63,16.66,4,Urban,No,Personal,Offline,Premium,39926.0,17,387.0,4,5,3,5,10,Maybe,Food Delivery Behavior exceeded my expectations
+60,30.71,4,Rural,Yes,Leisure,Online,Mass,79132.0,14,286.1,5,4,2,5,5,Definitely,Food Delivery Behavior exceeded my expectations
+63,37.64,1,Rural,Yes,Leisure,Online,Premium,35628.0,7,387.0,3,4,2,4,7,Definitely,Food Delivery Behavior is impressive and modern
+58,52.64,6,Semi-Urban,Yes,Leisure,Online,Premium,29116.0,17,485.5,4,3,4,5,7,Unlikely,Food Delivery Behavior is impressive and modern
+64,50.85,4,Semi-Urban,Yes,Family,Hybrid,Mass,51023.0,14,327.4,5,5,5,4,7,Definitely,Food Delivery Behavior needs serious improvement
+23,28.46,1,Rural,Yes,Business,Online,Premium,46807.0,23,309.5,5,2,2,4,3,Definitely,Food Delivery Behavior feels overpriced for what it offers
+33,40.62,5,Semi-Urban,No,Personal,Hybrid,Premium,47593.0,14,215.0,5,1,4,5,5,Definitely,Food Delivery Behavior feels overpriced for what it offers
+56,21.38,7,Urban,No,Leisure,Online,Premium,72059.0,15,114.4,5,5,3,4,2,Unlikely,I am unsure about long term value of Food Delivery Behavior
+61,39.82,7,Semi-Urban,No,Leisure,Online,Luxury,53797.0,12,199.6,2,2,3,4,7,Definitely,Food Delivery Behavior needs serious improvement
+68,55.2,7,Rural,Yes,Family,Online,Mass,79903.0,10,269.6,5,4,5,1,9,Definitely,Food Delivery Behavior is impressive and modern
+32,39.35,6,Rural,No,Business,Online,Luxury,56481.0,14,36.7,5,3,2,5,7,Definitely,Food Delivery Behavior needs serious improvement
+40,21.71,6,Rural,No,Family,Hybrid,Luxury,3910.0,15,248.4,4,5,4,2,2,Unlikely,Food Delivery Behavior exceeded my expectations
+59,40.42,6,Urban,No,Family,Offline,Premium,78595.0,23,433.8,2,3,2,3,9,Definitely,Food Delivery Behavior is impressive and modern
+64,54.65,2,Semi-Urban,Yes,Family,Offline,Luxury,75901.0,18,488.8,4,4,3,5,3,Definitely,Food Delivery Behavior feels overpriced for what it offers
+28,12.54,4,Urban,No,Family,Offline,Premium,6299.0,14,430.7,3,1,2,3,9,Definitely,Food Delivery Behavior is impressive and modern
+67,31.53,1,Semi-Urban,No,Family,Online,Luxury,13025.0,10,102.6,4,2,4,3,7,Definitely,Food Delivery Behavior exceeded my expectations
+22,22.66,5,Semi-Urban,Yes,Family,Online,Premium,50959.0,13,94.4,4,5,2,5,7,Unlikely,Food Delivery Behavior is impressive and modern
+31,18.28,3,Urban,Yes,Business,Online,Mass,5771.0,19,208.8,4,3,3,3,7,Maybe,Food Delivery Behavior feels overpriced for what it offers
+41,26.79,5,Semi-Urban,Yes,Family,Online,Premium,38183.0,15,128.2,5,2,4,3,3,Definitely,Food Delivery Behavior exceeded my expectations
+57,26.67,2,Urban,Yes,Leisure,Online,Mass,87832.0,15,344.5,4,3,1,4,6,Maybe,I am unsure about long term value of Food Delivery Behavior
+26,16.57,5,Urban,Yes,Business,Online,Mass,17204.0,12,60.6,4,3,2,2,4,Maybe,Food Delivery Behavior needs serious improvement
+39,27.2,4,Semi-Urban,Yes,Business,Hybrid,Premium,20136.0,15,233.0,5,4,3,5,7,Maybe,I am unsure about long term value of Food Delivery Behavior
+50,39.86,4,Semi-Urban,Yes,Leisure,Online,Luxury,61519.0,11,154.6,4,1,1,3,6,Definitely,Food Delivery Behavior exceeded my expectations
+66,6.42,3,Urban,No,Personal,Online,Premium,5870.0,14,305.8,4,2,4,5,7,Definitely,Food Delivery Behavior exceeded my expectations
+59,59.41,6,Urban,No,Family,Online,Luxury,74220.0,6,402.6,4,3,4,3,10,Definitely,Food Delivery Behavior exceeded my expectations
+64,21.28,1,Urban,Yes,Personal,Online,Mass,19515.0,17,463.3,4,5,1,3,5,Definitely,Food Delivery Behavior feels overpriced for what it offers
+69,39.3,7,Semi-Urban,Yes,Business,Online,Premium,48777.0,17,482.6,5,4,4,2,7,Definitely,Food Delivery Behavior exceeded my expectations
+56,20.6,5,Urban,No,Family,Online,Luxury,23891.0,17,188.6,3,4,3,2,9,Unlikely,Food Delivery Behavior needs serious improvement
+40,26.64,3,Semi-Urban,No,Business,Hybrid,Mass,59982.0,8,430.8,4,2,2,4,2,Unlikely,Food Delivery Behavior feels overpriced for what it offers

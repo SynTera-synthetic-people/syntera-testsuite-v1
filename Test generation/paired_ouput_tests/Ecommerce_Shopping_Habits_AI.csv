@@ -1,0 +1,250 @@
+﻿Age,Monthly_Income_Lakh,Household_Size,Area_Type,Current_User,Primary_Purpose,Preferred_Channel,Brand_Segment,Monthly_Spend,Usage_Frequency_per_Month,Travel_Distance_km_per_Week,Satisfaction_1to5,Ease_of_Use_1to5,Value_for_Money_1to5,Trust_in_Brand_1to5,Recommend_NPS_0to10,Future_Intent,Open_Ended_Feedback
+56,24.74,1,Urban,No,Personal,Online,Premium,89600.0,19,143.1,5,4,4,4,6,Definitely,Ecommerce Shopping Habits feels overpriced for what it offers
+42,13.19,2,Semi-Urban,Yes,Business,Offline,Premium,68876.0,10,492.5,1,2,2,4,5,Maybe,Ecommerce Shopping Habits needs serious improvement
+21,54.72,6,Urban,No,Business,Online,Mass,17293.0,10,383.2,4,2,1,2,4,Definitely,Ecommerce Shopping Habits needs serious improvement
+41,11.52,5,Semi-Urban,Yes,Business,Offline,Luxury,57765.0,10,251.4,3,5,3,5,3,Maybe,Ecommerce Shopping Habits feels overpriced for what it offers
+68,30.96,2,Semi-Urban,Yes,Personal,Online,Mass,2835.0,14,128.5,4,3,3,5,5,Definitely,Ecommerce Shopping Habits is impressive and modern
+63,18.01,5,Semi-Urban,No,Business,Online,Mass,43335.0,18,295.3,2,4,1,5,7,Definitely,I am unsure about long term value of Ecommerce Shopping Habits
+39,59.8,6,Urban,Yes,Personal,Online,Premium,48931.0,16,131.3,3,5,1,3,8,Maybe,Ecommerce Shopping Habits exceeded my expectations
+28,37.22,7,Semi-Urban,Yes,Personal,Online,Mass,87569.0,13,112.7,1,3,2,3,8,Maybe,I am unsure about long term value of Ecommerce Shopping Habits
+25,13.23,3,Rural,Yes,Family,Offline,Mass,66874.0,13,65.0,3,4,4,5,9,Maybe,Ecommerce Shopping Habits needs serious improvement
+60,41.72,8,Semi-Urban,No,Business,Online,Premium,64125.0,9,186.0,4,4,2,4,7,Maybe,I am unsure about long term value of Ecommerce Shopping Habits
+49,59.54,3,Semi-Urban,Yes,Family,Online,Premium,48852.0,18,280.0,3,5,2,5,7,Definitely,Ecommerce Shopping Habits is impressive and modern
+38,38.28,8,Urban,Yes,Personal,Online,Premium,47159.0,16,96.5,4,2,1,2,9,Maybe,I am unsure about long term value of Ecommerce Shopping Habits
+49,30.16,8,Urban,No,Family,Offline,Mass,89303.0,14,116.2,2,5,2,5,5,Unlikely,I am unsure about long term value of Ecommerce Shopping Habits
+35,21.13,4,Rural,No,Personal,Offline,Mass,3872.0,7,207.7,4,3,3,4,3,Definitely,Ecommerce Shopping Habits needs serious improvement
+65,10.07,2,Semi-Urban,No,Business,Offline,Premium,28682.0,15,255.0,5,4,1,1,2,Definitely,Ecommerce Shopping Habits needs serious improvement
+51,17.55,1,Urban,No,Business,Online,Luxury,13773.0,17,385.9,3,2,1,4,9,Maybe,Ecommerce Shopping Habits exceeded my expectations
+35,35.45,7,Urban,No,Business,Online,Luxury,29718.0,10,292.0,4,5,1,5,5,Definitely,Ecommerce Shopping Habits feels overpriced for what it offers
+65,46.46,5,Urban,Yes,Leisure,Online,Premium,42799.0,15,316.5,4,3,4,4,6,Definitely,Ecommerce Shopping Habits exceeded my expectations
+23,53.29,3,Rural,No,Business,Hybrid,Premium,32090.0,21,354.2,5,4,3,2,8,Unlikely,Ecommerce Shopping Habits needs serious improvement
+64,48.65,7,Semi-Urban,Yes,Leisure,Offline,Luxury,86718.0,13,236.5,5,5,2,5,5,Definitely,Ecommerce Shopping Habits exceeded my expectations
+64,11.9,6,Rural,Yes,Business,Online,Mass,61892.0,7,184.7,4,3,1,3,9,Unlikely,I am unsure about long term value of Ecommerce Shopping Habits
+62,47.54,7,Semi-Urban,Yes,Family,Online,Mass,66068.0,17,404.2,3,3,4,5,5,Definitely,I am unsure about long term value of Ecommerce Shopping Habits
+53,36.99,5,Rural,No,Business,Online,Premium,67322.0,18,417.6,4,3,2,5,8,Definitely,Ecommerce Shopping Habits needs serious improvement
+44,30.8,1,Urban,No,Personal,Online,Premium,81132.0,13,93.9,4,3,1,3,7,Unlikely,Ecommerce Shopping Habits needs serious improvement
+58,36.5,7,Semi-Urban,No,Business,Offline,Mass,69586.0,7,477.6,3,4,4,4,4,Definitely,Ecommerce Shopping Habits exceeded my expectations
+44,5.44,5,Urban,Yes,Leisure,Online,Premium,3426.0,19,466.4,3,4,3,2,3,Unlikely,Ecommerce Shopping Habits exceeded my expectations
+33,8.73,4,Rural,No,Family,Online,Mass,25003.0,12,438.0,4,1,4,5,3,Definitely,I am unsure about long term value of Ecommerce Shopping Habits
+47,33.92,1,Urban,No,Family,Online,Premium,89041.0,15,222.9,5,4,4,5,7,Unlikely,Ecommerce Shopping Habits feels overpriced for what it offers
+53,14.55,8,Semi-Urban,No,Business,Hybrid,Premium,59387.0,11,424.2,5,3,5,4,0,Unlikely,Ecommerce Shopping Habits feels overpriced for what it offers
+39,35.0,8,Semi-Urban,No,Business,Hybrid,Luxury,7994.0,18,321.5,4,5,3,3,7,Definitely,Ecommerce Shopping Habits needs serious improvement
+45,24.48,1,Rural,Yes,Business,Online,Mass,43064.0,17,118.6,5,5,1,2,8,Maybe,Ecommerce Shopping Habits exceeded my expectations
+26,54.91,8,Rural,No,Personal,Online,Luxury,88313.0,10,391.9,4,4,3,2,5,Maybe,Ecommerce Shopping Habits feels overpriced for what it offers
+53,57.23,5,Urban,Yes,Family,Online,Premium,89370.0,14,214.9,4,5,3,4,8,Unlikely,Ecommerce Shopping Habits exceeded my expectations
+45,58.89,5,Rural,No,Business,Online,Luxury,40055.0,11,160.2,5,5,1,5,3,Definitely,Ecommerce Shopping Habits is impressive and modern
+43,54.44,3,Semi-Urban,No,Business,Online,Luxury,80589.0,22,441.6,3,4,2,5,10,Unlikely,I am unsure about long term value of Ecommerce Shopping Habits
+69,59.22,5,Rural,Yes,Business,Online,Mass,54095.0,16,433.9,3,5,2,5,4,Definitely,Ecommerce Shopping Habits exceeded my expectations
+37,43.84,1,Rural,Yes,Business,Hybrid,Mass,46830.0,18,434.9,5,5,1,3,6,Maybe,Ecommerce Shopping Habits exceeded my expectations
+41,57.83,7,Urban,No,Business,Online,Premium,38251.0,14,432.6,5,2,1,4,10,Definitely,Ecommerce Shopping Habits exceeded my expectations
+63,40.3,6,Semi-Urban,No,Family,Online,Mass,80507.0,9,286.0,5,4,4,3,9,Definitely,Ecommerce Shopping Habits feels overpriced for what it offers
+40,49.51,5,Semi-Urban,Yes,Family,Online,Luxury,56659.0,11,316.1,3,2,4,5,7,Definitely,Ecommerce Shopping Habits exceeded my expectations
+32,12.26,6,Rural,Yes,Business,Online,Mass,31374.0,16,475.5,4,4,2,2,5,Definitely,Ecommerce Shopping Habits is impressive and modern
+33,42.54,6,Semi-Urban,Yes,Business,Online,Premium,45290.0,19,82.1,4,4,1,4,7,Definitely,Ecommerce Shopping Habits feels overpriced for what it offers
+38,56.21,3,Urban,Yes,Personal,Online,Mass,41079.0,11,407.0,3,5,4,5,6,Definitely,Ecommerce Shopping Habits needs serious improvement
+42,34.7,2,Semi-Urban,No,Personal,Online,Premium,41702.0,15,272.6,4,4,1,5,3,Unlikely,Ecommerce Shopping Habits needs serious improvement
+44,15.28,6,Semi-Urban,Yes,Business,Hybrid,Premium,29422.0,16,489.6,4,3,2,3,8,Definitely,I am unsure about long term value of Ecommerce Shopping Habits
+53,33.98,4,Rural,No,Family,Online,Premium,57700.0,14,326.8,3,2,2,4,9,Definitely,Ecommerce Shopping Habits is impressive and modern
+23,43.88,6,Semi-Urban,No,Leisure,Offline,Luxury,6597.0,11,98.0,5,2,1,5,6,Unlikely,Ecommerce Shopping Habits exceeded my expectations
+37,47.34,7,Urban,Yes,Leisure,Hybrid,Luxury,79982.0,17,411.4,4,3,3,5,7,Definitely,Ecommerce Shopping Habits is impressive and modern
+59,33.8,1,Rural,Yes,Business,Online,Mass,38555.0,12,342.9,4,5,5,4,1,Definitely,Ecommerce Shopping Habits needs serious improvement
+52,16.96,8,Semi-Urban,No,Business,Online,Luxury,72476.0,15,91.5,4,4,3,3,4,Maybe,Ecommerce Shopping Habits exceeded my expectations
+37,55.97,7,Semi-Urban,No,Business,Online,Premium,66195.0,17,24.3,5,5,5,4,7,Definitely,Ecommerce Shopping Habits is impressive and modern
+68,47.55,3,Rural,Yes,Personal,Online,Mass,43523.0,8,281.0,4,5,1,4,4,Definitely,Ecommerce Shopping Habits feels overpriced for what it offers
+64,19.89,4,Semi-Urban,No,Business,Online,Premium,19487.0,11,135.9,4,2,4,5,9,Definitely,Ecommerce Shopping Habits exceeded my expectations
+45,49.65,8,Semi-Urban,No,Business,Online,Luxury,51475.0,14,436.3,3,2,2,4,8,Definitely,Ecommerce Shopping Habits feels overpriced for what it offers
+28,24.13,7,Urban,Yes,Business,Online,Premium,85430.0,15,140.4,4,3,2,3,7,Maybe,Ecommerce Shopping Habits is impressive and modern
+63,22.18,5,Rural,Yes,Leisure,Online,Premium,18348.0,9,338.2,3,2,1,5,10,Definitely,Ecommerce Shopping Habits exceeded my expectations
+55,52.47,6,Urban,Yes,Leisure,Hybrid,Premium,24529.0,13,185.7,4,2,4,3,4,Maybe,I am unsure about long term value of Ecommerce Shopping Habits
+49,53.03,5,Urban,No,Family,Hybrid,Premium,89384.0,15,188.2,3,3,4,1,9,Maybe,I am unsure about long term value of Ecommerce Shopping Habits
+32,26.92,2,Rural,Yes,Business,Online,Premium,80546.0,9,107.3,4,1,2,2,5,Definitely,Ecommerce Shopping Habits needs serious improvement
+56,5.49,5,Semi-Urban,Yes,Business,Online,Mass,50360.0,17,261.3,4,4,2,5,7,Definitely,Ecommerce Shopping Habits exceeded my expectations
+29,15.26,8,Urban,Yes,Leisure,Online,Premium,63137.0,13,298.1,4,3,4,5,6,Definitely,Ecommerce Shopping Habits is impressive and modern
+46,55.01,4,Urban,No,Personal,Online,Premium,40989.0,14,298.9,2,2,5,3,6,Maybe,I am unsure about long term value of Ecommerce Shopping Habits
+42,54.43,8,Rural,Yes,Business,Online,Premium,37560.0,16,431.2,4,2,3,4,8,Unlikely,Ecommerce Shopping Habits needs serious improvement
+51,29.93,3,Semi-Urban,No,Business,Offline,Mass,41001.0,12,333.1,5,3,2,4,5,Definitely,Ecommerce Shopping Habits exceeded my expectations
+69,21.73,7,Semi-Urban,Yes,Family,Online,Premium,38469.0,14,375.3,3,4,1,4,6,Unlikely,I am unsure about long term value of Ecommerce Shopping Habits
+68,21.65,2,Rural,No,Personal,Online,Premium,61449.0,12,175.3,2,5,1,2,4,Definitely,Ecommerce Shopping Habits exceeded my expectations
+64,54.35,4,Semi-Urban,No,Leisure,Offline,Premium,31080.0,19,221.9,1,3,1,2,8,Unlikely,Ecommerce Shopping Habits needs serious improvement
+50,22.86,3,Urban,Yes,Business,Online,Luxury,17028.0,17,28.8,1,1,2,4,7,Unlikely,Ecommerce Shopping Habits is impressive and modern
+35,33.14,7,Urban,Yes,Business,Online,Premium,64178.0,9,58.0,5,4,2,5,4,Definitely,Ecommerce Shopping Habits needs serious improvement
+67,45.21,4,Semi-Urban,Yes,Family,Online,Premium,4754.0,11,204.9,4,2,3,2,4,Definitely,Ecommerce Shopping Habits is impressive and modern
+53,16.52,5,Semi-Urban,Yes,Business,Offline,Premium,65250.0,20,120.7,3,3,5,3,5,Definitely,Ecommerce Shopping Habits feels overpriced for what it offers
+23,18.96,4,Urban,No,Leisure,Hybrid,Luxury,25165.0,10,410.2,5,5,4,3,7,Definitely,I am unsure about long term value of Ecommerce Shopping Habits
+54,24.69,2,Semi-Urban,Yes,Personal,Online,Luxury,18742.0,9,344.7,2,1,3,4,7,Maybe,Ecommerce Shopping Habits feels overpriced for what it offers
+37,40.98,4,Urban,No,Leisure,Online,Mass,35348.0,17,485.7,3,2,1,1,8,Maybe,Ecommerce Shopping Habits is impressive and modern
+64,49.96,1,Rural,Yes,Business,Online,Premium,12340.0,14,445.8,4,1,1,5,7,Maybe,Ecommerce Shopping Habits exceeded my expectations
+25,35.07,5,Urban,Yes,Leisure,Online,Luxury,35835.0,18,489.3,2,2,4,4,5,Definitely,Ecommerce Shopping Habits is impressive and modern
+50,12.31,4,Semi-Urban,Yes,Business,Online,Premium,11004.0,19,195.3,3,2,2,4,10,Definitely,Ecommerce Shopping Habits is impressive and modern
+63,29.54,3,Semi-Urban,Yes,Family,Hybrid,Luxury,44547.0,20,252.5,2,3,2,3,9,Unlikely,Ecommerce Shopping Habits exceeded my expectations
+35,12.02,5,Semi-Urban,Yes,Family,Offline,Mass,17503.0,14,198.9,5,4,1,3,4,Definitely,Ecommerce Shopping Habits feels overpriced for what it offers
+59,9.86,6,Semi-Urban,No,Family,Online,Premium,13440.0,13,482.9,1,1,2,4,9,Unlikely,I am unsure about long term value of Ecommerce Shopping Habits
+28,37.43,3,Urban,Yes,Family,Offline,Premium,52962.0,13,213.3,1,1,2,5,7,Definitely,Ecommerce Shopping Habits is impressive and modern
+62,57.59,2,Rural,No,Business,Online,Premium,57022.0,13,76.0,4,4,2,2,6,Definitely,Ecommerce Shopping Habits is impressive and modern
+58,51.07,6,Urban,No,Personal,Hybrid,Luxury,2486.0,19,140.2,5,4,3,2,6,Definitely,I am unsure about long term value of Ecommerce Shopping Habits
+48,47.6,6,Semi-Urban,No,Leisure,Online,Premium,36116.0,15,223.9,4,3,2,2,6,Definitely,Ecommerce Shopping Habits is impressive and modern
+41,44.99,6,Urban,No,Business,Hybrid,Mass,8860.0,8,309.4,3,4,2,5,8,Definitely,I am unsure about long term value of Ecommerce Shopping Habits
+67,54.34,1,Urban,No,Leisure,Offline,Premium,67001.0,10,316.7,3,4,1,1,3,Definitely,I am unsure about long term value of Ecommerce Shopping Habits
+30,46.41,7,Semi-Urban,Yes,Business,Online,Luxury,61974.0,12,384.2,2,4,1,3,2,Definitely,I am unsure about long term value of Ecommerce Shopping Habits
+48,39.48,4,Semi-Urban,Yes,Business,Online,Mass,6376.0,11,331.0,4,3,2,4,6,Definitely,Ecommerce Shopping Habits exceeded my expectations
+41,25.06,5,Rural,No,Personal,Online,Premium,84830.0,12,255.9,4,1,1,4,5,Definitely,Ecommerce Shopping Habits feels overpriced for what it offers
+69,10.55,7,Rural,Yes,Business,Online,Premium,86477.0,11,34.5,4,5,2,1,7,Maybe,Ecommerce Shopping Habits feels overpriced for what it offers
+48,30.36,4,Rural,No,Business,Online,Luxury,31451.0,14,353.6,5,2,4,4,10,Maybe,Ecommerce Shopping Habits needs serious improvement
+42,55.86,4,Semi-Urban,Yes,Leisure,Online,Premium,13494.0,14,61.0,2,5,2,3,7,Unlikely,Ecommerce Shopping Habits exceeded my expectations
+58,37.07,5,Urban,No,Family,Online,Premium,12062.0,14,245.0,4,3,1,2,10,Definitely,Ecommerce Shopping Habits needs serious improvement
+39,15.15,7,Semi-Urban,No,Business,Online,Premium,75983.0,16,450.3,4,4,5,4,8,Unlikely,Ecommerce Shopping Habits feels overpriced for what it offers
+58,40.7,6,Semi-Urban,No,Business,Online,Premium,42406.0,11,306.5,3,3,3,5,2,Definitely,Ecommerce Shopping Habits feels overpriced for what it offers
+66,30.6,6,Urban,No,Business,Hybrid,Mass,2837.0,19,115.5,4,3,5,5,9,Definitely,Ecommerce Shopping Habits feels overpriced for what it offers
+44,56.23,8,Rural,Yes,Personal,Offline,Luxury,83431.0,15,407.8,3,4,2,5,4,Maybe,Ecommerce Shopping Habits is impressive and modern
+48,13.85,1,Semi-Urban,Yes,Business,Hybrid,Luxury,54161.0,18,164.2,3,4,2,4,9,Definitely,Ecommerce Shopping Habits needs serious improvement
+65,44.16,1,Semi-Urban,No,Leisure,Online,Luxury,62755.0,16,297.1,5,2,2,5,8,Definitely,Ecommerce Shopping Habits exceeded my expectations
+33,42.49,2,Semi-Urban,No,Leisure,Offline,Premium,74473.0,16,325.2,5,3,4,5,8,Definitely,Ecommerce Shopping Habits needs serious improvement
+29,59.09,5,Rural,No,Business,Online,Mass,74035.0,12,370.9,4,1,1,4,4,Maybe,Ecommerce Shopping Habits feels overpriced for what it offers
+29,36.07,5,Urban,No,Leisure,Offline,Mass,8671.0,18,51.2,3,2,2,2,8,Definitely,Ecommerce Shopping Habits exceeded my expectations
+41,52.94,3,Urban,Yes,Leisure,Online,Premium,52511.0,16,430.0,4,3,4,4,7,Definitely,Ecommerce Shopping Habits needs serious improvement
+44,6.36,3,Semi-Urban,No,Business,Online,Luxury,63270.0,14,74.6,2,5,4,5,2,Unlikely,Ecommerce Shopping Habits feels overpriced for what it offers
+51,11.76,8,Semi-Urban,No,Business,Offline,Luxury,9535.0,13,65.4,3,4,5,4,9,Definitely,Ecommerce Shopping Habits feels overpriced for what it offers
+49,24.03,3,Rural,Yes,Business,Offline,Luxury,21571.0,17,239.3,2,4,5,3,9,Definitely,Ecommerce Shopping Habits exceeded my expectations
+60,39.06,1,Urban,No,Family,Online,Mass,36832.0,11,198.6,4,4,3,5,7,Definitely,I am unsure about long term value of Ecommerce Shopping Habits
+30,29.7,2,Rural,Yes,Business,Online,Premium,80014.0,15,46.2,5,5,2,5,6,Definitely,Ecommerce Shopping Habits exceeded my expectations
+24,16.15,2,Semi-Urban,No,Business,Online,Premium,76856.0,16,99.7,5,4,3,4,6,Definitely,I am unsure about long term value of Ecommerce Shopping Habits
+23,37.41,6,Semi-Urban,No,Family,Hybrid,Luxury,70825.0,14,230.8,5,4,2,4,7,Unlikely,Ecommerce Shopping Habits is impressive and modern
+33,36.17,4,Urban,No,Leisure,Online,Premium,89144.0,10,418.0,3,3,2,4,8,Definitely,Ecommerce Shopping Habits exceeded my expectations
+41,33.84,2,Semi-Urban,Yes,Family,Hybrid,Premium,23354.0,18,78.2,4,4,2,5,7,Maybe,I am unsure about long term value of Ecommerce Shopping Habits
+28,9.98,7,Semi-Urban,Yes,Personal,Hybrid,Mass,43168.0,13,70.2,5,4,1,4,3,Definitely,Ecommerce Shopping Habits needs serious improvement
+29,55.99,3,Urban,No,Business,Offline,Luxury,41312.0,20,406.3,5,2,2,4,5,Definitely,Ecommerce Shopping Habits feels overpriced for what it offers
+66,37.57,5,Semi-Urban,No,Business,Offline,Premium,61746.0,10,256.3,1,3,5,4,7,Definitely,Ecommerce Shopping Habits is impressive and modern
+21,19.52,4,Urban,Yes,Personal,Hybrid,Premium,76813.0,20,192.9,5,3,4,4,7,Definitely,Ecommerce Shopping Habits exceeded my expectations
+34,42.81,6,Semi-Urban,Yes,Personal,Online,Luxury,45268.0,17,241.4,4,2,3,5,6,Definitely,I am unsure about long term value of Ecommerce Shopping Habits
+32,22.48,1,Semi-Urban,No,Family,Online,Premium,45255.0,11,217.2,2,3,1,3,4,Definitely,Ecommerce Shopping Habits needs serious improvement
+56,32.82,2,Semi-Urban,Yes,Family,Hybrid,Premium,55532.0,16,395.3,3,4,4,4,4,Maybe,I am unsure about long term value of Ecommerce Shopping Habits
+42,23.76,6,Urban,Yes,Family,Online,Premium,67338.0,15,24.5,2,4,2,4,6,Maybe,Ecommerce Shopping Habits exceeded my expectations
+56,53.42,5,Urban,No,Business,Online,Mass,19714.0,15,227.9,4,3,3,4,5,Maybe,I am unsure about long term value of Ecommerce Shopping Habits
+65,59.67,3,Rural,No,Personal,Online,Mass,86644.0,16,96.3,1,3,5,5,5,Definitely,Ecommerce Shopping Habits exceeded my expectations
+36,13.87,1,Urban,Yes,Personal,Online,Mass,10101.0,16,168.0,4,4,2,3,8,Definitely,I am unsure about long term value of Ecommerce Shopping Habits
+31,6.3,8,Rural,No,Business,Online,Mass,4033.0,17,73.8,5,3,5,4,6,Unlikely,Ecommerce Shopping Habits feels overpriced for what it offers
+23,17.06,1,Urban,Yes,Business,Online,Mass,33574.0,20,225.0,5,5,2,5,6,Definitely,Ecommerce Shopping Habits exceeded my expectations
+54,37.45,2,Semi-Urban,Yes,Family,Online,Premium,63726.0,14,328.8,4,1,5,3,6,Definitely,Ecommerce Shopping Habits exceeded my expectations
+45,14.57,7,Urban,Yes,Personal,Offline,Mass,88071.0,13,337.6,4,3,2,1,7,Definitely,Ecommerce Shopping Habits is impressive and modern
+46,49.63,5,Semi-Urban,No,Family,Hybrid,Luxury,84083.0,18,402.4,4,2,2,3,3,Definitely,Ecommerce Shopping Habits feels overpriced for what it offers
+23,27.48,3,Rural,No,Leisure,Online,Luxury,62587.0,15,411.2,5,4,3,5,9,Definitely,Ecommerce Shopping Habits exceeded my expectations
+40,38.58,3,Urban,Yes,Family,Online,Premium,40416.0,14,306.9,5,2,2,2,3,Definitely,Ecommerce Shopping Habits needs serious improvement
+51,30.06,3,Urban,Yes,Leisure,Online,Luxury,54431.0,12,189.5,5,4,2,2,7,Maybe,I am unsure about long term value of Ecommerce Shopping Habits
+69,54.68,3,Semi-Urban,Yes,Family,Hybrid,Premium,87242.0,7,44.6,3,5,3,3,7,Definitely,Ecommerce Shopping Habits needs serious improvement
+21,6.93,2,Rural,Yes,Business,Online,Luxury,25364.0,13,37.2,3,2,3,5,3,Definitely,I am unsure about long term value of Ecommerce Shopping Habits
+46,45.11,6,Urban,No,Leisure,Online,Premium,44089.0,10,74.4,5,5,5,5,10,Unlikely,I am unsure about long term value of Ecommerce Shopping Habits
+45,40.87,6,Rural,No,Leisure,Online,Premium,62975.0,13,492.2,5,4,2,2,1,Definitely,Ecommerce Shopping Habits is impressive and modern
+31,40.72,6,Semi-Urban,Yes,Family,Online,Luxury,2906.0,17,397.3,4,2,2,5,5,Maybe,Ecommerce Shopping Habits exceeded my expectations
+36,27.77,2,Urban,No,Personal,Online,Premium,35551.0,15,214.3,4,4,4,3,6,Definitely,I am unsure about long term value of Ecommerce Shopping Habits
+40,5.86,8,Urban,No,Business,Offline,Premium,51976.0,15,243.8,3,1,2,3,8,Unlikely,Ecommerce Shopping Habits is impressive and modern
+62,42.91,8,Urban,Yes,Business,Offline,Premium,81281.0,16,373.9,3,4,1,4,1,Maybe,Ecommerce Shopping Habits needs serious improvement
+58,50.62,5,Semi-Urban,Yes,Leisure,Online,Luxury,89296.0,14,266.9,4,5,3,4,7,Definitely,Ecommerce Shopping Habits is impressive and modern
+22,9.69,7,Semi-Urban,No,Business,Online,Premium,50957.0,20,193.0,5,5,3,4,4,Unlikely,Ecommerce Shopping Habits needs serious improvement
+49,29.29,4,Urban,No,Personal,Online,Premium,85123.0,11,187.8,5,1,3,5,7,Maybe,Ecommerce Shopping Habits exceeded my expectations
+27,13.94,2,Semi-Urban,No,Business,Offline,Premium,10735.0,18,120.6,3,1,2,4,7,Definitely,I am unsure about long term value of Ecommerce Shopping Habits
+69,38.6,3,Semi-Urban,No,Personal,Online,Luxury,63712.0,8,445.1,3,5,5,5,1,Unlikely,Ecommerce Shopping Habits feels overpriced for what it offers
+60,48.21,6,Urban,Yes,Business,Offline,Premium,37249.0,14,218.8,3,4,4,2,2,Definitely,Ecommerce Shopping Habits needs serious improvement
+65,41.67,6,Rural,Yes,Business,Online,Premium,68086.0,9,381.1,3,4,4,5,2,Definitely,I am unsure about long term value of Ecommerce Shopping Habits
+45,22.49,5,Rural,No,Family,Offline,Premium,78360.0,10,295.4,2,4,4,3,9,Unlikely,Ecommerce Shopping Habits feels overpriced for what it offers
+24,12.69,3,Urban,No,Leisure,Online,Mass,6728.0,14,382.0,5,4,1,4,9,Maybe,Ecommerce Shopping Habits feels overpriced for what it offers
+63,48.68,2,Rural,No,Business,Offline,Premium,84322.0,9,174.0,5,4,3,3,6,Definitely,Ecommerce Shopping Habits needs serious improvement
+54,22.82,6,Rural,No,Leisure,Online,Luxury,7998.0,15,381.0,4,5,4,3,9,Definitely,I am unsure about long term value of Ecommerce Shopping Habits
+45,6.22,5,Urban,Yes,Business,Online,Premium,68299.0,9,399.2,4,1,1,5,6,Definitely,Ecommerce Shopping Habits feels overpriced for what it offers
+28,36.43,7,Urban,Yes,Leisure,Hybrid,Premium,8078.0,25,70.1,5,4,4,4,6,Definitely,Ecommerce Shopping Habits is impressive and modern
+52,18.57,8,Semi-Urban,No,Business,Online,Premium,77828.0,18,63.9,4,4,5,3,6,Definitely,Ecommerce Shopping Habits is impressive and modern
+38,51.27,3,Rural,No,Leisure,Online,Luxury,20038.0,7,493.0,4,5,3,3,8,Definitely,I am unsure about long term value of Ecommerce Shopping Habits
+60,12.88,6,Rural,Yes,Business,Hybrid,Premium,40198.0,22,76.6,5,5,2,5,4,Maybe,Ecommerce Shopping Habits exceeded my expectations
+31,28.91,4,Urban,Yes,Personal,Online,Mass,84071.0,16,348.7,4,2,3,4,5,Definitely,Ecommerce Shopping Habits is impressive and modern
+57,18.92,1,Urban,Yes,Personal,Offline,Premium,71702.0,13,379.0,5,4,3,4,8,Definitely,Ecommerce Shopping Habits needs serious improvement
+59,42.93,1,Semi-Urban,No,Leisure,Online,Premium,71148.0,18,50.5,4,5,3,5,9,Definitely,I am unsure about long term value of Ecommerce Shopping Habits
+56,35.17,6,Urban,No,Business,Online,Luxury,69173.0,8,378.3,4,3,4,5,3,Unlikely,Ecommerce Shopping Habits feels overpriced for what it offers
+30,48.5,3,Urban,No,Personal,Online,Luxury,52110.0,19,221.4,2,5,2,5,7,Definitely,Ecommerce Shopping Habits is impressive and modern
+26,30.22,6,Semi-Urban,Yes,Business,Offline,Mass,85726.0,15,151.8,5,4,2,4,0,Definitely,I am unsure about long term value of Ecommerce Shopping Habits
+65,5.26,7,Semi-Urban,Yes,Family,Online,Luxury,75184.0,18,339.4,2,3,4,2,4,Definitely,I am unsure about long term value of Ecommerce Shopping Habits
+36,16.84,1,Urban,Yes,Leisure,Online,Premium,40745.0,18,419.9,5,5,3,5,2,Maybe,Ecommerce Shopping Habits exceeded my expectations
+45,59.95,6,Rural,Yes,Business,Online,Premium,67345.0,11,294.9,5,5,4,5,6,Definitely,Ecommerce Shopping Habits feels overpriced for what it offers
+54,27.29,6,Urban,No,Personal,Online,Luxury,89833.0,14,437.9,5,3,4,5,5,Unlikely,Ecommerce Shopping Habits feels overpriced for what it offers
+51,39.11,4,Semi-Urban,Yes,Personal,Hybrid,Premium,78648.0,18,30.7,4,4,2,4,3,Maybe,Ecommerce Shopping Habits feels overpriced for what it offers
+67,54.77,6,Semi-Urban,Yes,Business,Online,Mass,2108.0,13,374.5,4,1,2,4,0,Definitely,Ecommerce Shopping Habits needs serious improvement
+28,6.13,7,Urban,No,Leisure,Hybrid,Luxury,66934.0,17,101.3,5,3,3,5,5,Maybe,I am unsure about long term value of Ecommerce Shopping Habits
+37,41.28,4,Semi-Urban,Yes,Business,Online,Mass,81014.0,8,157.3,5,1,5,5,5,Definitely,Ecommerce Shopping Habits needs serious improvement
+34,20.86,3,Rural,No,Business,Online,Luxury,30842.0,15,294.7,5,3,4,1,1,Definitely,Ecommerce Shopping Habits needs serious improvement
+50,20.36,4,Semi-Urban,Yes,Business,Online,Premium,88019.0,14,151.7,2,5,3,4,9,Definitely,I am unsure about long term value of Ecommerce Shopping Habits
+38,17.37,1,Semi-Urban,No,Family,Hybrid,Mass,37314.0,14,100.7,3,4,3,4,6,Unlikely,Ecommerce Shopping Habits feels overpriced for what it offers
+66,50.25,3,Urban,No,Leisure,Online,Mass,39064.0,8,445.0,5,4,4,5,8,Definitely,I am unsure about long term value of Ecommerce Shopping Habits
+56,25.51,7,Urban,Yes,Business,Hybrid,Mass,16157.0,11,455.2,4,2,3,2,6,Maybe,Ecommerce Shopping Habits exceeded my expectations
+41,8.69,6,Semi-Urban,Yes,Personal,Online,Luxury,10500.0,9,37.5,2,4,1,5,2,Unlikely,I am unsure about long term value of Ecommerce Shopping Habits
+51,10.33,1,Rural,Yes,Family,Offline,Mass,49220.0,18,260.1,3,3,2,2,5,Maybe,I am unsure about long term value of Ecommerce Shopping Habits
+53,13.17,4,Semi-Urban,No,Business,Offline,Premium,55044.0,16,117.8,1,4,1,2,9,Definitely,Ecommerce Shopping Habits is impressive and modern
+43,54.44,4,Semi-Urban,No,Business,Online,Mass,34287.0,12,434.4,5,2,3,3,0,Maybe,Ecommerce Shopping Habits exceeded my expectations
+58,28.51,5,Semi-Urban,No,Family,Online,Luxury,55382.0,16,242.0,4,3,2,5,9,Definitely,Ecommerce Shopping Habits is impressive and modern
+25,55.38,2,Urban,Yes,Business,Offline,Luxury,36731.0,11,249.7,4,5,4,4,7,Maybe,Ecommerce Shopping Habits feels overpriced for what it offers
+35,49.96,7,Semi-Urban,Yes,Business,Online,Premium,78400.0,18,321.2,5,2,2,1,10,Definitely,Ecommerce Shopping Habits feels overpriced for what it offers
+50,51.08,7,Urban,Yes,Family,Online,Luxury,85936.0,10,46.7,5,4,1,3,9,Definitely,Ecommerce Shopping Habits exceeded my expectations
+36,20.78,6,Semi-Urban,No,Family,Online,Premium,54232.0,14,81.1,3,3,2,2,9,Maybe,Ecommerce Shopping Habits needs serious improvement
+60,19.92,8,Semi-Urban,No,Business,Online,Mass,76120.0,17,259.2,3,1,2,1,1,Definitely,I am unsure about long term value of Ecommerce Shopping Habits
+49,35.8,2,Semi-Urban,Yes,Leisure,Online,Mass,77129.0,15,484.0,4,2,2,4,5,Definitely,Ecommerce Shopping Habits is impressive and modern
+48,27.99,3,Rural,Yes,Family,Online,Premium,64811.0,18,424.9,4,5,2,4,5,Unlikely,Ecommerce Shopping Habits exceeded my expectations
+26,33.0,1,Urban,Yes,Family,Online,Mass,18896.0,20,446.9,5,5,5,4,7,Unlikely,Ecommerce Shopping Habits is impressive and modern
+25,7.93,8,Urban,Yes,Family,Online,Luxury,15635.0,15,85.8,3,3,5,3,7,Maybe,I am unsure about long term value of Ecommerce Shopping Habits
+58,58.44,2,Semi-Urban,No,Personal,Online,Luxury,82915.0,11,480.1,3,4,4,5,3,Unlikely,Ecommerce Shopping Habits needs serious improvement
+45,8.2,3,Rural,Yes,Family,Online,Premium,25325.0,21,370.4,3,4,2,4,8,Unlikely,Ecommerce Shopping Habits is impressive and modern
+48,14.84,4,Urban,No,Business,Online,Luxury,23677.0,15,176.3,4,3,4,4,3,Unlikely,Ecommerce Shopping Habits exceeded my expectations
+21,42.3,2,Rural,Yes,Business,Hybrid,Mass,16619.0,16,434.9,5,3,1,5,6,Definitely,I am unsure about long term value of Ecommerce Shopping Habits
+34,13.55,1,Semi-Urban,No,Business,Hybrid,Mass,48416.0,10,378.7,3,4,1,3,7,Definitely,I am unsure about long term value of Ecommerce Shopping Habits
+39,10.88,8,Semi-Urban,Yes,Personal,Hybrid,Premium,61576.0,12,373.5,4,4,4,3,9,Definitely,Ecommerce Shopping Habits needs serious improvement
+51,13.45,5,Rural,No,Business,Online,Premium,61502.0,8,372.6,5,3,3,3,7,Unlikely,Ecommerce Shopping Habits exceeded my expectations
+35,8.41,7,Semi-Urban,No,Family,Online,Premium,24973.0,14,404.4,2,4,2,5,10,Unlikely,I am unsure about long term value of Ecommerce Shopping Habits
+39,18.82,8,Semi-Urban,No,Family,Offline,Mass,10341.0,17,475.3,4,5,4,2,10,Maybe,Ecommerce Shopping Habits is impressive and modern
+58,19.91,5,Semi-Urban,No,Business,Offline,Premium,29298.0,18,85.7,3,1,1,4,6,Definitely,Ecommerce Shopping Habits feels overpriced for what it offers
+52,32.42,2,Semi-Urban,Yes,Personal,Online,Luxury,46302.0,16,499.8,4,2,2,5,2,Definitely,Ecommerce Shopping Habits exceeded my expectations
+51,29.13,5,Urban,Yes,Family,Offline,Premium,55895.0,7,438.7,2,5,4,4,1,Definitely,Ecommerce Shopping Habits is impressive and modern
+57,31.05,3,Semi-Urban,No,Business,Online,Premium,25813.0,15,232.0,4,1,2,4,9,Maybe,Ecommerce Shopping Habits needs serious improvement
+46,38.88,6,Semi-Urban,No,Business,Hybrid,Mass,18118.0,13,95.6,4,4,3,2,6,Unlikely,Ecommerce Shopping Habits needs serious improvement
+68,17.7,1,Semi-Urban,Yes,Personal,Hybrid,Premium,76059.0,13,237.8,4,4,2,5,5,Definitely,I am unsure about long term value of Ecommerce Shopping Habits
+61,12.41,4,Urban,No,Personal,Online,Premium,77497.0,16,393.7,4,1,2,4,5,Maybe,Ecommerce Shopping Habits needs serious improvement
+45,53.34,1,Semi-Urban,No,Business,Online,Premium,26636.0,14,309.2,4,1,4,5,5,Unlikely,Ecommerce Shopping Habits feels overpriced for what it offers
+67,39.87,4,Urban,Yes,Leisure,Online,Luxury,51290.0,13,154.2,5,4,2,5,2,Definitely,Ecommerce Shopping Habits is impressive and modern
+60,8.34,8,Rural,Yes,Leisure,Online,Mass,40705.0,11,215.3,3,2,3,4,5,Unlikely,Ecommerce Shopping Habits exceeded my expectations
+28,57.86,5,Urban,Yes,Leisure,Online,Premium,14493.0,14,478.1,4,5,2,4,7,Maybe,I am unsure about long term value of Ecommerce Shopping Habits
+24,43.12,3,Semi-Urban,Yes,Family,Hybrid,Premium,84772.0,14,405.8,4,3,2,5,5,Maybe,Ecommerce Shopping Habits exceeded my expectations
+51,13.34,4,Urban,No,Family,Offline,Mass,2861.0,11,79.6,3,2,1,5,9,Maybe,Ecommerce Shopping Habits is impressive and modern
+52,58.3,7,Semi-Urban,Yes,Personal,Offline,Luxury,18507.0,19,281.8,4,2,3,4,7,Definitely,Ecommerce Shopping Habits feels overpriced for what it offers
+54,25.1,8,Semi-Urban,No,Family,Hybrid,Luxury,32410.0,15,466.9,1,5,2,5,9,Maybe,Ecommerce Shopping Habits is impressive and modern
+68,59.15,8,Semi-Urban,No,Family,Online,Premium,77369.0,12,36.5,4,4,2,4,3,Definitely,Ecommerce Shopping Habits is impressive and modern
+23,10.68,5,Urban,No,Business,Offline,Premium,71402.0,13,40.4,3,4,4,4,6,Definitely,I am unsure about long term value of Ecommerce Shopping Habits
+61,13.8,4,Rural,No,Family,Offline,Luxury,53030.0,10,364.0,5,1,4,3,1,Maybe,Ecommerce Shopping Habits exceeded my expectations
+46,41.16,2,Urban,No,Family,Hybrid,Premium,63162.0,12,296.3,3,4,3,4,9,Definitely,Ecommerce Shopping Habits is impressive and modern
+24,6.22,1,Rural,No,Business,Online,Premium,32000.0,16,42.1,3,5,1,2,3,Maybe,Ecommerce Shopping Habits is impressive and modern
+22,6.03,6,Semi-Urban,Yes,Family,Offline,Luxury,84768.0,16,498.1,4,4,5,4,8,Definitely,Ecommerce Shopping Habits feels overpriced for what it offers
+39,48.56,6,Urban,Yes,Family,Hybrid,Luxury,4357.0,14,298.4,5,2,1,2,9,Maybe,Ecommerce Shopping Habits needs serious improvement
+43,14.23,8,Semi-Urban,No,Business,Online,Premium,10882.0,10,256.1,3,5,1,4,6,Unlikely,Ecommerce Shopping Habits feels overpriced for what it offers
+45,55.53,3,Semi-Urban,Yes,Personal,Online,Mass,83449.0,11,234.9,5,1,2,3,5,Definitely,Ecommerce Shopping Habits exceeded my expectations
+67,28.42,5,Semi-Urban,Yes,Business,Hybrid,Mass,85165.0,7,356.3,3,4,5,5,7,Definitely,Ecommerce Shopping Habits exceeded my expectations
+27,53.05,3,Urban,Yes,Leisure,Online,Premium,45170.0,19,240.0,4,5,2,4,8,Definitely,I am unsure about long term value of Ecommerce Shopping Habits
+28,27.98,1,Rural,Yes,Business,Online,Luxury,52729.0,15,336.4,2,5,3,5,7,Maybe,Ecommerce Shopping Habits needs serious improvement
+23,34.16,6,Semi-Urban,No,Business,Online,Premium,81423.0,11,254.4,2,4,4,4,0,Unlikely,Ecommerce Shopping Habits exceeded my expectations
+43,22.41,4,Urban,Yes,Family,Offline,Premium,77102.0,16,313.1,4,5,5,5,8,Definitely,Ecommerce Shopping Habits needs serious improvement
+67,41.19,8,Semi-Urban,No,Leisure,Offline,Mass,77852.0,12,406.5,3,4,3,3,3,Maybe,Ecommerce Shopping Habits feels overpriced for what it offers
+53,22.5,4,Urban,No,Personal,Offline,Premium,34717.0,13,412.2,3,1,2,4,6,Definitely,Ecommerce Shopping Habits exceeded my expectations
+68,17.27,3,Urban,No,Leisure,Online,Premium,75088.0,16,427.5,4,3,5,4,5,Maybe,Ecommerce Shopping Habits is impressive and modern
+48,9.46,4,Urban,No,Business,Hybrid,Premium,8099.0,16,117.4,5,3,1,3,9,Definitely,Ecommerce Shopping Habits exceeded my expectations
+42,8.17,4,Rural,Yes,Business,Online,Luxury,44853.0,15,49.3,3,4,4,5,6,Definitely,Ecommerce Shopping Habits needs serious improvement
+55,21.83,7,Urban,Yes,Leisure,Hybrid,Luxury,22892.0,9,421.3,3,2,2,3,6,Definitely,Ecommerce Shopping Habits exceeded my expectations
+54,45.51,7,Semi-Urban,Yes,Business,Hybrid,Luxury,5150.0,14,40.3,4,5,4,4,2,Definitely,I am unsure about long term value of Ecommerce Shopping Habits
+50,16.31,4,Urban,No,Family,Online,Premium,56315.0,9,122.5,4,2,1,1,9,Unlikely,Ecommerce Shopping Habits is impressive and modern
+67,21.46,8,Urban,No,Business,Online,Luxury,8704.0,12,272.6,4,4,2,2,4,Definitely,I am unsure about long term value of Ecommerce Shopping Habits
+56,54.78,2,Urban,No,Leisure,Online,Premium,12574.0,14,430.6,4,5,1,3,6,Definitely,Ecommerce Shopping Habits feels overpriced for what it offers
+34,40.15,8,Rural,No,Business,Online,Luxury,9194.0,16,450.5,4,4,1,5,10,Unlikely,Ecommerce Shopping Habits exceeded my expectations
+29,55.58,7,Urban,Yes,Leisure,Offline,Premium,87804.0,19,321.5,2,2,3,5,3,Definitely,Ecommerce Shopping Habits exceeded my expectations
+42,55.12,5,Urban,Yes,Business,Online,Luxury,5453.0,13,484.0,5,5,4,5,7,Definitely,Ecommerce Shopping Habits feels overpriced for what it offers
+48,8.49,8,Urban,No,Leisure,Online,Mass,25739.0,13,370.4,1,1,5,5,4,Maybe,I am unsure about long term value of Ecommerce Shopping Habits
+61,57.53,5,Urban,No,Business,Offline,Luxury,59376.0,17,273.3,4,2,1,4,6,Definitely,Ecommerce Shopping Habits is impressive and modern
+34,7.81,8,Rural,Yes,Family,Online,Mass,74458.0,12,84.5,3,2,1,4,6,Unlikely,I am unsure about long term value of Ecommerce Shopping Habits
+35,55.91,8,Rural,Yes,Business,Offline,Mass,55522.0,14,225.8,2,4,5,5,9,Definitely,Ecommerce Shopping Habits needs serious improvement
+57,35.07,6,Urban,No,Personal,Offline,Premium,87932.0,22,414.7,3,5,4,4,0,Unlikely,I am unsure about long term value of Ecommerce Shopping Habits
+44,34.33,8,Urban,No,Business,Online,Premium,31718.0,11,156.2,4,2,3,5,5,Definitely,Ecommerce Shopping Habits is impressive and modern
+54,44.23,7,Semi-Urban,Yes,Business,Offline,Premium,43536.0,14,297.6,4,5,3,4,9,Definitely,Ecommerce Shopping Habits exceeded my expectations
+69,53.36,8,Urban,No,Personal,Offline,Premium,74275.0,17,492.0,5,2,1,4,9,Maybe,I am unsure about long term value of Ecommerce Shopping Habits
+63,38.94,1,Rural,Yes,Business,Offline,Mass,61989.0,11,103.7,4,3,2,3,5,Definitely,Ecommerce Shopping Habits feels overpriced for what it offers
+65,28.4,4,Urban,No,Family,Online,Premium,20838.0,14,68.7,3,3,2,2,4,Definitely,Ecommerce Shopping Habits is impressive and modern

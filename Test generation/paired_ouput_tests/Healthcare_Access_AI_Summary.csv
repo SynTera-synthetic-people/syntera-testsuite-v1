@@ -1,0 +1,61 @@
+﻿Context,Question_ID,Question_Text,Option,Count
+Healthcare_Access,Q1,What is your age?,MEAN,46.17
+Healthcare_Access,Q1,What is your age?,MEDIAN,47.0
+Healthcare_Access,Q1,What is your age?,STD,14.31
+Healthcare_Access,Q2,What is your monthly income (in Lakhs)?,MEAN,32.47
+Healthcare_Access,Q2,What is your monthly income (in Lakhs)?,MEDIAN,32.32
+Healthcare_Access,Q2,What is your monthly income (in Lakhs)?,STD,15.86
+Healthcare_Access,Q3,How many people live in your household?,MEAN,4.2
+Healthcare_Access,Q3,How many people live in your household?,MEDIAN,4.0
+Healthcare_Access,Q3,How many people live in your household?,STD,2.26
+Healthcare_Access,Q4,What type of area do you live in?,Rural,46.0
+Healthcare_Access,Q4,What type of area do you live in?,Semi-Urban,111.0
+Healthcare_Access,Q4,What type of area do you live in?,Urban,101.0
+Healthcare_Access,Q5,Do you currently use this product/service?,No,142.0
+Healthcare_Access,Q5,Do you currently use this product/service?,Yes,116.0
+Healthcare_Access,Q6,What is your primary purpose of usage?,Business,101.0
+Healthcare_Access,Q6,What is your primary purpose of usage?,Family,45.0
+Healthcare_Access,Q6,What is your primary purpose of usage?,Leisure,64.0
+Healthcare_Access,Q6,What is your primary purpose of usage?,Personal,48.0
+Healthcare_Access,Q7,What is your preferred interaction channel?,Hybrid,45.0
+Healthcare_Access,Q7,What is your preferred interaction channel?,Offline,67.0
+Healthcare_Access,Q7,What is your preferred interaction channel?,Online,146.0
+Healthcare_Access,Q8,Which brand segment do you prefer?,Luxury,81.0
+Healthcare_Access,Q8,Which brand segment do you prefer?,Mass,73.0
+Healthcare_Access,Q8,Which brand segment do you prefer?,Premium,104.0
+Healthcare_Access,Q9,How much do you spend monthly on this category?,MEAN,45358.57
+Healthcare_Access,Q9,How much do you spend monthly on this category?,MEDIAN,43878.5
+Healthcare_Access,Q9,How much do you spend monthly on this category?,STD,25009.91
+Healthcare_Access,Q10,How many times do you use it per month?,MEAN,14.14
+Healthcare_Access,Q10,How many times do you use it per month?,MEDIAN,14.0
+Healthcare_Access,Q10,How many times do you use it per month?,STD,3.6
+Healthcare_Access,Q11,How far do you travel weekly (km)?,MEAN,256.44
+Healthcare_Access,Q11,How far do you travel weekly (km)?,MEDIAN,255.5
+Healthcare_Access,Q11,How far do you travel weekly (km)?,STD,139.51
+Healthcare_Access,Q12,Overall satisfaction (1-5),1,16.0
+Healthcare_Access,Q12,Overall satisfaction (1-5),2,18.0
+Healthcare_Access,Q12,Overall satisfaction (1-5),3,69.0
+Healthcare_Access,Q12,Overall satisfaction (1-5),4,93.0
+Healthcare_Access,Q12,Overall satisfaction (1-5),5,62.0
+Healthcare_Access,Q13,Ease of use (1-5),1,30.0
+Healthcare_Access,Q13,Ease of use (1-5),2,34.0
+Healthcare_Access,Q13,Ease of use (1-5),3,66.0
+Healthcare_Access,Q13,Ease of use (1-5),4,78.0
+Healthcare_Access,Q13,Ease of use (1-5),5,50.0
+Healthcare_Access,Q14,Value for money (1-5),1,52.0
+Healthcare_Access,Q14,Value for money (1-5),2,60.0
+Healthcare_Access,Q14,Value for money (1-5),3,58.0
+Healthcare_Access,Q14,Value for money (1-5),4,58.0
+Healthcare_Access,Q14,Value for money (1-5),5,30.0
+Healthcare_Access,Q15,Trust in brand (1-5),1,6.0
+Healthcare_Access,Q15,Trust in brand (1-5),2,25.0
+Healthcare_Access,Q15,Trust in brand (1-5),3,50.0
+Healthcare_Access,Q15,Trust in brand (1-5),4,77.0
+Healthcare_Access,Q15,Trust in brand (1-5),5,100.0
+Healthcare_Access,Q16,Likelihood to recommend (0-10),MEAN,5.8
+Healthcare_Access,Q16,Likelihood to recommend (0-10),MEDIAN,6.0
+Healthcare_Access,Q16,Likelihood to recommend (0-10),STD,2.37
+Healthcare_Access,Q17,Future intent to use,Definitely,144.0
+Healthcare_Access,Q17,Future intent to use,Maybe,64.0
+Healthcare_Access,Q17,Future intent to use,Unlikely,50.0
+Healthcare_Access,Q18,Any additional feedback?,TOTAL_RESPONSES,258.0

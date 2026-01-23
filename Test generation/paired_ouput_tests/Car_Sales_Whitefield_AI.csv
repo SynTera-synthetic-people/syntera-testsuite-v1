@@ -1,0 +1,282 @@
+﻿Age,Monthly_Income_Lakh,Household_Size,Area_Type,Current_User,Primary_Purpose,Preferred_Channel,Brand_Segment,Monthly_Spend,Usage_Frequency_per_Month,Travel_Distance_km_per_Week,Satisfaction_1to5,Ease_of_Use_1to5,Value_for_Money_1to5,Trust_in_Brand_1to5,Recommend_NPS_0to10,Future_Intent,Open_Ended_Feedback
+34,37.74,2,Semi-Urban,No,Personal,Online,Mass,73763.0,12,364.1,3,3,5,4,6,Unlikely,Car Sales Whitefield is impressive and modern
+53,34.66,6,Urban,No,Leisure,Online,Premium,45538.0,15,440.8,3,5,2,2,4,Definitely,Car Sales Whitefield is impressive and modern
+68,58.28,6,Urban,Yes,Business,Online,Luxury,13771.0,11,123.8,1,4,2,3,8,Definitely,I am unsure about long term value of Car Sales Whitefield
+30,31.63,8,Urban,Yes,Family,Online,Premium,79942.0,16,407.5,4,1,2,5,8,Definitely,Car Sales Whitefield feels overpriced for what it offers
+39,8.5,5,Urban,No,Personal,Online,Premium,59132.0,18,383.6,4,4,2,1,7,Definitely,Car Sales Whitefield feels overpriced for what it offers
+50,35.34,5,Semi-Urban,Yes,Business,Online,Luxury,16392.0,7,191.3,4,3,3,5,8,Unlikely,Car Sales Whitefield feels overpriced for what it offers
+42,51.26,1,Semi-Urban,Yes,Leisure,Online,Premium,4961.0,12,495.0,2,4,3,5,6,Unlikely,Car Sales Whitefield is impressive and modern
+23,59.83,2,Urban,No,Leisure,Online,Premium,14418.0,22,146.0,2,4,3,4,7,Unlikely,Car Sales Whitefield needs serious improvement
+57,28.67,6,Urban,No,Business,Offline,Premium,55574.0,10,142.3,3,5,2,3,6,Unlikely,Car Sales Whitefield is impressive and modern
+61,22.62,7,Urban,No,Leisure,Online,Luxury,17778.0,11,390.7,3,3,2,1,7,Definitely,Car Sales Whitefield needs serious improvement
+38,54.87,4,Semi-Urban,Yes,Personal,Offline,Luxury,21867.0,16,228.6,5,5,3,5,4,Unlikely,Car Sales Whitefield exceeded my expectations
+31,15.52,4,Urban,No,Personal,Online,Premium,4212.0,10,178.8,3,5,2,2,2,Unlikely,Car Sales Whitefield is impressive and modern
+68,38.85,2,Semi-Urban,Yes,Leisure,Online,Premium,65618.0,12,105.8,1,5,3,3,6,Definitely,Car Sales Whitefield is impressive and modern
+22,27.31,3,Semi-Urban,No,Business,Online,Luxury,73312.0,18,387.4,3,4,3,4,6,Definitely,Car Sales Whitefield is impressive and modern
+32,7.26,1,Urban,Yes,Business,Online,Mass,72123.0,12,397.4,4,3,3,3,4,Definitely,Car Sales Whitefield feels overpriced for what it offers
+26,24.1,2,Urban,No,Business,Online,Premium,13226.0,17,292.0,4,3,3,4,7,Definitely,Car Sales Whitefield feels overpriced for what it offers
+63,19.59,8,Urban,No,Leisure,Hybrid,Mass,81490.0,16,479.5,5,1,3,5,2,Definitely,Car Sales Whitefield needs serious improvement
+60,42.74,8,Semi-Urban,Yes,Business,Online,Luxury,61161.0,21,172.7,2,2,2,4,4,Unlikely,Car Sales Whitefield needs serious improvement
+64,57.18,4,Rural,No,Leisure,Online,Mass,80983.0,12,125.4,4,4,1,5,8,Unlikely,Car Sales Whitefield is impressive and modern
+49,19.74,5,Urban,No,Business,Offline,Premium,41350.0,19,345.2,3,4,3,5,6,Definitely,Car Sales Whitefield needs serious improvement
+50,49.63,4,Rural,Yes,Personal,Online,Mass,40452.0,15,384.0,3,5,2,3,7,Definitely,Car Sales Whitefield feels overpriced for what it offers
+22,8.04,5,Urban,No,Leisure,Hybrid,Premium,71039.0,14,128.0,5,1,3,4,7,Unlikely,Car Sales Whitefield needs serious improvement
+29,34.6,1,Rural,Yes,Personal,Online,Luxury,10210.0,12,56.8,3,2,4,4,10,Maybe,Car Sales Whitefield exceeded my expectations
+67,8.88,5,Semi-Urban,No,Leisure,Hybrid,Premium,47837.0,13,409.0,4,4,5,4,7,Definitely,Car Sales Whitefield feels overpriced for what it offers
+22,56.37,2,Semi-Urban,No,Business,Online,Premium,75602.0,20,488.7,3,3,5,3,0,Maybe,Car Sales Whitefield exceeded my expectations
+49,47.15,5,Semi-Urban,Yes,Business,Online,Premium,75057.0,14,329.4,4,2,1,5,5,Unlikely,Car Sales Whitefield needs serious improvement
+53,41.19,3,Semi-Urban,No,Business,Hybrid,Premium,86140.0,15,153.4,5,5,5,4,3,Unlikely,I am unsure about long term value of Car Sales Whitefield
+30,50.31,8,Rural,Yes,Personal,Online,Luxury,63448.0,18,498.4,5,4,3,4,9,Definitely,Car Sales Whitefield is impressive and modern
+54,40.61,2,Semi-Urban,Yes,Family,Online,Premium,20284.0,11,448.8,5,3,3,4,3,Definitely,Car Sales Whitefield feels overpriced for what it offers
+64,58.29,8,Semi-Urban,No,Leisure,Offline,Luxury,3785.0,14,266.4,4,5,1,4,5,Unlikely,Car Sales Whitefield exceeded my expectations
+28,44.27,1,Urban,No,Leisure,Online,Mass,44189.0,20,416.2,3,4,4,5,4,Definitely,I am unsure about long term value of Car Sales Whitefield
+57,55.86,2,Urban,No,Family,Online,Mass,47206.0,14,411.6,4,4,1,4,8,Maybe,I am unsure about long term value of Car Sales Whitefield
+53,33.44,3,Rural,Yes,Leisure,Offline,Premium,23143.0,12,468.7,4,5,4,1,5,Definitely,Car Sales Whitefield feels overpriced for what it offers
+67,11.44,1,Semi-Urban,Yes,Leisure,Online,Premium,12973.0,13,423.6,1,1,1,3,10,Definitely,Car Sales Whitefield feels overpriced for what it offers
+26,34.05,4,Semi-Urban,No,Business,Hybrid,Premium,53586.0,15,329.0,4,4,3,5,1,Definitely,I am unsure about long term value of Car Sales Whitefield
+64,11.98,3,Semi-Urban,Yes,Personal,Hybrid,Luxury,69254.0,12,312.5,5,1,2,4,3,Definitely,Car Sales Whitefield is impressive and modern
+60,37.59,1,Rural,Yes,Leisure,Online,Mass,89398.0,15,244.3,4,1,2,5,4,Unlikely,Car Sales Whitefield is impressive and modern
+65,31.54,7,Semi-Urban,No,Business,Online,Mass,68731.0,16,320.7,3,5,1,2,8,Definitely,Car Sales Whitefield exceeded my expectations
+39,39.24,5,Semi-Urban,No,Leisure,Online,Luxury,71840.0,23,401.7,5,4,2,3,9,Unlikely,Car Sales Whitefield is impressive and modern
+52,5.55,2,Semi-Urban,No,Leisure,Online,Luxury,56249.0,9,485.1,3,4,1,3,2,Unlikely,I am unsure about long term value of Car Sales Whitefield
+47,15.72,1,Urban,Yes,Leisure,Hybrid,Mass,88761.0,14,244.3,3,5,3,4,1,Definitely,I am unsure about long term value of Car Sales Whitefield
+21,32.02,2,Urban,Yes,Business,Online,Premium,58316.0,13,295.4,4,5,3,4,8,Maybe,Car Sales Whitefield needs serious improvement
+63,57.28,5,Rural,Yes,Family,Online,Premium,77702.0,16,233.5,3,5,4,3,3,Definitely,I am unsure about long term value of Car Sales Whitefield
+53,26.1,1,Urban,No,Family,Hybrid,Luxury,85229.0,7,340.9,4,3,3,4,3,Maybe,Car Sales Whitefield is impressive and modern
+60,28.34,4,Rural,Yes,Family,Hybrid,Luxury,83828.0,14,322.4,3,3,1,4,1,Maybe,Car Sales Whitefield exceeded my expectations
+52,44.31,7,Urban,No,Personal,Online,Luxury,35565.0,4,28.6,3,2,2,3,1,Definitely,Car Sales Whitefield needs serious improvement
+25,38.21,7,Urban,No,Business,Online,Luxury,8922.0,14,279.8,3,3,2,4,4,Definitely,Car Sales Whitefield is impressive and modern
+37,21.44,3,Rural,No,Business,Offline,Premium,17125.0,9,62.5,5,3,5,5,2,Maybe,Car Sales Whitefield exceeded my expectations
+28,27.59,1,Semi-Urban,No,Leisure,Hybrid,Luxury,7212.0,13,32.7,4,4,4,3,5,Unlikely,Car Sales Whitefield is impressive and modern
+62,16.97,5,Urban,Yes,Personal,Offline,Premium,11275.0,13,399.8,3,4,2,3,8,Definitely,Car Sales Whitefield needs serious improvement
+54,58.13,1,Semi-Urban,Yes,Business,Online,Mass,18249.0,12,144.2,1,5,1,3,5,Maybe,I am unsure about long term value of Car Sales Whitefield
+29,12.18,2,Semi-Urban,No,Personal,Online,Premium,32016.0,14,183.5,3,4,4,5,7,Definitely,Car Sales Whitefield needs serious improvement
+43,25.45,6,Semi-Urban,Yes,Personal,Online,Luxury,49831.0,18,50.8,4,4,4,5,2,Unlikely,I am unsure about long term value of Car Sales Whitefield
+55,6.42,8,Urban,No,Personal,Online,Luxury,64628.0,11,106.2,2,3,4,4,7,Definitely,Car Sales Whitefield needs serious improvement
+27,17.2,1,Rural,No,Business,Hybrid,Mass,20562.0,13,387.5,4,1,4,3,5,Maybe,Car Sales Whitefield feels overpriced for what it offers
+35,47.93,7,Rural,No,Personal,Hybrid,Luxury,61182.0,20,256.9,4,3,3,5,8,Definitely,Car Sales Whitefield is impressive and modern
+40,16.06,7,Urban,Yes,Business,Hybrid,Luxury,63975.0,13,442.7,5,4,1,5,3,Maybe,Car Sales Whitefield is impressive and modern
+45,9.4,8,Rural,No,Family,Online,Premium,51159.0,15,210.7,4,2,3,5,9,Unlikely,Car Sales Whitefield feels overpriced for what it offers
+23,31.09,7,Rural,Yes,Leisure,Offline,Premium,81518.0,16,149.0,4,4,3,5,4,Maybe,I am unsure about long term value of Car Sales Whitefield
+66,5.55,4,Semi-Urban,No,Leisure,Hybrid,Luxury,11768.0,16,186.8,3,4,3,5,5,Maybe,Car Sales Whitefield is impressive and modern
+44,9.66,1,Semi-Urban,Yes,Leisure,Offline,Premium,17587.0,16,362.1,4,2,3,5,10,Definitely,Car Sales Whitefield feels overpriced for what it offers
+54,49.42,3,Urban,No,Leisure,Online,Mass,39723.0,16,286.4,4,3,2,4,7,Unlikely,Car Sales Whitefield is impressive and modern
+66,47.43,1,Urban,Yes,Leisure,Online,Luxury,13151.0,7,454.0,3,3,2,4,5,Maybe,Car Sales Whitefield exceeded my expectations
+42,55.33,6,Semi-Urban,No,Leisure,Hybrid,Luxury,51834.0,18,309.0,5,3,2,2,9,Unlikely,I am unsure about long term value of Car Sales Whitefield
+31,52.0,7,Rural,No,Business,Online,Premium,37059.0,16,256.6,2,4,1,5,5,Definitely,Car Sales Whitefield exceeded my expectations
+68,42.57,2,Semi-Urban,No,Personal,Hybrid,Luxury,27044.0,15,397.2,2,4,3,5,2,Definitely,I am unsure about long term value of Car Sales Whitefield
+28,7.88,7,Semi-Urban,Yes,Family,Online,Premium,16959.0,10,474.8,3,4,4,4,10,Definitely,Car Sales Whitefield feels overpriced for what it offers
+59,48.06,1,Urban,No,Family,Offline,Mass,31510.0,13,190.8,5,5,4,3,4,Definitely,I am unsure about long term value of Car Sales Whitefield
+63,51.5,4,Urban,No,Business,Offline,Premium,55500.0,18,139.9,4,4,2,3,9,Definitely,I am unsure about long term value of Car Sales Whitefield
+55,48.95,5,Semi-Urban,Yes,Business,Offline,Premium,52669.0,14,315.8,5,5,3,3,3,Unlikely,Car Sales Whitefield feels overpriced for what it offers
+69,32.97,1,Urban,Yes,Leisure,Online,Luxury,16399.0,9,259.5,3,2,1,3,8,Maybe,I am unsure about long term value of Car Sales Whitefield
+66,17.81,1,Semi-Urban,Yes,Leisure,Hybrid,Mass,12993.0,11,494.8,4,4,3,4,6,Unlikely,Car Sales Whitefield is impressive and modern
+58,51.49,3,Urban,Yes,Business,Offline,Premium,4348.0,11,241.9,3,3,2,5,10,Definitely,Car Sales Whitefield needs serious improvement
+28,44.99,4,Semi-Urban,No,Business,Online,Premium,3093.0,17,55.7,5,3,2,1,7,Definitely,Car Sales Whitefield feels overpriced for what it offers
+57,58.94,6,Urban,No,Leisure,Offline,Luxury,79423.0,15,489.1,1,2,4,1,1,Unlikely,Car Sales Whitefield needs serious improvement
+47,13.56,5,Semi-Urban,Yes,Family,Online,Mass,5968.0,16,424.9,3,4,3,4,7,Definitely,Car Sales Whitefield feels overpriced for what it offers
+48,17.41,7,Semi-Urban,No,Business,Online,Mass,66347.0,10,105.6,3,2,1,3,3,Definitely,Car Sales Whitefield feels overpriced for what it offers
+60,16.65,2,Urban,No,Family,Online,Mass,78735.0,18,454.2,5,2,2,5,8,Unlikely,Car Sales Whitefield exceeded my expectations
+54,48.59,1,Urban,Yes,Business,Hybrid,Luxury,10629.0,10,183.5,4,5,3,3,9,Definitely,Car Sales Whitefield exceeded my expectations
+52,15.28,6,Urban,No,Family,Online,Mass,40395.0,17,201.0,4,5,2,3,6,Definitely,I am unsure about long term value of Car Sales Whitefield
+35,8.67,5,Rural,No,Leisure,Offline,Mass,86683.0,17,455.1,4,4,4,3,8,Unlikely,Car Sales Whitefield needs serious improvement
+64,59.92,2,Urban,No,Business,Online,Mass,75404.0,18,274.5,5,4,3,2,3,Definitely,Car Sales Whitefield feels overpriced for what it offers
+37,6.36,6,Semi-Urban,Yes,Personal,Online,Luxury,45094.0,11,86.1,5,5,3,4,6,Unlikely,I am unsure about long term value of Car Sales Whitefield
+53,50.94,4,Rural,No,Family,Hybrid,Mass,69106.0,7,197.1,4,4,3,3,5,Definitely,Car Sales Whitefield is impressive and modern
+67,25.1,4,Semi-Urban,Yes,Business,Offline,Premium,75337.0,11,366.6,3,2,2,4,7,Maybe,Car Sales Whitefield feels overpriced for what it offers
+66,51.29,5,Urban,No,Leisure,Hybrid,Premium,32626.0,14,103.6,3,5,2,4,1,Definitely,Car Sales Whitefield is impressive and modern
+36,35.5,7,Rural,Yes,Business,Online,Premium,80509.0,14,303.3,5,4,2,1,8,Maybe,I am unsure about long term value of Car Sales Whitefield
+49,54.59,8,Urban,No,Business,Online,Luxury,43402.0,12,353.7,4,3,3,1,2,Definitely,Car Sales Whitefield exceeded my expectations
+29,55.94,2,Semi-Urban,Yes,Family,Hybrid,Premium,48447.0,11,185.0,3,3,2,4,7,Unlikely,I am unsure about long term value of Car Sales Whitefield
+53,5.5,4,Rural,Yes,Business,Offline,Luxury,89974.0,12,353.1,4,3,4,5,0,Definitely,Car Sales Whitefield is impressive and modern
+69,9.15,8,Semi-Urban,No,Business,Online,Luxury,76211.0,12,444.4,5,5,2,5,8,Definitely,Car Sales Whitefield feels overpriced for what it offers
+49,18.77,5,Semi-Urban,Yes,Business,Online,Premium,33836.0,13,246.6,3,3,1,3,3,Maybe,Car Sales Whitefield needs serious improvement
+33,41.81,4,Urban,No,Family,Hybrid,Luxury,2910.0,10,203.8,4,5,1,2,6,Definitely,I am unsure about long term value of Car Sales Whitefield
+41,53.85,4,Urban,No,Business,Online,Luxury,57103.0,14,140.6,5,5,1,2,4,Definitely,Car Sales Whitefield feels overpriced for what it offers
+41,30.3,6,Semi-Urban,No,Business,Offline,Luxury,63944.0,12,310.0,4,4,2,4,7,Definitely,Car Sales Whitefield exceeded my expectations
+25,38.38,8,Urban,Yes,Leisure,Online,Premium,59271.0,14,442.3,3,4,1,4,5,Definitely,Car Sales Whitefield exceeded my expectations
+30,15.37,6,Rural,No,Leisure,Online,Premium,87172.0,17,175.8,5,3,1,5,7,Definitely,Car Sales Whitefield exceeded my expectations
+26,49.27,4,Rural,No,Business,Hybrid,Premium,77941.0,12,210.2,5,1,3,5,5,Definitely,Car Sales Whitefield feels overpriced for what it offers
+33,58.2,8,Rural,No,Business,Online,Luxury,41497.0,15,215.2,5,2,3,3,8,Definitely,I am unsure about long term value of Car Sales Whitefield
+21,19.77,3,Semi-Urban,Yes,Family,Online,Mass,7531.0,11,289.2,4,4,1,4,1,Maybe,Car Sales Whitefield feels overpriced for what it offers
+40,32.22,8,Semi-Urban,No,Leisure,Hybrid,Mass,43893.0,14,129.6,3,3,3,5,5,Definitely,Car Sales Whitefield feels overpriced for what it offers
+67,9.74,6,Rural,No,Business,Online,Premium,62653.0,16,414.7,5,2,4,3,6,Definitely,Car Sales Whitefield needs serious improvement
+66,35.75,2,Rural,Yes,Family,Online,Mass,55478.0,8,161.9,3,3,5,4,1,Unlikely,Car Sales Whitefield needs serious improvement
+28,32.65,5,Semi-Urban,Yes,Family,Offline,Premium,49356.0,15,358.6,5,5,3,5,4,Unlikely,I am unsure about long term value of Car Sales Whitefield
+30,12.94,5,Urban,Yes,Leisure,Online,Mass,43256.0,8,266.3,5,3,2,5,9,Definitely,Car Sales Whitefield needs serious improvement
+29,29.31,7,Urban,No,Personal,Online,Premium,27851.0,12,301.2,4,5,4,5,10,Definitely,Car Sales Whitefield exceeded my expectations
+69,23.38,2,Semi-Urban,No,Business,Online,Luxury,26407.0,11,106.2,5,3,3,3,8,Unlikely,Car Sales Whitefield needs serious improvement
+61,33.7,2,Semi-Urban,No,Business,Online,Premium,46020.0,16,372.8,5,4,2,4,4,Definitely,Car Sales Whitefield exceeded my expectations
+23,37.21,2,Rural,Yes,Personal,Offline,Luxury,16133.0,13,110.5,3,1,4,2,4,Definitely,I am unsure about long term value of Car Sales Whitefield
+31,5.47,7,Urban,Yes,Personal,Offline,Mass,31980.0,14,74.5,4,4,2,4,7,Definitely,Car Sales Whitefield feels overpriced for what it offers
+32,46.86,2,Urban,No,Leisure,Online,Mass,30510.0,15,282.4,2,4,5,2,3,Maybe,Car Sales Whitefield feels overpriced for what it offers
+30,44.22,1,Urban,No,Leisure,Offline,Luxury,53668.0,16,360.5,4,2,4,5,9,Definitely,Car Sales Whitefield needs serious improvement
+45,25.15,7,Urban,No,Family,Hybrid,Luxury,7868.0,17,44.0,3,4,3,5,4,Maybe,Car Sales Whitefield exceeded my expectations
+69,7.91,5,Urban,No,Leisure,Online,Premium,75011.0,12,53.3,4,4,4,4,10,Maybe,Car Sales Whitefield is impressive and modern
+69,46.52,1,Semi-Urban,Yes,Business,Offline,Luxury,51489.0,12,405.3,5,4,3,2,6,Definitely,Car Sales Whitefield is impressive and modern
+45,57.53,7,Semi-Urban,No,Business,Online,Luxury,61033.0,15,408.3,5,4,3,1,8,Unlikely,Car Sales Whitefield is impressive and modern
+31,18.21,4,Semi-Urban,Yes,Business,Hybrid,Luxury,63872.0,8,137.7,3,3,4,5,0,Definitely,Car Sales Whitefield feels overpriced for what it offers
+56,22.79,4,Urban,Yes,Leisure,Hybrid,Premium,27651.0,10,315.3,4,4,3,4,9,Maybe,Car Sales Whitefield feels overpriced for what it offers
+59,15.11,5,Urban,No,Business,Online,Mass,43393.0,7,232.7,4,5,4,5,4,Definitely,Car Sales Whitefield exceeded my expectations
+46,36.73,4,Semi-Urban,Yes,Family,Online,Premium,86150.0,14,323.7,5,5,4,3,7,Definitely,Car Sales Whitefield needs serious improvement
+34,13.52,2,Rural,Yes,Leisure,Online,Premium,69470.0,20,434.2,4,5,5,4,8,Definitely,Car Sales Whitefield is impressive and modern
+59,24.59,7,Urban,Yes,Business,Online,Mass,87321.0,15,58.3,4,3,4,5,3,Definitely,Car Sales Whitefield exceeded my expectations
+60,43.34,1,Rural,Yes,Personal,Online,Luxury,67670.0,13,393.4,5,4,3,4,6,Definitely,Car Sales Whitefield exceeded my expectations
+21,35.81,2,Urban,No,Business,Hybrid,Mass,17453.0,18,256.7,3,4,1,4,6,Definitely,Car Sales Whitefield needs serious improvement
+24,26.26,4,Rural,Yes,Business,Online,Premium,7679.0,18,290.8,5,1,4,5,5,Definitely,Car Sales Whitefield exceeded my expectations
+50,28.11,6,Rural,Yes,Leisure,Online,Premium,52834.0,13,333.9,5,5,2,3,6,Maybe,Car Sales Whitefield needs serious improvement
+32,35.92,8,Urban,Yes,Business,Offline,Luxury,33488.0,16,462.9,5,4,2,2,5,Definitely,I am unsure about long term value of Car Sales Whitefield
+55,5.32,1,Semi-Urban,Yes,Family,Online,Premium,26240.0,11,47.2,3,2,2,4,5,Maybe,Car Sales Whitefield needs serious improvement
+33,9.32,2,Urban,Yes,Business,Hybrid,Luxury,73035.0,20,34.1,4,1,4,2,7,Definitely,Car Sales Whitefield is impressive and modern
+51,53.47,7,Rural,No,Business,Hybrid,Premium,34295.0,20,105.6,5,5,4,5,7,Definitely,Car Sales Whitefield is impressive and modern
+58,9.28,5,Semi-Urban,Yes,Family,Online,Luxury,29896.0,21,493.5,3,1,3,5,4,Definitely,Car Sales Whitefield needs serious improvement
+63,43.87,2,Semi-Urban,No,Business,Online,Luxury,76799.0,14,363.2,4,1,3,5,9,Definitely,I am unsure about long term value of Car Sales Whitefield
+43,55.6,6,Semi-Urban,No,Leisure,Online,Premium,76473.0,13,315.0,2,3,3,4,9,Maybe,I am unsure about long term value of Car Sales Whitefield
+24,19.89,4,Rural,No,Personal,Offline,Luxury,33360.0,10,42.6,2,2,3,2,6,Definitely,Car Sales Whitefield is impressive and modern
+36,25.38,1,Urban,Yes,Business,Online,Mass,75260.0,10,442.0,4,5,2,3,6,Unlikely,I am unsure about long term value of Car Sales Whitefield
+27,36.29,5,Semi-Urban,Yes,Family,Offline,Premium,76869.0,12,410.1,4,3,2,5,5,Unlikely,Car Sales Whitefield exceeded my expectations
+42,53.49,1,Urban,No,Family,Hybrid,Mass,39306.0,14,339.1,3,4,2,3,7,Definitely,Car Sales Whitefield feels overpriced for what it offers
+49,56.8,5,Urban,No,Family,Online,Premium,7850.0,22,182.8,4,5,3,5,7,Maybe,Car Sales Whitefield exceeded my expectations
+31,45.68,8,Semi-Urban,No,Family,Hybrid,Luxury,2139.0,12,53.8,4,4,3,5,4,Definitely,Car Sales Whitefield is impressive and modern
+53,9.76,7,Urban,No,Leisure,Online,Mass,48050.0,12,298.4,4,3,3,3,7,Definitely,I am unsure about long term value of Car Sales Whitefield
+49,41.8,1,Urban,No,Family,Hybrid,Premium,32279.0,12,365.5,4,4,5,3,4,Maybe,Car Sales Whitefield needs serious improvement
+59,27.57,4,Rural,No,Business,Online,Premium,89748.0,19,65.2,4,3,1,4,0,Definitely,Car Sales Whitefield feels overpriced for what it offers
+32,30.89,7,Urban,No,Personal,Offline,Premium,69972.0,9,324.2,4,3,2,5,7,Definitely,Car Sales Whitefield needs serious improvement
+27,7.7,7,Semi-Urban,Yes,Leisure,Online,Premium,68992.0,13,157.5,2,4,2,3,7,Definitely,Car Sales Whitefield is impressive and modern
+59,15.51,8,Urban,No,Business,Hybrid,Luxury,86061.0,15,386.8,4,5,1,5,6,Definitely,I am unsure about long term value of Car Sales Whitefield
+62,48.48,5,Urban,No,Business,Online,Mass,80120.0,18,279.0,4,4,2,4,6,Definitely,Car Sales Whitefield needs serious improvement
+68,29.97,3,Urban,Yes,Family,Online,Premium,30000.0,14,81.9,4,5,2,5,9,Definitely,Car Sales Whitefield needs serious improvement
+46,21.59,1,Semi-Urban,No,Business,Online,Premium,16607.0,18,272.7,3,4,3,2,7,Definitely,Car Sales Whitefield feels overpriced for what it offers
+60,26.12,1,Semi-Urban,No,Family,Online,Premium,67639.0,8,210.0,4,4,2,2,7,Definitely,Car Sales Whitefield feels overpriced for what it offers
+29,51.99,2,Urban,No,Leisure,Offline,Premium,35288.0,17,106.6,2,5,4,5,2,Maybe,I am unsure about long term value of Car Sales Whitefield
+61,46.19,5,Urban,No,Business,Hybrid,Luxury,43639.0,10,423.9,5,1,3,5,3,Definitely,Car Sales Whitefield feels overpriced for what it offers
+54,19.98,6,Rural,Yes,Business,Online,Premium,57475.0,18,25.3,1,3,1,4,5,Maybe,Car Sales Whitefield needs serious improvement
+65,11.46,3,Urban,No,Business,Online,Premium,81893.0,16,169.8,5,4,4,5,6,Maybe,Car Sales Whitefield needs serious improvement
+33,18.86,4,Rural,No,Family,Online,Mass,38880.0,9,26.0,4,4,1,5,8,Maybe,Car Sales Whitefield is impressive and modern
+56,55.64,2,Urban,No,Business,Online,Premium,70932.0,18,66.1,4,2,4,1,5,Maybe,Car Sales Whitefield needs serious improvement
+45,36.99,8,Semi-Urban,Yes,Business,Online,Luxury,25614.0,11,162.6,3,3,5,4,5,Definitely,I am unsure about long term value of Car Sales Whitefield
+44,34.34,3,Urban,Yes,Business,Online,Mass,63422.0,10,46.1,1,3,2,5,4,Definitely,Car Sales Whitefield exceeded my expectations
+64,37.8,5,Rural,No,Business,Online,Premium,2139.0,10,306.4,3,4,5,4,4,Definitely,Car Sales Whitefield is impressive and modern
+37,25.13,3,Semi-Urban,Yes,Family,Online,Luxury,78693.0,17,61.7,2,5,4,3,9,Unlikely,Car Sales Whitefield is impressive and modern
+22,49.39,8,Semi-Urban,Yes,Family,Hybrid,Premium,4673.0,16,356.8,4,5,5,5,7,Maybe,I am unsure about long term value of Car Sales Whitefield
+33,33.78,7,Urban,No,Leisure,Online,Mass,64722.0,18,45.3,3,4,3,3,3,Definitely,I am unsure about long term value of Car Sales Whitefield
+51,11.42,1,Semi-Urban,No,Business,Online,Premium,6071.0,10,48.5,5,5,2,1,7,Definitely,Car Sales Whitefield feels overpriced for what it offers
+49,12.1,7,Semi-Urban,Yes,Business,Offline,Mass,25430.0,14,166.6,3,3,4,5,7,Unlikely,Car Sales Whitefield is impressive and modern
+48,34.53,1,Urban,Yes,Leisure,Offline,Luxury,45754.0,15,450.4,5,3,1,4,7,Definitely,Car Sales Whitefield feels overpriced for what it offers
+47,56.51,2,Urban,Yes,Personal,Online,Mass,38955.0,11,327.9,4,3,2,5,3,Definitely,Car Sales Whitefield needs serious improvement
+35,21.96,8,Rural,No,Leisure,Offline,Luxury,18882.0,16,389.7,2,4,2,5,6,Definitely,Car Sales Whitefield is impressive and modern
+51,52.82,5,Urban,Yes,Leisure,Hybrid,Premium,31376.0,16,87.9,4,2,2,2,3,Unlikely,Car Sales Whitefield is impressive and modern
+60,47.03,5,Semi-Urban,Yes,Leisure,Online,Luxury,66038.0,11,420.4,3,4,3,3,8,Definitely,Car Sales Whitefield exceeded my expectations
+35,18.63,3,Semi-Urban,No,Leisure,Online,Mass,60895.0,17,23.9,3,4,4,3,7,Definitely,Car Sales Whitefield is impressive and modern
+53,7.0,2,Rural,No,Family,Online,Premium,8320.0,15,122.3,4,3,5,3,6,Maybe,Car Sales Whitefield needs serious improvement
+40,10.6,5,Rural,No,Family,Online,Premium,67764.0,16,315.7,4,5,1,5,5,Definitely,Car Sales Whitefield feels overpriced for what it offers
+62,45.07,6,Rural,Yes,Business,Online,Premium,6668.0,16,200.1,5,4,5,4,4,Unlikely,Car Sales Whitefield feels overpriced for what it offers
+32,15.98,6,Urban,Yes,Family,Offline,Premium,49778.0,13,492.4,4,2,5,4,3,Definitely,Car Sales Whitefield exceeded my expectations
+57,25.42,7,Rural,No,Personal,Online,Luxury,24886.0,16,34.6,5,3,1,3,10,Definitely,Car Sales Whitefield needs serious improvement
+29,32.59,1,Urban,Yes,Business,Online,Luxury,53717.0,15,499.3,5,4,2,4,4,Unlikely,Car Sales Whitefield feels overpriced for what it offers
+43,44.9,3,Semi-Urban,No,Family,Online,Mass,24997.0,22,319.3,5,3,4,4,2,Unlikely,I am unsure about long term value of Car Sales Whitefield
+28,11.23,4,Semi-Urban,Yes,Leisure,Online,Mass,88676.0,12,288.2,4,1,3,4,10,Definitely,Car Sales Whitefield needs serious improvement
+52,27.35,8,Urban,Yes,Leisure,Offline,Luxury,29256.0,5,48.6,2,4,4,2,6,Definitely,Car Sales Whitefield needs serious improvement
+68,31.68,1,Rural,No,Leisure,Online,Mass,23293.0,11,151.2,3,5,4,4,8,Unlikely,Car Sales Whitefield exceeded my expectations
+34,34.75,2,Urban,No,Business,Hybrid,Luxury,26505.0,19,463.8,4,3,3,2,1,Definitely,Car Sales Whitefield feels overpriced for what it offers
+47,50.01,5,Semi-Urban,No,Leisure,Online,Premium,80890.0,14,190.0,4,5,1,4,7,Unlikely,Car Sales Whitefield needs serious improvement
+45,14.44,1,Semi-Urban,Yes,Leisure,Online,Premium,57987.0,10,337.6,2,5,3,5,5,Unlikely,Car Sales Whitefield feels overpriced for what it offers
+33,49.43,4,Semi-Urban,Yes,Business,Hybrid,Mass,66300.0,13,499.8,4,2,1,1,8,Definitely,I am unsure about long term value of Car Sales Whitefield
+41,43.11,4,Urban,No,Family,Online,Mass,82785.0,20,146.3,1,4,3,4,1,Unlikely,Car Sales Whitefield exceeded my expectations
+65,35.57,6,Semi-Urban,No,Leisure,Online,Premium,82245.0,17,296.5,4,3,4,3,6,Definitely,I am unsure about long term value of Car Sales Whitefield
+51,43.47,2,Rural,Yes,Leisure,Offline,Luxury,67027.0,15,354.3,2,3,3,1,8,Maybe,Car Sales Whitefield exceeded my expectations
+57,27.66,1,Urban,Yes,Business,Online,Luxury,19409.0,16,99.0,4,4,5,3,6,Definitely,Car Sales Whitefield needs serious improvement
+68,12.61,3,Semi-Urban,Yes,Personal,Hybrid,Mass,76217.0,9,91.4,5,4,3,5,7,Unlikely,Car Sales Whitefield exceeded my expectations
+63,41.62,1,Urban,No,Business,Hybrid,Mass,19932.0,14,239.0,2,2,4,4,2,Maybe,Car Sales Whitefield is impressive and modern
+25,33.86,6,Semi-Urban,No,Personal,Online,Mass,67375.0,12,205.2,4,5,3,5,3,Maybe,Car Sales Whitefield feels overpriced for what it offers
+33,40.17,7,Rural,No,Leisure,Online,Luxury,62333.0,5,362.8,5,4,5,4,7,Unlikely,Car Sales Whitefield feels overpriced for what it offers
+48,23.59,4,Semi-Urban,Yes,Leisure,Online,Premium,68782.0,11,53.4,3,5,4,4,7,Definitely,Car Sales Whitefield is impressive and modern
+63,54.88,2,Semi-Urban,No,Personal,Online,Mass,48876.0,13,486.6,3,3,1,4,10,Definitely,I am unsure about long term value of Car Sales Whitefield
+45,37.31,2,Semi-Urban,Yes,Business,Offline,Mass,58208.0,16,26.9,3,5,5,3,7,Unlikely,Car Sales Whitefield is impressive and modern
+55,9.7,3,Semi-Urban,No,Personal,Offline,Premium,85892.0,13,308.6,4,3,3,3,6,Maybe,Car Sales Whitefield needs serious improvement
+67,29.74,2,Urban,No,Business,Online,Luxury,10896.0,13,290.1,4,1,1,3,9,Unlikely,Car Sales Whitefield needs serious improvement
+59,46.6,6,Urban,Yes,Family,Online,Premium,29179.0,14,84.7,2,4,3,4,3,Unlikely,Car Sales Whitefield feels overpriced for what it offers
+27,48.68,6,Semi-Urban,Yes,Business,Online,Mass,55799.0,21,92.4,4,4,4,3,6,Definitely,Car Sales Whitefield needs serious improvement
+58,32.2,6,Semi-Urban,Yes,Family,Online,Premium,86837.0,9,400.5,3,4,3,3,5,Definitely,Car Sales Whitefield feels overpriced for what it offers
+52,54.21,2,Semi-Urban,Yes,Personal,Hybrid,Premium,10411.0,16,446.0,5,3,2,3,3,Definitely,Car Sales Whitefield is impressive and modern
+23,19.72,2,Urban,No,Business,Online,Mass,3984.0,17,155.8,3,1,4,4,8,Maybe,Car Sales Whitefield is impressive and modern
+65,27.58,6,Urban,No,Personal,Hybrid,Mass,6906.0,18,230.2,5,4,4,5,6,Definitely,Car Sales Whitefield is impressive and modern
+59,54.42,2,Urban,No,Business,Offline,Premium,6612.0,21,190.4,4,3,3,5,7,Maybe,Car Sales Whitefield feels overpriced for what it offers
+57,54.29,8,Rural,No,Personal,Offline,Mass,81888.0,19,54.8,4,4,1,3,6,Definitely,Car Sales Whitefield is impressive and modern
+42,42.71,2,Semi-Urban,No,Business,Online,Mass,65471.0,14,343.1,4,3,2,3,6,Definitely,Car Sales Whitefield is impressive and modern
+28,52.24,8,Urban,Yes,Leisure,Offline,Premium,61585.0,17,416.1,4,5,4,4,3,Definitely,I am unsure about long term value of Car Sales Whitefield
+37,9.88,4,Urban,Yes,Leisure,Offline,Luxury,47986.0,16,166.3,3,4,4,5,7,Definitely,Car Sales Whitefield is impressive and modern
+47,52.57,1,Rural,No,Leisure,Offline,Premium,70812.0,13,495.3,5,4,2,1,6,Maybe,Car Sales Whitefield needs serious improvement
+53,22.63,5,Urban,Yes,Leisure,Online,Premium,15697.0,15,56.4,4,5,2,5,8,Definitely,Car Sales Whitefield feels overpriced for what it offers
+66,14.81,8,Rural,No,Personal,Online,Premium,36491.0,18,337.7,4,4,1,4,4,Definitely,I am unsure about long term value of Car Sales Whitefield
+37,18.17,8,Urban,Yes,Personal,Offline,Premium,45120.0,13,235.1,4,1,4,3,4,Definitely,Car Sales Whitefield exceeded my expectations
+62,27.99,2,Rural,No,Business,Online,Mass,11716.0,8,234.4,5,1,1,3,7,Maybe,Car Sales Whitefield feels overpriced for what it offers
+32,18.82,5,Rural,No,Leisure,Online,Luxury,38917.0,19,239.7,4,4,1,3,8,Unlikely,Car Sales Whitefield needs serious improvement
+68,22.63,7,Semi-Urban,Yes,Leisure,Hybrid,Mass,29852.0,13,144.2,3,3,1,5,6,Definitely,Car Sales Whitefield feels overpriced for what it offers
+66,12.42,5,Urban,Yes,Personal,Online,Premium,5131.0,18,363.5,4,4,3,4,7,Maybe,Car Sales Whitefield needs serious improvement
+47,21.29,4,Urban,No,Family,Online,Luxury,14033.0,17,366.4,4,2,2,4,10,Definitely,Car Sales Whitefield needs serious improvement
+68,36.48,8,Semi-Urban,Yes,Family,Online,Premium,69235.0,10,155.6,5,3,2,4,10,Definitely,Car Sales Whitefield exceeded my expectations
+28,29.3,2,Semi-Urban,Yes,Business,Offline,Luxury,3587.0,10,420.9,5,4,5,4,8,Maybe,Car Sales Whitefield feels overpriced for what it offers
+43,24.07,6,Urban,No,Business,Online,Premium,84214.0,13,172.1,4,5,1,4,8,Definitely,Car Sales Whitefield exceeded my expectations
+62,46.05,5,Urban,Yes,Personal,Offline,Luxury,9605.0,11,368.0,3,4,2,1,4,Maybe,Car Sales Whitefield exceeded my expectations
+69,54.14,2,Semi-Urban,No,Business,Online,Luxury,72333.0,18,78.1,5,5,5,3,8,Definitely,Car Sales Whitefield feels overpriced for what it offers
+49,46.62,3,Semi-Urban,No,Business,Online,Luxury,81078.0,15,101.0,4,5,2,3,6,Unlikely,Car Sales Whitefield is impressive and modern
+40,23.26,7,Urban,Yes,Business,Offline,Luxury,84820.0,16,171.6,5,2,3,5,10,Definitely,Car Sales Whitefield is impressive and modern
+36,45.94,6,Urban,No,Personal,Online,Luxury,78338.0,11,305.1,3,3,1,2,2,Maybe,Car Sales Whitefield exceeded my expectations
+37,13.36,3,Rural,No,Leisure,Hybrid,Luxury,27304.0,13,329.8,2,4,4,4,6,Unlikely,I am unsure about long term value of Car Sales Whitefield
+36,12.17,3,Semi-Urban,Yes,Business,Online,Premium,31312.0,17,210.3,2,5,2,3,7,Definitely,Car Sales Whitefield exceeded my expectations
+39,24.01,5,Semi-Urban,Yes,Leisure,Online,Mass,39536.0,11,57.4,4,4,4,5,6,Definitely,Car Sales Whitefield exceeded my expectations
+28,49.42,3,Semi-Urban,Yes,Leisure,Online,Premium,14258.0,16,199.3,5,5,2,3,4,Definitely,Car Sales Whitefield exceeded my expectations
+58,18.55,4,Urban,Yes,Personal,Online,Luxury,3960.0,11,350.6,1,1,2,3,7,Maybe,Car Sales Whitefield is impressive and modern
+58,8.48,4,Urban,Yes,Personal,Hybrid,Luxury,78483.0,18,342.1,4,3,4,5,8,Definitely,Car Sales Whitefield is impressive and modern
+49,12.24,5,Urban,Yes,Business,Hybrid,Luxury,50763.0,18,96.9,4,4,5,4,7,Definitely,Car Sales Whitefield is impressive and modern
+61,52.23,2,Rural,Yes,Personal,Online,Luxury,55568.0,21,23.7,4,3,1,5,4,Maybe,Car Sales Whitefield exceeded my expectations
+56,39.86,1,Semi-Urban,No,Leisure,Online,Mass,83575.0,15,381.4,3,2,4,1,8,Definitely,I am unsure about long term value of Car Sales Whitefield
+46,18.93,2,Urban,No,Business,Offline,Mass,60531.0,10,71.1,5,3,2,3,4,Maybe,Car Sales Whitefield is impressive and modern
+51,35.54,2,Rural,No,Leisure,Online,Premium,62795.0,13,59.5,1,1,3,5,3,Definitely,Car Sales Whitefield feels overpriced for what it offers
+64,34.02,2,Urban,No,Family,Online,Mass,71253.0,17,21.3,5,4,2,5,7,Definitely,Car Sales Whitefield feels overpriced for what it offers
+32,41.05,2,Rural,No,Family,Hybrid,Premium,12239.0,15,227.6,3,5,3,3,8,Maybe,Car Sales Whitefield feels overpriced for what it offers
+37,17.83,6,Rural,No,Business,Hybrid,Luxury,33694.0,16,261.6,4,5,2,5,6,Maybe,Car Sales Whitefield needs serious improvement
+35,52.54,1,Urban,No,Personal,Hybrid,Luxury,87202.0,16,326.1,5,4,2,4,6,Definitely,Car Sales Whitefield exceeded my expectations
+29,22.02,6,Urban,Yes,Business,Offline,Premium,83218.0,12,162.1,3,3,1,5,5,Definitely,Car Sales Whitefield feels overpriced for what it offers
+59,43.18,3,Semi-Urban,No,Leisure,Offline,Mass,79799.0,15,361.0,3,4,1,4,6,Definitely,Car Sales Whitefield exceeded my expectations
+62,5.89,7,Semi-Urban,Yes,Business,Online,Premium,41784.0,21,101.3,4,2,5,3,3,Definitely,Car Sales Whitefield feels overpriced for what it offers
+68,25.5,2,Semi-Urban,Yes,Business,Online,Premium,77433.0,10,419.4,4,3,5,5,10,Definitely,I am unsure about long term value of Car Sales Whitefield
+32,24.34,7,Rural,No,Personal,Online,Premium,6259.0,11,294.5,4,2,4,5,8,Definitely,Car Sales Whitefield exceeded my expectations
+52,34.89,4,Semi-Urban,Yes,Family,Offline,Mass,15070.0,12,300.3,3,5,2,4,7,Maybe,Car Sales Whitefield feels overpriced for what it offers
+45,9.0,5,Urban,Yes,Leisure,Offline,Premium,38429.0,11,120.7,1,5,2,1,6,Maybe,Car Sales Whitefield is impressive and modern
+59,48.46,5,Urban,No,Leisure,Hybrid,Premium,44539.0,15,55.6,4,4,4,2,8,Definitely,Car Sales Whitefield exceeded my expectations
+38,16.98,6,Semi-Urban,No,Business,Hybrid,Luxury,25189.0,14,243.1,2,4,5,4,6,Definitely,Car Sales Whitefield needs serious improvement
+35,42.24,6,Urban,No,Leisure,Hybrid,Mass,33370.0,21,315.5,5,2,3,1,5,Definitely,Car Sales Whitefield is impressive and modern
+52,49.18,4,Semi-Urban,No,Business,Hybrid,Mass,16324.0,5,65.6,1,4,4,4,3,Definitely,Car Sales Whitefield is impressive and modern
+26,35.9,2,Urban,Yes,Family,Online,Mass,45044.0,10,476.3,4,4,5,3,7,Unlikely,Car Sales Whitefield needs serious improvement
+64,45.75,7,Urban,Yes,Family,Offline,Premium,71858.0,16,490.6,2,3,4,5,9,Maybe,Car Sales Whitefield is impressive and modern
+63,41.4,8,Urban,No,Leisure,Online,Premium,60200.0,18,281.8,2,2,2,2,3,Maybe,Car Sales Whitefield is impressive and modern
+55,24.55,7,Semi-Urban,Yes,Personal,Online,Luxury,11486.0,15,476.0,4,5,1,4,4,Unlikely,Car Sales Whitefield feels overpriced for what it offers
+54,49.49,1,Urban,No,Business,Hybrid,Premium,44907.0,14,106.1,4,4,3,4,6,Definitely,Car Sales Whitefield feels overpriced for what it offers
+58,21.21,3,Semi-Urban,Yes,Business,Hybrid,Premium,63393.0,18,32.2,1,5,3,4,8,Definitely,Car Sales Whitefield exceeded my expectations
+25,36.42,5,Semi-Urban,No,Business,Online,Premium,48631.0,9,38.9,1,5,2,4,5,Maybe,Car Sales Whitefield exceeded my expectations
+38,46.0,3,Semi-Urban,No,Business,Online,Premium,36467.0,13,302.0,2,5,2,3,4,Definitely,Car Sales Whitefield exceeded my expectations
+36,25.84,1,Semi-Urban,No,Family,Offline,Mass,56728.0,14,49.6,5,2,4,5,7,Maybe,Car Sales Whitefield feels overpriced for what it offers
+28,21.65,6,Urban,No,Personal,Offline,Premium,87240.0,10,480.1,4,1,3,5,6,Maybe,Car Sales Whitefield exceeded my expectations
+45,30.26,7,Semi-Urban,No,Business,Hybrid,Luxury,10352.0,21,88.1,1,3,2,5,2,Maybe,Car Sales Whitefield is impressive and modern
+52,49.99,5,Urban,Yes,Business,Online,Luxury,36321.0,11,166.3,4,2,3,5,2,Definitely,Car Sales Whitefield feels overpriced for what it offers
+46,56.15,3,Semi-Urban,Yes,Business,Online,Luxury,37781.0,18,414.8,4,4,3,5,7,Definitely,Car Sales Whitefield exceeded my expectations
+42,34.98,8,Urban,Yes,Business,Online,Mass,52773.0,15,125.0,5,4,4,5,6,Maybe,Car Sales Whitefield is impressive and modern
+51,41.38,6,Semi-Urban,Yes,Personal,Online,Mass,15391.0,12,136.6,5,4,1,3,10,Unlikely,Car Sales Whitefield exceeded my expectations
+63,54.68,1,Rural,Yes,Leisure,Online,Luxury,17545.0,11,328.3,3,3,4,4,7,Maybe,I am unsure about long term value of Car Sales Whitefield
+30,10.42,8,Semi-Urban,No,Business,Hybrid,Mass,27112.0,15,152.5,2,5,3,4,0,Unlikely,Car Sales Whitefield exceeded my expectations
+32,17.76,3,Semi-Urban,Yes,Personal,Online,Mass,86117.0,13,124.4,3,1,1,3,6,Definitely,I am unsure about long term value of Car Sales Whitefield
+48,43.99,8,Semi-Urban,No,Business,Online,Mass,66602.0,18,142.0,5,3,4,4,6,Definitely,Car Sales Whitefield exceeded my expectations
+26,50.31,7,Urban,No,Leisure,Online,Premium,60229.0,14,255.5,5,4,2,3,3,Definitely,Car Sales Whitefield needs serious improvement
+40,52.14,2,Rural,Yes,Leisure,Online,Mass,73892.0,13,483.7,4,4,2,5,9,Definitely,Car Sales Whitefield exceeded my expectations
+25,27.83,8,Urban,Yes,Family,Hybrid,Premium,13227.0,9,419.5,3,3,2,4,8,Unlikely,Car Sales Whitefield feels overpriced for what it offers
+43,9.91,6,Rural,Yes,Business,Offline,Premium,77621.0,17,156.6,4,1,2,4,4,Unlikely,Car Sales Whitefield feels overpriced for what it offers
+29,29.08,1,Semi-Urban,No,Personal,Offline,Luxury,54345.0,9,194.4,3,4,2,5,4,Definitely,I am unsure about long term value of Car Sales Whitefield
+49,17.69,3,Semi-Urban,Yes,Personal,Online,Mass,31509.0,12,243.0,3,1,4,4,1,Definitely,Car Sales Whitefield feels overpriced for what it offers
+36,21.02,7,Semi-Urban,Yes,Business,Online,Premium,73795.0,13,489.9,4,2,1,4,5,Definitely,Car Sales Whitefield is impressive and modern
+66,47.47,2,Semi-Urban,No,Business,Online,Premium,72626.0,18,102.7,1,4,5,3,7,Unlikely,Car Sales Whitefield needs serious improvement
+42,9.15,2,Semi-Urban,Yes,Business,Online,Premium,76422.0,9,191.6,3,3,3,5,6,Definitely,Car Sales Whitefield needs serious improvement
+28,50.52,1,Urban,No,Family,Hybrid,Premium,12166.0,13,370.1,4,3,1,4,10,Definitely,Car Sales Whitefield is impressive and modern
+40,28.52,4,Semi-Urban,No,Personal,Online,Luxury,87304.0,11,482.7,1,3,1,4,2,Definitely,I am unsure about long term value of Car Sales Whitefield
+34,37.78,7,Semi-Urban,No,Business,Offline,Mass,86447.0,18,94.7,2,5,3,3,7,Definitely,Car Sales Whitefield is impressive and modern

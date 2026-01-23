@@ -1,0 +1,61 @@
+﻿Context,Question_ID,Question_Text,Option,Count
+Car_Sales_Whitefield,Q1,What is your age?,MEAN,46.26
+Car_Sales_Whitefield,Q1,What is your age?,MEDIAN,47.0
+Car_Sales_Whitefield,Q1,What is your age?,STD,14.1
+Car_Sales_Whitefield,Q2,What is your monthly income (in Lakhs)?,MEAN,32.31
+Car_Sales_Whitefield,Q2,What is your monthly income (in Lakhs)?,MEDIAN,32.65
+Car_Sales_Whitefield,Q2,What is your monthly income (in Lakhs)?,STD,15.7
+Car_Sales_Whitefield,Q3,How many people live in your household?,MEAN,4.25
+Car_Sales_Whitefield,Q3,How many people live in your household?,MEDIAN,4.0
+Car_Sales_Whitefield,Q3,How many people live in your household?,STD,2.32
+Car_Sales_Whitefield,Q4,What type of area do you live in?,Rural,56.0
+Car_Sales_Whitefield,Q4,What type of area do you live in?,Semi-Urban,113.0
+Car_Sales_Whitefield,Q4,What type of area do you live in?,Urban,112.0
+Car_Sales_Whitefield,Q5,Do you currently use this product/service?,No,152.0
+Car_Sales_Whitefield,Q5,Do you currently use this product/service?,Yes,129.0
+Car_Sales_Whitefield,Q6,What is your primary purpose of usage?,Business,107.0
+Car_Sales_Whitefield,Q6,What is your primary purpose of usage?,Family,49.0
+Car_Sales_Whitefield,Q6,What is your primary purpose of usage?,Leisure,77.0
+Car_Sales_Whitefield,Q6,What is your primary purpose of usage?,Personal,48.0
+Car_Sales_Whitefield,Q7,What is your preferred interaction channel?,Hybrid,60.0
+Car_Sales_Whitefield,Q7,What is your preferred interaction channel?,Offline,56.0
+Car_Sales_Whitefield,Q7,What is your preferred interaction channel?,Online,165.0
+Car_Sales_Whitefield,Q8,Which brand segment do you prefer?,Luxury,89.0
+Car_Sales_Whitefield,Q8,Which brand segment do you prefer?,Mass,76.0
+Car_Sales_Whitefield,Q8,Which brand segment do you prefer?,Premium,116.0
+Car_Sales_Whitefield,Q9,How much do you spend monthly on this category?,MEAN,47148.18
+Car_Sales_Whitefield,Q9,How much do you spend monthly on this category?,MEDIAN,48447.0
+Car_Sales_Whitefield,Q9,How much do you spend monthly on this category?,STD,26507.52
+Car_Sales_Whitefield,Q10,How many times do you use it per month?,MEAN,14.01
+Car_Sales_Whitefield,Q10,How many times do you use it per month?,MEDIAN,14.0
+Car_Sales_Whitefield,Q10,How many times do you use it per month?,STD,3.54
+Car_Sales_Whitefield,Q11,How far do you travel weekly (km)?,MEAN,255.16
+Car_Sales_Whitefield,Q11,How far do you travel weekly (km)?,MEDIAN,256.9
+Car_Sales_Whitefield,Q11,How far do you travel weekly (km)?,STD,141.21
+Car_Sales_Whitefield,Q12,Overall satisfaction (1-5),1,17.0
+Car_Sales_Whitefield,Q12,Overall satisfaction (1-5),2,26.0
+Car_Sales_Whitefield,Q12,Overall satisfaction (1-5),3,69.0
+Car_Sales_Whitefield,Q12,Overall satisfaction (1-5),4,105.0
+Car_Sales_Whitefield,Q12,Overall satisfaction (1-5),5,64.0
+Car_Sales_Whitefield,Q13,Ease of use (1-5),1,25.0
+Car_Sales_Whitefield,Q13,Ease of use (1-5),2,31.0
+Car_Sales_Whitefield,Q13,Ease of use (1-5),3,67.0
+Car_Sales_Whitefield,Q13,Ease of use (1-5),4,96.0
+Car_Sales_Whitefield,Q13,Ease of use (1-5),5,62.0
+Car_Sales_Whitefield,Q14,Value for money (1-5),1,47.0
+Car_Sales_Whitefield,Q14,Value for money (1-5),2,75.0
+Car_Sales_Whitefield,Q14,Value for money (1-5),3,76.0
+Car_Sales_Whitefield,Q14,Value for money (1-5),4,57.0
+Car_Sales_Whitefield,Q14,Value for money (1-5),5,26.0
+Car_Sales_Whitefield,Q15,Trust in brand (1-5),1,17.0
+Car_Sales_Whitefield,Q15,Trust in brand (1-5),2,21.0
+Car_Sales_Whitefield,Q15,Trust in brand (1-5),3,69.0
+Car_Sales_Whitefield,Q15,Trust in brand (1-5),4,89.0
+Car_Sales_Whitefield,Q15,Trust in brand (1-5),5,85.0
+Car_Sales_Whitefield,Q16,Likelihood to recommend (0-10),MEAN,5.74
+Car_Sales_Whitefield,Q16,Likelihood to recommend (0-10),MEDIAN,6.0
+Car_Sales_Whitefield,Q16,Likelihood to recommend (0-10),STD,2.42
+Car_Sales_Whitefield,Q17,Future intent to use,Definitely,161.0
+Car_Sales_Whitefield,Q17,Future intent to use,Maybe,61.0
+Car_Sales_Whitefield,Q17,Future intent to use,Unlikely,59.0
+Car_Sales_Whitefield,Q18,Any additional feedback?,TOTAL_RESPONSES,281.0

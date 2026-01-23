@@ -1,0 +1,61 @@
+﻿Context,Question_ID,Question_Text,Option,Count
+RealEstate_Preferences,Q1,What is your age?,MEAN,43.09
+RealEstate_Preferences,Q1,What is your age?,MEDIAN,42.0
+RealEstate_Preferences,Q1,What is your age?,STD,14.66
+RealEstate_Preferences,Q2,What is your monthly income (in Lakhs)?,MEAN,31.73
+RealEstate_Preferences,Q2,What is your monthly income (in Lakhs)?,MEDIAN,31.67
+RealEstate_Preferences,Q2,What is your monthly income (in Lakhs)?,STD,15.68
+RealEstate_Preferences,Q3,How many people live in your household?,MEAN,4.38
+RealEstate_Preferences,Q3,How many people live in your household?,MEDIAN,4.0
+RealEstate_Preferences,Q3,How many people live in your household?,STD,2.32
+RealEstate_Preferences,Q4,What type of area do you live in?,Rural,44.0
+RealEstate_Preferences,Q4,What type of area do you live in?,Semi-Urban,86.0
+RealEstate_Preferences,Q4,What type of area do you live in?,Urban,78.0
+RealEstate_Preferences,Q5,Do you currently use this product/service?,No,111.0
+RealEstate_Preferences,Q5,Do you currently use this product/service?,Yes,97.0
+RealEstate_Preferences,Q6,What is your primary purpose of usage?,Business,102.0
+RealEstate_Preferences,Q6,What is your primary purpose of usage?,Family,33.0
+RealEstate_Preferences,Q6,What is your primary purpose of usage?,Leisure,42.0
+RealEstate_Preferences,Q6,What is your primary purpose of usage?,Personal,31.0
+RealEstate_Preferences,Q7,What is your preferred interaction channel?,Hybrid,39.0
+RealEstate_Preferences,Q7,What is your preferred interaction channel?,Offline,43.0
+RealEstate_Preferences,Q7,What is your preferred interaction channel?,Online,126.0
+RealEstate_Preferences,Q8,Which brand segment do you prefer?,Luxury,60.0
+RealEstate_Preferences,Q8,Which brand segment do you prefer?,Mass,53.0
+RealEstate_Preferences,Q8,Which brand segment do you prefer?,Premium,95.0
+RealEstate_Preferences,Q9,How much do you spend monthly on this category?,MEAN,45458.82
+RealEstate_Preferences,Q9,How much do you spend monthly on this category?,MEDIAN,47387.0
+RealEstate_Preferences,Q9,How much do you spend monthly on this category?,STD,25683.7
+RealEstate_Preferences,Q10,How many times do you use it per month?,MEAN,13.69
+RealEstate_Preferences,Q10,How many times do you use it per month?,MEDIAN,14.0
+RealEstate_Preferences,Q10,How many times do you use it per month?,STD,3.62
+RealEstate_Preferences,Q11,How far do you travel weekly (km)?,MEAN,277.61
+RealEstate_Preferences,Q11,How far do you travel weekly (km)?,MEDIAN,289.65
+RealEstate_Preferences,Q11,How far do you travel weekly (km)?,STD,140.79
+RealEstate_Preferences,Q12,Overall satisfaction (1-5),1,9.0
+RealEstate_Preferences,Q12,Overall satisfaction (1-5),2,20.0
+RealEstate_Preferences,Q12,Overall satisfaction (1-5),3,44.0
+RealEstate_Preferences,Q12,Overall satisfaction (1-5),4,83.0
+RealEstate_Preferences,Q12,Overall satisfaction (1-5),5,52.0
+RealEstate_Preferences,Q13,Ease of use (1-5),1,16.0
+RealEstate_Preferences,Q13,Ease of use (1-5),2,39.0
+RealEstate_Preferences,Q13,Ease of use (1-5),3,60.0
+RealEstate_Preferences,Q13,Ease of use (1-5),4,56.0
+RealEstate_Preferences,Q13,Ease of use (1-5),5,37.0
+RealEstate_Preferences,Q14,Value for money (1-5),1,45.0
+RealEstate_Preferences,Q14,Value for money (1-5),2,51.0
+RealEstate_Preferences,Q14,Value for money (1-5),3,43.0
+RealEstate_Preferences,Q14,Value for money (1-5),4,50.0
+RealEstate_Preferences,Q14,Value for money (1-5),5,19.0
+RealEstate_Preferences,Q15,Trust in brand (1-5),1,10.0
+RealEstate_Preferences,Q15,Trust in brand (1-5),2,16.0
+RealEstate_Preferences,Q15,Trust in brand (1-5),3,44.0
+RealEstate_Preferences,Q15,Trust in brand (1-5),4,63.0
+RealEstate_Preferences,Q15,Trust in brand (1-5),5,75.0
+RealEstate_Preferences,Q16,Likelihood to recommend (0-10),MEAN,5.96
+RealEstate_Preferences,Q16,Likelihood to recommend (0-10),MEDIAN,6.0
+RealEstate_Preferences,Q16,Likelihood to recommend (0-10),STD,2.43
+RealEstate_Preferences,Q17,Future intent to use,Definitely,122.0
+RealEstate_Preferences,Q17,Future intent to use,Maybe,50.0
+RealEstate_Preferences,Q17,Future intent to use,Unlikely,36.0
+RealEstate_Preferences,Q18,Any additional feedback?,TOTAL_RESPONSES,208.0

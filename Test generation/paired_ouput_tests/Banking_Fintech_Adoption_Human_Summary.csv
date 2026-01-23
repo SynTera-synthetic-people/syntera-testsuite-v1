@@ -1,0 +1,61 @@
+﻿Context,Question_ID,Question_Text,Option,Count
+Banking_Fintech_Adoption,Q1,What is your age?,MEAN,40.59
+Banking_Fintech_Adoption,Q1,What is your age?,MEDIAN,41.0
+Banking_Fintech_Adoption,Q1,What is your age?,STD,13.96
+Banking_Fintech_Adoption,Q2,What is your monthly income (in Lakhs)?,MEAN,21.55
+Banking_Fintech_Adoption,Q2,What is your monthly income (in Lakhs)?,MEDIAN,20.08
+Banking_Fintech_Adoption,Q2,What is your monthly income (in Lakhs)?,STD,11.39
+Banking_Fintech_Adoption,Q3,How many people live in your household?,MEAN,3.41
+Banking_Fintech_Adoption,Q3,How many people live in your household?,MEDIAN,3.0
+Banking_Fintech_Adoption,Q3,How many people live in your household?,STD,1.7
+Banking_Fintech_Adoption,Q4,What type of area do you live in?,Rural,28.0
+Banking_Fintech_Adoption,Q4,What type of area do you live in?,Semi-Urban,67.0
+Banking_Fintech_Adoption,Q4,What type of area do you live in?,Urban,171.0
+Banking_Fintech_Adoption,Q5,Do you currently use this product/service?,No,90.0
+Banking_Fintech_Adoption,Q5,Do you currently use this product/service?,Yes,176.0
+Banking_Fintech_Adoption,Q6,What is your primary purpose of usage?,Business,57.0
+Banking_Fintech_Adoption,Q6,What is your primary purpose of usage?,Family,68.0
+Banking_Fintech_Adoption,Q6,What is your primary purpose of usage?,Leisure,75.0
+Banking_Fintech_Adoption,Q6,What is your primary purpose of usage?,Personal,66.0
+Banking_Fintech_Adoption,Q7,What is your preferred interaction channel?,Hybrid,89.0
+Banking_Fintech_Adoption,Q7,What is your preferred interaction channel?,Offline,85.0
+Banking_Fintech_Adoption,Q7,What is your preferred interaction channel?,Online,92.0
+Banking_Fintech_Adoption,Q8,Which brand segment do you prefer?,Luxury,48.0
+Banking_Fintech_Adoption,Q8,Which brand segment do you prefer?,Mass,128.0
+Banking_Fintech_Adoption,Q8,Which brand segment do you prefer?,Premium,90.0
+Banking_Fintech_Adoption,Q9,How much do you spend monthly on this category?,MEAN,24548.05
+Banking_Fintech_Adoption,Q9,How much do you spend monthly on this category?,MEDIAN,24907.5
+Banking_Fintech_Adoption,Q9,How much do you spend monthly on this category?,STD,13556.37
+Banking_Fintech_Adoption,Q10,How many times do you use it per month?,MEAN,8.12
+Banking_Fintech_Adoption,Q10,How many times do you use it per month?,MEDIAN,8.0
+Banking_Fintech_Adoption,Q10,How many times do you use it per month?,STD,2.79
+Banking_Fintech_Adoption,Q11,How far do you travel weekly (km)?,MEAN,150.81
+Banking_Fintech_Adoption,Q11,How far do you travel weekly (km)?,MEDIAN,146.95
+Banking_Fintech_Adoption,Q11,How far do you travel weekly (km)?,STD,87.75
+Banking_Fintech_Adoption,Q12,Overall satisfaction (1-5),1,42.0
+Banking_Fintech_Adoption,Q12,Overall satisfaction (1-5),2,58.0
+Banking_Fintech_Adoption,Q12,Overall satisfaction (1-5),3,50.0
+Banking_Fintech_Adoption,Q12,Overall satisfaction (1-5),4,53.0
+Banking_Fintech_Adoption,Q12,Overall satisfaction (1-5),5,63.0
+Banking_Fintech_Adoption,Q13,Ease of use (1-5),1,48.0
+Banking_Fintech_Adoption,Q13,Ease of use (1-5),2,47.0
+Banking_Fintech_Adoption,Q13,Ease of use (1-5),3,62.0
+Banking_Fintech_Adoption,Q13,Ease of use (1-5),4,49.0
+Banking_Fintech_Adoption,Q13,Ease of use (1-5),5,60.0
+Banking_Fintech_Adoption,Q14,Value for money (1-5),1,46.0
+Banking_Fintech_Adoption,Q14,Value for money (1-5),2,60.0
+Banking_Fintech_Adoption,Q14,Value for money (1-5),3,49.0
+Banking_Fintech_Adoption,Q14,Value for money (1-5),4,48.0
+Banking_Fintech_Adoption,Q14,Value for money (1-5),5,63.0
+Banking_Fintech_Adoption,Q15,Trust in brand (1-5),1,58.0
+Banking_Fintech_Adoption,Q15,Trust in brand (1-5),2,45.0
+Banking_Fintech_Adoption,Q15,Trust in brand (1-5),3,50.0
+Banking_Fintech_Adoption,Q15,Trust in brand (1-5),4,57.0
+Banking_Fintech_Adoption,Q15,Trust in brand (1-5),5,56.0
+Banking_Fintech_Adoption,Q16,Likelihood to recommend (0-10),MEAN,4.97
+Banking_Fintech_Adoption,Q16,Likelihood to recommend (0-10),MEDIAN,5.0
+Banking_Fintech_Adoption,Q16,Likelihood to recommend (0-10),STD,3.21
+Banking_Fintech_Adoption,Q17,Future intent to use,Definitely,91.0
+Banking_Fintech_Adoption,Q17,Future intent to use,Maybe,116.0
+Banking_Fintech_Adoption,Q17,Future intent to use,Unlikely,59.0
+Banking_Fintech_Adoption,Q18,Any additional feedback?,TOTAL_RESPONSES,266.0

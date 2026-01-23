@@ -1,0 +1,237 @@
+﻿Age,Monthly_Income_Lakh,Household_Size,Area_Type,Current_User,Primary_Purpose,Preferred_Channel,Brand_Segment,Monthly_Spend,Usage_Frequency_per_Month,Travel_Distance_km_per_Week,Satisfaction_1to5,Ease_of_Use_1to5,Value_for_Money_1to5,Trust_in_Brand_1to5,Recommend_NPS_0to10,Future_Intent,Open_Ended_Feedback
+53,44.98,5,Semi-Urban,Yes,Business,Hybrid,Premium,5802.0,10,155.7,4,3,1,5,8,Maybe,Public Transport Usage feels overpriced for what it offers
+29,55.78,3,Rural,Yes,Personal,Online,Premium,43296.0,15,302.7,4,4,5,4,7,Unlikely,Public Transport Usage exceeded my expectations
+69,40.05,5,Semi-Urban,Yes,Business,Online,Premium,68271.0,12,88.9,3,2,2,5,3,Maybe,Public Transport Usage needs serious improvement
+53,57.35,3,Rural,Yes,Business,Offline,Mass,71518.0,21,214.2,4,4,3,4,3,Unlikely,Public Transport Usage needs serious improvement
+29,10.08,1,Semi-Urban,No,Family,Offline,Premium,45911.0,10,36.0,4,1,2,3,7,Definitely,I am unsure about long term value of Public Transport Usage
+34,8.34,4,Urban,No,Business,Hybrid,Premium,10437.0,14,124.0,5,2,3,4,5,Maybe,Public Transport Usage exceeded my expectations
+52,38.23,3,Urban,No,Family,Hybrid,Premium,35560.0,12,55.9,4,4,2,5,7,Maybe,Public Transport Usage exceeded my expectations
+57,58.14,2,Semi-Urban,No,Family,Offline,Luxury,84025.0,15,206.1,4,4,4,5,6,Maybe,Public Transport Usage exceeded my expectations
+26,32.65,6,Urban,No,Business,Hybrid,Mass,22206.0,17,424.7,3,4,1,4,7,Maybe,Public Transport Usage feels overpriced for what it offers
+25,7.83,7,Urban,Yes,Business,Online,Premium,30138.0,15,201.4,3,3,4,2,1,Definitely,Public Transport Usage needs serious improvement
+24,17.17,2,Semi-Urban,Yes,Leisure,Offline,Mass,67721.0,12,419.2,3,4,4,5,1,Definitely,Public Transport Usage exceeded my expectations
+68,18.46,7,Semi-Urban,No,Personal,Hybrid,Mass,66555.0,10,335.1,3,4,3,4,7,Unlikely,Public Transport Usage feels overpriced for what it offers
+36,23.58,4,Urban,Yes,Family,Offline,Premium,82274.0,16,264.6,1,5,1,5,4,Definitely,Public Transport Usage is impressive and modern
+30,7.4,8,Rural,Yes,Personal,Hybrid,Luxury,36154.0,8,133.7,3,5,2,2,7,Definitely,I am unsure about long term value of Public Transport Usage
+51,54.77,5,Semi-Urban,Yes,Business,Online,Premium,47285.0,9,462.6,4,4,4,3,6,Definitely,Public Transport Usage needs serious improvement
+51,33.36,6,Semi-Urban,No,Business,Online,Premium,43131.0,13,46.0,4,4,1,2,10,Definitely,Public Transport Usage needs serious improvement
+34,41.9,2,Rural,No,Business,Hybrid,Mass,83642.0,10,350.7,2,4,1,5,8,Maybe,I am unsure about long term value of Public Transport Usage
+33,8.69,6,Urban,Yes,Family,Online,Premium,69701.0,15,318.2,3,2,3,5,6,Maybe,Public Transport Usage is impressive and modern
+24,7.98,3,Semi-Urban,No,Leisure,Offline,Luxury,75167.0,18,231.7,4,2,2,4,7,Unlikely,Public Transport Usage feels overpriced for what it offers
+66,37.26,4,Rural,No,Business,Online,Premium,13713.0,18,135.4,3,5,2,3,3,Definitely,I am unsure about long term value of Public Transport Usage
+46,53.8,2,Semi-Urban,No,Leisure,Offline,Luxury,71683.0,16,226.7,4,5,3,2,5,Maybe,Public Transport Usage feels overpriced for what it offers
+44,34.07,5,Semi-Urban,No,Personal,Hybrid,Luxury,40102.0,11,438.9,4,4,2,4,8,Unlikely,Public Transport Usage feels overpriced for what it offers
+29,53.28,6,Semi-Urban,No,Business,Online,Premium,4054.0,11,421.6,1,3,1,4,7,Unlikely,Public Transport Usage feels overpriced for what it offers
+55,49.6,5,Semi-Urban,No,Business,Online,Premium,7288.0,20,471.9,3,1,3,5,6,Unlikely,Public Transport Usage is impressive and modern
+62,9.17,6,Urban,Yes,Business,Online,Premium,61656.0,18,167.7,2,3,2,3,3,Maybe,Public Transport Usage is impressive and modern
+35,16.11,2,Rural,Yes,Personal,Hybrid,Luxury,34737.0,9,205.8,2,3,4,4,8,Definitely,Public Transport Usage feels overpriced for what it offers
+44,41.17,4,Rural,No,Leisure,Offline,Mass,78394.0,13,29.0,5,3,1,1,4,Definitely,Public Transport Usage exceeded my expectations
+51,29.39,1,Rural,Yes,Family,Online,Premium,66616.0,17,472.6,3,5,3,4,8,Unlikely,Public Transport Usage needs serious improvement
+39,20.99,2,Semi-Urban,Yes,Family,Online,Premium,3908.0,10,178.1,4,2,2,4,7,Unlikely,Public Transport Usage is impressive and modern
+22,28.02,5,Urban,No,Business,Hybrid,Premium,62446.0,17,214.0,4,4,2,5,5,Maybe,Public Transport Usage exceeded my expectations
+22,29.49,1,Urban,Yes,Business,Hybrid,Luxury,18927.0,11,455.7,1,3,2,4,1,Definitely,Public Transport Usage exceeded my expectations
+61,55.08,8,Rural,Yes,Business,Online,Premium,39187.0,20,272.8,3,5,1,4,4,Maybe,Public Transport Usage needs serious improvement
+56,10.69,4,Urban,No,Family,Online,Premium,56977.0,17,291.8,5,5,4,3,9,Definitely,Public Transport Usage feels overpriced for what it offers
+57,20.39,5,Urban,No,Business,Offline,Premium,78799.0,12,104.6,5,3,2,5,8,Definitely,Public Transport Usage exceeded my expectations
+54,34.57,4,Semi-Urban,No,Business,Online,Mass,42137.0,14,259.4,3,5,3,1,7,Definitely,Public Transport Usage exceeded my expectations
+59,43.41,6,Semi-Urban,No,Family,Hybrid,Mass,73147.0,13,460.7,3,4,5,3,6,Unlikely,Public Transport Usage exceeded my expectations
+39,39.69,2,Semi-Urban,No,Leisure,Online,Premium,70901.0,10,288.2,5,2,3,5,7,Definitely,Public Transport Usage feels overpriced for what it offers
+58,56.79,4,Semi-Urban,Yes,Leisure,Offline,Premium,38479.0,17,142.5,3,4,2,5,6,Maybe,Public Transport Usage feels overpriced for what it offers
+43,48.76,5,Semi-Urban,Yes,Business,Online,Premium,46086.0,12,35.0,2,2,2,4,7,Definitely,Public Transport Usage is impressive and modern
+36,35.64,2,Rural,Yes,Personal,Hybrid,Mass,63643.0,17,181.4,3,4,5,3,5,Maybe,Public Transport Usage is impressive and modern
+66,16.81,7,Urban,No,Leisure,Online,Premium,4741.0,11,294.8,3,5,3,5,8,Maybe,Public Transport Usage exceeded my expectations
+64,29.8,5,Urban,No,Personal,Online,Luxury,80391.0,16,40.5,2,4,3,3,7,Unlikely,Public Transport Usage feels overpriced for what it offers
+26,43.14,5,Semi-Urban,No,Family,Online,Luxury,69744.0,15,312.7,4,3,2,3,5,Definitely,Public Transport Usage feels overpriced for what it offers
+46,51.09,7,Rural,No,Personal,Hybrid,Mass,23949.0,13,271.2,4,3,4,3,8,Definitely,Public Transport Usage needs serious improvement
+42,57.79,7,Urban,Yes,Personal,Online,Premium,88344.0,15,396.0,4,1,4,3,6,Maybe,Public Transport Usage exceeded my expectations
+65,38.3,1,Urban,No,Leisure,Online,Luxury,17786.0,6,33.9,2,3,2,5,3,Definitely,Public Transport Usage is impressive and modern
+67,33.98,3,Semi-Urban,Yes,Business,Online,Premium,82440.0,16,394.8,4,1,3,4,2,Definitely,Public Transport Usage needs serious improvement
+44,5.97,4,Semi-Urban,Yes,Leisure,Online,Luxury,30554.0,16,270.0,4,3,2,4,7,Definitely,Public Transport Usage feels overpriced for what it offers
+66,8.97,4,Rural,No,Family,Online,Luxury,69157.0,9,197.9,2,4,1,5,9,Maybe,Public Transport Usage is impressive and modern
+60,13.59,1,Rural,No,Business,Online,Mass,42161.0,15,483.4,2,4,4,3,8,Definitely,Public Transport Usage exceeded my expectations
+41,8.01,8,Semi-Urban,No,Leisure,Offline,Premium,66809.0,15,96.9,3,1,1,1,7,Definitely,Public Transport Usage feels overpriced for what it offers
+50,27.05,6,Semi-Urban,No,Leisure,Offline,Mass,15709.0,11,279.8,3,3,3,4,3,Unlikely,Public Transport Usage exceeded my expectations
+31,23.53,8,Urban,Yes,Business,Hybrid,Mass,25717.0,14,174.1,5,3,2,4,2,Definitely,Public Transport Usage needs serious improvement
+29,40.05,4,Semi-Urban,Yes,Personal,Hybrid,Luxury,10787.0,14,273.2,4,2,2,4,5,Definitely,Public Transport Usage needs serious improvement
+32,34.46,7,Semi-Urban,Yes,Business,Online,Luxury,78133.0,13,285.1,3,3,3,2,9,Definitely,Public Transport Usage needs serious improvement
+46,37.78,8,Urban,Yes,Family,Offline,Mass,28074.0,4,62.9,4,3,5,4,10,Maybe,I am unsure about long term value of Public Transport Usage
+58,30.96,1,Urban,Yes,Business,Online,Premium,63114.0,8,337.3,3,4,2,3,4,Definitely,Public Transport Usage exceeded my expectations
+23,20.28,4,Rural,No,Business,Online,Premium,74179.0,12,324.6,2,5,1,3,8,Unlikely,Public Transport Usage needs serious improvement
+53,57.41,4,Semi-Urban,No,Business,Online,Premium,81325.0,17,389.3,3,3,3,3,7,Maybe,Public Transport Usage needs serious improvement
+35,9.75,5,Semi-Urban,No,Business,Online,Premium,11354.0,11,63.5,4,4,2,3,1,Definitely,Public Transport Usage exceeded my expectations
+67,56.64,1,Urban,No,Business,Online,Luxury,80585.0,12,162.7,2,2,1,4,6,Unlikely,Public Transport Usage needs serious improvement
+25,22.12,7,Semi-Urban,Yes,Personal,Online,Mass,19358.0,12,332.1,3,5,1,3,8,Definitely,Public Transport Usage exceeded my expectations
+44,33.2,6,Rural,No,Business,Offline,Mass,66847.0,15,85.6,3,2,1,5,4,Definitely,Public Transport Usage feels overpriced for what it offers
+31,10.99,4,Urban,No,Business,Online,Mass,66139.0,15,345.2,3,2,2,5,9,Maybe,Public Transport Usage exceeded my expectations
+53,8.9,6,Semi-Urban,No,Family,Online,Premium,2748.0,15,48.3,4,2,2,4,4,Maybe,Public Transport Usage exceeded my expectations
+43,28.62,3,Urban,No,Family,Online,Premium,21415.0,18,180.8,5,3,1,5,2,Definitely,I am unsure about long term value of Public Transport Usage
+30,45.79,1,Semi-Urban,Yes,Personal,Online,Premium,45288.0,11,426.4,4,4,4,5,3,Definitely,Public Transport Usage feels overpriced for what it offers
+63,19.82,1,Rural,No,Business,Online,Premium,38963.0,14,391.7,4,5,1,4,8,Definitely,I am unsure about long term value of Public Transport Usage
+48,35.93,1,Semi-Urban,No,Leisure,Online,Luxury,82834.0,13,329.5,5,4,5,4,6,Definitely,Public Transport Usage needs serious improvement
+59,20.33,7,Rural,No,Family,Online,Premium,33657.0,11,437.8,2,3,3,5,8,Maybe,Public Transport Usage exceeded my expectations
+37,26.37,8,Rural,No,Business,Offline,Premium,84455.0,19,360.4,3,4,1,4,6,Maybe,Public Transport Usage feels overpriced for what it offers
+64,54.85,7,Rural,No,Business,Offline,Luxury,42430.0,15,269.3,4,4,5,3,6,Definitely,I am unsure about long term value of Public Transport Usage
+46,52.07,5,Rural,Yes,Personal,Online,Luxury,86863.0,8,490.3,3,5,2,5,8,Definitely,Public Transport Usage exceeded my expectations
+45,33.38,8,Urban,Yes,Leisure,Online,Mass,66887.0,14,353.5,4,4,2,3,6,Definitely,Public Transport Usage is impressive and modern
+56,18.1,1,Rural,Yes,Family,Hybrid,Premium,74981.0,10,308.7,3,4,2,3,8,Definitely,I am unsure about long term value of Public Transport Usage
+32,15.63,5,Urban,Yes,Leisure,Online,Luxury,11229.0,11,216.3,2,4,4,3,3,Definitely,Public Transport Usage feels overpriced for what it offers
+23,57.47,7,Urban,No,Personal,Online,Mass,53580.0,15,453.2,4,4,3,3,7,Definitely,I am unsure about long term value of Public Transport Usage
+49,16.15,3,Urban,Yes,Personal,Online,Premium,14558.0,5,161.9,5,2,1,1,7,Definitely,I am unsure about long term value of Public Transport Usage
+64,49.45,2,Urban,No,Family,Offline,Premium,28191.0,15,24.4,3,2,1,5,9,Definitely,I am unsure about long term value of Public Transport Usage
+44,25.29,5,Semi-Urban,No,Family,Online,Mass,56874.0,11,114.4,1,4,4,3,4,Maybe,Public Transport Usage needs serious improvement
+39,59.21,4,Semi-Urban,Yes,Leisure,Offline,Mass,65908.0,14,72.6,4,5,2,2,7,Definitely,Public Transport Usage is impressive and modern
+33,25.25,1,Urban,No,Personal,Online,Premium,5448.0,13,173.1,3,3,1,2,6,Unlikely,Public Transport Usage feels overpriced for what it offers
+36,24.33,8,Semi-Urban,No,Business,Online,Luxury,48723.0,9,416.4,3,5,3,4,5,Unlikely,Public Transport Usage feels overpriced for what it offers
+60,40.06,2,Semi-Urban,No,Personal,Online,Luxury,51748.0,12,332.7,3,2,4,5,3,Unlikely,Public Transport Usage feels overpriced for what it offers
+47,57.88,5,Semi-Urban,No,Leisure,Offline,Luxury,8937.0,10,101.1,4,3,2,2,3,Unlikely,Public Transport Usage exceeded my expectations
+26,58.69,8,Urban,Yes,Business,Hybrid,Mass,46061.0,17,398.6,5,3,2,2,8,Maybe,Public Transport Usage feels overpriced for what it offers
+62,43.9,8,Urban,No,Business,Online,Mass,64818.0,15,262.0,4,5,4,4,8,Maybe,Public Transport Usage feels overpriced for what it offers
+30,46.5,6,Urban,No,Family,Online,Luxury,6684.0,16,266.1,3,3,1,4,5,Definitely,Public Transport Usage is impressive and modern
+58,35.99,7,Urban,No,Business,Online,Premium,68904.0,12,193.8,3,3,3,3,8,Maybe,Public Transport Usage exceeded my expectations
+28,46.57,6,Semi-Urban,No,Personal,Online,Premium,52726.0,16,435.0,2,2,5,3,2,Maybe,Public Transport Usage exceeded my expectations
+38,52.29,4,Semi-Urban,Yes,Personal,Online,Mass,75324.0,16,172.8,5,4,4,4,7,Definitely,I am unsure about long term value of Public Transport Usage
+52,31.74,2,Urban,Yes,Business,Online,Premium,21190.0,16,65.2,4,5,1,3,9,Maybe,Public Transport Usage needs serious improvement
+37,39.09,3,Urban,No,Leisure,Hybrid,Premium,75328.0,13,165.3,1,3,2,5,8,Definitely,Public Transport Usage exceeded my expectations
+62,34.55,5,Urban,No,Leisure,Online,Mass,10321.0,14,363.4,4,5,1,1,5,Definitely,Public Transport Usage exceeded my expectations
+22,35.94,6,Rural,Yes,Business,Online,Luxury,37537.0,11,335.6,4,5,5,3,8,Definitely,Public Transport Usage is impressive and modern
+64,53.95,6,Urban,Yes,Business,Online,Mass,19555.0,19,110.2,5,1,5,5,6,Maybe,Public Transport Usage feels overpriced for what it offers
+40,24.56,5,Rural,Yes,Leisure,Online,Luxury,79090.0,20,73.7,5,4,2,5,8,Unlikely,Public Transport Usage exceeded my expectations
+30,16.45,6,Semi-Urban,Yes,Business,Online,Luxury,64033.0,14,337.2,3,3,3,2,6,Unlikely,Public Transport Usage exceeded my expectations
+29,30.1,3,Urban,Yes,Business,Offline,Premium,4232.0,10,344.7,4,2,4,5,8,Maybe,Public Transport Usage needs serious improvement
+68,16.44,8,Rural,Yes,Leisure,Online,Luxury,2838.0,14,195.8,4,4,2,5,2,Definitely,Public Transport Usage is impressive and modern
+59,32.41,6,Semi-Urban,No,Family,Hybrid,Premium,27630.0,21,424.5,3,4,1,3,7,Unlikely,Public Transport Usage needs serious improvement
+61,54.69,5,Semi-Urban,Yes,Personal,Online,Mass,14609.0,13,489.5,4,3,1,4,7,Definitely,Public Transport Usage exceeded my expectations
+45,38.96,1,Semi-Urban,Yes,Business,Online,Premium,57467.0,12,118.7,4,1,2,3,7,Unlikely,Public Transport Usage exceeded my expectations
+45,52.05,6,Semi-Urban,Yes,Personal,Online,Premium,60414.0,18,297.0,1,5,4,3,7,Definitely,Public Transport Usage is impressive and modern
+44,14.14,5,Urban,No,Family,Offline,Premium,84892.0,19,22.6,4,4,5,3,9,Definitely,I am unsure about long term value of Public Transport Usage
+26,54.55,8,Urban,No,Business,Online,Premium,85780.0,13,362.3,4,3,1,4,8,Maybe,I am unsure about long term value of Public Transport Usage
+50,38.1,8,Rural,No,Business,Online,Premium,59983.0,8,218.9,2,3,2,5,4,Maybe,Public Transport Usage exceeded my expectations
+30,6.75,1,Rural,No,Leisure,Online,Premium,2499.0,13,112.8,3,1,2,4,8,Definitely,Public Transport Usage exceeded my expectations
+59,39.82,6,Urban,Yes,Family,Hybrid,Premium,33592.0,11,381.1,4,3,4,3,3,Maybe,Public Transport Usage needs serious improvement
+51,57.33,6,Semi-Urban,Yes,Family,Online,Premium,47156.0,14,409.1,2,4,3,4,7,Definitely,Public Transport Usage needs serious improvement
+38,9.35,5,Semi-Urban,No,Personal,Online,Premium,45928.0,15,73.4,5,4,3,4,9,Definitely,Public Transport Usage needs serious improvement
+63,37.04,4,Urban,No,Business,Online,Luxury,55094.0,13,39.7,1,2,3,5,3,Maybe,Public Transport Usage feels overpriced for what it offers
+53,55.35,4,Semi-Urban,No,Business,Online,Premium,86529.0,17,180.4,2,4,1,3,8,Definitely,Public Transport Usage exceeded my expectations
+39,5.53,2,Semi-Urban,No,Business,Online,Luxury,79897.0,10,320.5,2,3,3,4,8,Maybe,Public Transport Usage feels overpriced for what it offers
+43,39.7,4,Semi-Urban,No,Family,Online,Premium,11584.0,14,400.8,4,4,5,4,6,Definitely,I am unsure about long term value of Public Transport Usage
+25,31.12,3,Rural,Yes,Business,Offline,Premium,25406.0,14,282.1,4,3,1,5,5,Definitely,Public Transport Usage exceeded my expectations
+46,24.08,8,Urban,No,Business,Online,Premium,75314.0,12,298.8,4,3,3,3,6,Definitely,Public Transport Usage exceeded my expectations
+49,39.51,2,Semi-Urban,No,Personal,Offline,Mass,74539.0,12,403.9,3,2,2,3,10,Definitely,Public Transport Usage is impressive and modern
+44,7.9,8,Semi-Urban,Yes,Business,Offline,Luxury,26233.0,15,273.8,5,4,3,4,4,Definitely,Public Transport Usage exceeded my expectations
+26,46.42,4,Semi-Urban,No,Business,Online,Mass,66292.0,17,313.4,2,3,3,5,7,Maybe,I am unsure about long term value of Public Transport Usage
+59,5.25,1,Urban,No,Leisure,Online,Premium,61139.0,18,267.8,3,1,3,4,2,Unlikely,Public Transport Usage exceeded my expectations
+24,21.88,7,Semi-Urban,Yes,Leisure,Offline,Mass,43670.0,14,442.6,1,1,4,5,4,Unlikely,Public Transport Usage feels overpriced for what it offers
+68,32.72,5,Rural,Yes,Business,Offline,Mass,19728.0,11,133.0,1,3,2,2,8,Maybe,Public Transport Usage exceeded my expectations
+62,25.74,8,Urban,Yes,Leisure,Offline,Luxury,80201.0,15,146.7,3,2,3,4,5,Definitely,Public Transport Usage feels overpriced for what it offers
+46,21.91,4,Semi-Urban,Yes,Business,Offline,Premium,61651.0,13,81.4,3,4,1,4,10,Definitely,Public Transport Usage needs serious improvement
+35,50.7,1,Rural,Yes,Leisure,Online,Luxury,16871.0,11,413.3,3,3,4,4,6,Definitely,Public Transport Usage needs serious improvement
+33,56.42,7,Urban,Yes,Personal,Offline,Premium,64023.0,6,217.7,5,4,2,5,6,Definitely,Public Transport Usage is impressive and modern
+60,53.05,2,Rural,Yes,Business,Online,Premium,67246.0,17,187.0,3,5,4,5,1,Unlikely,Public Transport Usage exceeded my expectations
+42,33.73,5,Urban,Yes,Business,Online,Premium,80045.0,9,491.0,5,4,2,5,10,Definitely,Public Transport Usage needs serious improvement
+33,53.63,8,Urban,No,Business,Online,Premium,21610.0,13,464.9,4,4,1,4,3,Definitely,Public Transport Usage needs serious improvement
+59,55.65,4,Urban,Yes,Personal,Hybrid,Luxury,89010.0,18,486.6,3,4,1,5,6,Definitely,Public Transport Usage is impressive and modern
+37,27.51,2,Urban,Yes,Family,Online,Premium,15499.0,6,88.3,4,5,5,4,5,Definitely,Public Transport Usage is impressive and modern
+56,20.59,8,Urban,Yes,Family,Offline,Premium,54861.0,11,447.8,4,2,2,5,6,Definitely,Public Transport Usage exceeded my expectations
+59,10.4,4,Semi-Urban,No,Family,Offline,Luxury,59832.0,16,177.8,2,5,1,5,7,Maybe,Public Transport Usage feels overpriced for what it offers
+68,31.35,2,Urban,Yes,Family,Hybrid,Mass,38868.0,14,26.1,5,5,1,4,7,Definitely,Public Transport Usage exceeded my expectations
+45,57.05,8,Rural,Yes,Business,Offline,Premium,43803.0,17,207.8,4,3,2,5,3,Maybe,Public Transport Usage feels overpriced for what it offers
+54,35.85,4,Semi-Urban,Yes,Leisure,Online,Premium,80400.0,21,264.4,5,3,1,4,6,Definitely,Public Transport Usage is impressive and modern
+41,41.72,7,Semi-Urban,No,Business,Hybrid,Mass,58784.0,13,71.9,5,5,3,3,8,Maybe,I am unsure about long term value of Public Transport Usage
+45,11.21,1,Semi-Urban,No,Leisure,Offline,Premium,45736.0,12,278.1,2,4,2,4,6,Maybe,Public Transport Usage exceeded my expectations
+45,12.89,3,Semi-Urban,Yes,Leisure,Offline,Mass,13295.0,11,413.3,3,3,3,3,3,Maybe,I am unsure about long term value of Public Transport Usage
+42,30.55,7,Semi-Urban,Yes,Business,Hybrid,Luxury,2646.0,15,201.3,2,4,1,4,5,Definitely,Public Transport Usage feels overpriced for what it offers
+43,57.32,8,Urban,Yes,Family,Online,Premium,12997.0,21,189.3,5,3,2,5,4,Definitely,Public Transport Usage exceeded my expectations
+45,24.84,1,Rural,Yes,Personal,Online,Luxury,86144.0,17,182.6,5,2,3,2,3,Unlikely,I am unsure about long term value of Public Transport Usage
+34,53.26,5,Semi-Urban,No,Leisure,Online,Premium,69240.0,18,463.1,4,4,1,1,5,Definitely,I am unsure about long term value of Public Transport Usage
+34,11.62,4,Urban,No,Personal,Offline,Premium,87106.0,16,43.4,2,4,2,4,6,Definitely,Public Transport Usage exceeded my expectations
+46,38.94,3,Semi-Urban,No,Business,Online,Luxury,5142.0,14,233.6,2,5,2,3,2,Definitely,I am unsure about long term value of Public Transport Usage
+60,38.03,7,Semi-Urban,Yes,Family,Offline,Luxury,61859.0,15,147.0,5,3,2,4,7,Maybe,Public Transport Usage exceeded my expectations
+50,52.29,3,Urban,No,Leisure,Online,Mass,5898.0,13,449.0,5,5,3,4,10,Definitely,I am unsure about long term value of Public Transport Usage
+46,5.18,5,Rural,Yes,Business,Offline,Premium,70821.0,14,66.1,3,3,3,2,10,Maybe,Public Transport Usage is impressive and modern
+58,15.45,8,Semi-Urban,Yes,Leisure,Hybrid,Luxury,35524.0,23,217.5,1,4,3,1,8,Maybe,Public Transport Usage exceeded my expectations
+42,17.08,5,Semi-Urban,No,Family,Online,Luxury,10427.0,19,215.3,3,2,1,5,4,Definitely,Public Transport Usage is impressive and modern
+59,57.25,3,Semi-Urban,Yes,Family,Offline,Luxury,51988.0,15,446.4,1,3,2,3,1,Definitely,Public Transport Usage needs serious improvement
+59,13.45,5,Rural,No,Business,Offline,Premium,26651.0,9,123.4,5,5,2,4,8,Definitely,Public Transport Usage is impressive and modern
+54,7.03,5,Urban,No,Leisure,Online,Mass,60043.0,13,329.5,4,2,3,5,2,Definitely,I am unsure about long term value of Public Transport Usage
+45,34.4,8,Semi-Urban,Yes,Business,Online,Mass,59919.0,14,84.5,4,5,3,5,4,Definitely,Public Transport Usage feels overpriced for what it offers
+56,34.07,4,Urban,No,Leisure,Online,Luxury,64041.0,26,477.9,4,3,2,2,6,Definitely,Public Transport Usage is impressive and modern
+33,51.42,1,Semi-Urban,Yes,Business,Offline,Premium,89337.0,13,304.6,3,1,4,4,3,Maybe,Public Transport Usage is impressive and modern
+49,57.19,6,Urban,Yes,Business,Online,Mass,36029.0,12,320.6,3,2,1,5,8,Maybe,Public Transport Usage is impressive and modern
+62,34.62,8,Urban,No,Business,Online,Luxury,42948.0,17,228.2,5,4,5,5,8,Definitely,Public Transport Usage feels overpriced for what it offers
+29,56.15,2,Rural,No,Family,Online,Mass,72806.0,13,184.3,4,3,1,5,8,Maybe,Public Transport Usage feels overpriced for what it offers
+35,44.88,8,Semi-Urban,Yes,Personal,Online,Luxury,52897.0,14,122.1,3,4,4,4,8,Maybe,Public Transport Usage is impressive and modern
+51,19.55,3,Urban,No,Leisure,Offline,Premium,5279.0,17,309.9,3,4,2,3,4,Definitely,Public Transport Usage needs serious improvement
+64,56.06,2,Semi-Urban,No,Leisure,Offline,Mass,76191.0,22,478.2,1,3,4,4,7,Definitely,Public Transport Usage feels overpriced for what it offers
+47,41.71,3,Semi-Urban,Yes,Business,Online,Premium,6532.0,8,192.7,2,3,1,4,5,Unlikely,Public Transport Usage feels overpriced for what it offers
+51,27.78,3,Urban,No,Family,Offline,Mass,17032.0,7,443.9,4,3,2,4,7,Maybe,Public Transport Usage feels overpriced for what it offers
+30,42.41,1,Urban,No,Family,Offline,Premium,10983.0,13,91.4,4,5,2,2,3,Maybe,Public Transport Usage exceeded my expectations
+57,27.07,7,Rural,No,Leisure,Online,Premium,8858.0,12,469.3,4,3,5,2,7,Definitely,Public Transport Usage is impressive and modern
+27,11.28,7,Semi-Urban,Yes,Personal,Online,Mass,4260.0,22,188.2,5,2,5,5,10,Maybe,Public Transport Usage needs serious improvement
+52,44.54,3,Urban,No,Leisure,Hybrid,Luxury,6842.0,15,202.3,4,3,1,3,1,Maybe,Public Transport Usage feels overpriced for what it offers
+31,50.32,3,Rural,Yes,Family,Offline,Premium,40935.0,17,242.2,3,4,3,3,2,Definitely,Public Transport Usage exceeded my expectations
+68,45.08,1,Semi-Urban,No,Business,Offline,Premium,24251.0,13,364.8,3,4,3,5,3,Unlikely,I am unsure about long term value of Public Transport Usage
+65,17.6,5,Urban,No,Leisure,Online,Mass,13135.0,13,365.4,5,5,1,4,6,Definitely,I am unsure about long term value of Public Transport Usage
+48,57.61,7,Urban,Yes,Personal,Hybrid,Mass,59966.0,16,250.2,4,5,1,3,5,Definitely,Public Transport Usage feels overpriced for what it offers
+24,6.39,6,Urban,Yes,Family,Online,Luxury,21898.0,20,271.1,2,3,5,4,8,Definitely,Public Transport Usage needs serious improvement
+68,23.3,8,Rural,No,Leisure,Hybrid,Premium,3668.0,15,34.4,4,3,3,4,6,Maybe,Public Transport Usage needs serious improvement
+65,19.31,2,Urban,No,Business,Hybrid,Premium,38821.0,7,166.1,4,4,1,4,6,Maybe,Public Transport Usage is impressive and modern
+51,7.65,3,Urban,Yes,Business,Hybrid,Luxury,29318.0,14,186.1,5,5,2,5,7,Maybe,Public Transport Usage feels overpriced for what it offers
+49,27.32,1,Rural,Yes,Business,Hybrid,Premium,30037.0,10,288.2,5,3,2,3,5,Unlikely,I am unsure about long term value of Public Transport Usage
+53,39.27,3,Urban,No,Personal,Online,Premium,41184.0,16,288.0,4,3,3,5,5,Definitely,Public Transport Usage is impressive and modern
+24,53.54,7,Semi-Urban,Yes,Family,Hybrid,Luxury,60864.0,10,360.8,4,5,2,2,8,Maybe,Public Transport Usage needs serious improvement
+67,59.43,1,Urban,Yes,Business,Online,Luxury,56250.0,15,364.2,2,3,3,4,8,Maybe,Public Transport Usage is impressive and modern
+46,49.44,2,Semi-Urban,No,Family,Hybrid,Mass,84479.0,5,132.9,4,3,1,5,0,Unlikely,I am unsure about long term value of Public Transport Usage
+51,30.78,4,Urban,Yes,Business,Online,Premium,47559.0,12,389.7,5,5,2,3,3,Definitely,Public Transport Usage needs serious improvement
+51,44.8,7,Urban,Yes,Business,Offline,Luxury,43586.0,7,29.4,4,5,1,4,4,Unlikely,Public Transport Usage exceeded my expectations
+47,51.4,5,Semi-Urban,Yes,Personal,Online,Premium,20780.0,12,363.8,4,2,4,3,5,Definitely,Public Transport Usage exceeded my expectations
+45,30.59,8,Semi-Urban,No,Business,Offline,Luxury,68474.0,21,69.0,5,3,1,2,5,Maybe,Public Transport Usage feels overpriced for what it offers
+68,48.18,8,Semi-Urban,Yes,Personal,Online,Luxury,14388.0,14,370.2,3,3,4,4,7,Maybe,Public Transport Usage is impressive and modern
+56,31.55,4,Semi-Urban,No,Personal,Online,Premium,45220.0,9,273.0,2,5,2,5,8,Unlikely,Public Transport Usage needs serious improvement
+69,26.26,1,Semi-Urban,No,Business,Hybrid,Mass,39076.0,13,229.9,4,5,3,2,4,Definitely,Public Transport Usage feels overpriced for what it offers
+51,33.93,3,Semi-Urban,Yes,Leisure,Offline,Mass,59930.0,7,351.5,5,4,2,5,7,Definitely,Public Transport Usage is impressive and modern
+63,42.17,5,Semi-Urban,No,Personal,Online,Premium,82751.0,10,37.5,5,3,3,3,5,Definitely,I am unsure about long term value of Public Transport Usage
+57,44.98,7,Semi-Urban,Yes,Business,Online,Premium,85300.0,10,127.3,4,1,4,2,6,Maybe,Public Transport Usage needs serious improvement
+65,24.62,2,Semi-Urban,No,Business,Online,Luxury,16766.0,15,315.9,5,4,2,3,7,Maybe,Public Transport Usage is impressive and modern
+64,36.42,8,Semi-Urban,Yes,Family,Offline,Premium,25040.0,13,426.7,4,3,2,3,9,Unlikely,Public Transport Usage needs serious improvement
+43,55.04,7,Urban,No,Business,Hybrid,Premium,73424.0,17,202.9,2,4,3,2,4,Definitely,Public Transport Usage is impressive and modern
+55,58.7,6,Urban,Yes,Leisure,Offline,Luxury,47609.0,12,144.2,5,4,1,5,2,Definitely,I am unsure about long term value of Public Transport Usage
+24,17.5,5,Urban,Yes,Business,Online,Premium,41867.0,15,269.0,3,3,3,4,7,Definitely,Public Transport Usage needs serious improvement
+48,15.61,8,Rural,No,Personal,Online,Premium,64535.0,12,318.7,3,5,1,4,5,Definitely,Public Transport Usage exceeded my expectations
+62,42.22,3,Semi-Urban,Yes,Business,Hybrid,Mass,54969.0,10,221.6,3,1,3,5,3,Maybe,I am unsure about long term value of Public Transport Usage
+61,27.81,8,Semi-Urban,No,Business,Online,Premium,87423.0,12,440.8,3,4,3,4,3,Unlikely,Public Transport Usage is impressive and modern
+62,6.33,8,Urban,Yes,Personal,Online,Luxury,53390.0,12,271.3,3,3,1,3,7,Unlikely,Public Transport Usage needs serious improvement
+33,24.08,4,Urban,Yes,Personal,Online,Premium,43006.0,20,37.2,3,4,3,3,5,Definitely,I am unsure about long term value of Public Transport Usage
+21,49.37,1,Rural,No,Personal,Offline,Premium,49768.0,17,127.1,3,4,2,3,10,Definitely,Public Transport Usage is impressive and modern
+32,48.86,4,Rural,Yes,Personal,Hybrid,Mass,73152.0,18,236.3,1,1,2,4,6,Definitely,Public Transport Usage exceeded my expectations
+63,32.21,7,Urban,No,Family,Online,Luxury,55915.0,8,354.9,4,3,2,3,4,Maybe,Public Transport Usage exceeded my expectations
+60,30.99,5,Semi-Urban,No,Business,Offline,Luxury,58940.0,19,125.5,5,2,3,4,7,Unlikely,Public Transport Usage is impressive and modern
+46,36.87,6,Semi-Urban,Yes,Family,Online,Premium,87487.0,15,488.6,5,2,1,5,4,Definitely,Public Transport Usage exceeded my expectations
+66,17.07,3,Urban,No,Leisure,Online,Luxury,56419.0,11,172.9,5,4,5,5,6,Definitely,I am unsure about long term value of Public Transport Usage
+66,33.93,1,Semi-Urban,Yes,Business,Online,Premium,35465.0,16,275.6,4,2,3,5,6,Maybe,Public Transport Usage exceeded my expectations
+43,5.61,3,Semi-Urban,Yes,Leisure,Online,Premium,62837.0,19,29.1,4,3,1,3,6,Maybe,Public Transport Usage feels overpriced for what it offers
+69,31.16,3,Semi-Urban,No,Business,Online,Luxury,60032.0,8,444.7,3,2,4,2,8,Definitely,Public Transport Usage exceeded my expectations
+42,23.48,6,Urban,Yes,Personal,Hybrid,Mass,3219.0,23,398.6,2,4,2,4,4,Unlikely,Public Transport Usage feels overpriced for what it offers
+48,42.12,5,Urban,Yes,Business,Online,Premium,43125.0,16,113.8,4,4,3,3,9,Definitely,Public Transport Usage needs serious improvement
+37,40.11,4,Urban,No,Leisure,Online,Mass,67376.0,9,468.0,4,3,2,2,8,Unlikely,I am unsure about long term value of Public Transport Usage
+26,25.95,3,Urban,No,Personal,Online,Premium,45916.0,20,171.6,5,4,4,4,5,Definitely,Public Transport Usage needs serious improvement
+34,5.4,7,Semi-Urban,No,Personal,Online,Premium,70607.0,12,352.2,4,5,4,3,4,Definitely,Public Transport Usage needs serious improvement
+37,18.88,7,Urban,No,Family,Online,Mass,41678.0,14,413.1,3,1,3,5,4,Definitely,Public Transport Usage exceeded my expectations
+58,39.83,3,Semi-Urban,No,Family,Online,Premium,88532.0,19,375.6,5,4,2,3,5,Definitely,Public Transport Usage exceeded my expectations
+25,8.98,3,Urban,No,Family,Offline,Premium,27774.0,16,460.4,4,3,2,5,7,Definitely,Public Transport Usage exceeded my expectations
+33,10.92,1,Semi-Urban,Yes,Personal,Hybrid,Premium,10107.0,14,434.9,5,2,2,5,1,Maybe,Public Transport Usage needs serious improvement
+68,40.59,3,Semi-Urban,No,Family,Offline,Mass,39841.0,7,497.4,5,4,1,2,9,Definitely,I am unsure about long term value of Public Transport Usage
+29,46.57,7,Semi-Urban,Yes,Business,Online,Luxury,49670.0,11,107.7,3,2,2,4,2,Maybe,I am unsure about long term value of Public Transport Usage
+64,22.69,3,Urban,No,Family,Hybrid,Premium,32720.0,17,166.3,2,5,3,4,4,Definitely,Public Transport Usage feels overpriced for what it offers
+62,31.93,8,Urban,No,Business,Online,Luxury,23321.0,14,325.4,3,1,4,5,3,Definitely,Public Transport Usage is impressive and modern
+46,57.01,8,Urban,No,Business,Online,Luxury,61141.0,15,371.9,2,1,2,4,4,Unlikely,I am unsure about long term value of Public Transport Usage
+33,57.0,5,Urban,No,Business,Online,Premium,35187.0,14,276.6,3,4,2,4,8,Unlikely,Public Transport Usage exceeded my expectations
+39,21.91,7,Urban,Yes,Family,Online,Mass,57560.0,15,55.5,4,4,4,4,7,Definitely,Public Transport Usage feels overpriced for what it offers
+68,49.55,3,Urban,Yes,Business,Hybrid,Premium,70558.0,12,424.0,5,4,4,3,4,Definitely,Public Transport Usage exceeded my expectations
+37,37.67,6,Semi-Urban,No,Personal,Online,Premium,68968.0,11,481.2,5,3,2,5,9,Maybe,Public Transport Usage needs serious improvement
+36,58.65,8,Rural,Yes,Business,Online,Mass,35027.0,11,214.6,4,5,1,3,8,Definitely,Public Transport Usage needs serious improvement
+50,31.27,6,Urban,No,Business,Online,Mass,51975.0,16,127.9,1,5,3,2,8,Maybe,Public Transport Usage exceeded my expectations
+52,47.61,7,Rural,Yes,Personal,Offline,Premium,41570.0,10,29.3,3,3,4,3,8,Definitely,I am unsure about long term value of Public Transport Usage
+34,47.25,3,Urban,No,Family,Offline,Luxury,78631.0,16,133.9,4,4,1,5,7,Definitely,Public Transport Usage is impressive and modern
+68,32.36,6,Semi-Urban,No,Family,Online,Luxury,79331.0,13,356.0,2,4,3,4,6,Definitely,Public Transport Usage exceeded my expectations
+35,48.76,5,Semi-Urban,Yes,Personal,Offline,Mass,32249.0,5,457.6,5,1,3,5,5,Maybe,I am unsure about long term value of Public Transport Usage
+32,19.36,1,Rural,No,Family,Offline,Premium,10073.0,15,64.9,5,3,2,5,4,Definitely,Public Transport Usage feels overpriced for what it offers

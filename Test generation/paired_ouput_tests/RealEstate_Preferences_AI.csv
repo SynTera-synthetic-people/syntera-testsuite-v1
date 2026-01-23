@@ -1,0 +1,209 @@
+﻿Age,Monthly_Income_Lakh,Household_Size,Area_Type,Current_User,Primary_Purpose,Preferred_Channel,Brand_Segment,Monthly_Spend,Usage_Frequency_per_Month,Travel_Distance_km_per_Week,Satisfaction_1to5,Ease_of_Use_1to5,Value_for_Money_1to5,Trust_in_Brand_1to5,Recommend_NPS_0to10,Future_Intent,Open_Ended_Feedback
+28,32.48,8,Urban,Yes,Leisure,Online,Premium,68342.0,7,289.6,4,3,3,1,8,Maybe,RealEstate Preferences needs serious improvement
+68,43.34,4,Semi-Urban,No,Business,Online,Luxury,80414.0,10,426.5,3,3,1,5,5,Unlikely,RealEstate Preferences needs serious improvement
+45,49.08,1,Semi-Urban,No,Business,Online,Mass,76149.0,11,279.0,3,2,3,4,8,Definitely,RealEstate Preferences needs serious improvement
+62,52.97,3,Urban,Yes,Family,Online,Premium,42382.0,11,457.5,4,3,4,3,5,Definitely,RealEstate Preferences needs serious improvement
+66,35.79,6,Semi-Urban,Yes,Family,Online,Luxury,48679.0,19,455.8,4,2,4,4,7,Unlikely,RealEstate Preferences needs serious improvement
+57,20.21,2,Rural,No,Business,Hybrid,Premium,16924.0,15,187.2,3,2,4,4,8,Unlikely,RealEstate Preferences is impressive and modern
+58,33.03,8,Urban,No,Personal,Hybrid,Mass,65437.0,11,439.5,5,4,1,5,7,Definitely,RealEstate Preferences exceeded my expectations
+28,26.32,5,Urban,No,Business,Online,Mass,39131.0,6,300.9,1,5,4,5,7,Definitely,RealEstate Preferences exceeded my expectations
+46,17.43,5,Urban,No,Business,Online,Premium,16192.0,19,250.3,4,2,2,3,7,Unlikely,RealEstate Preferences is impressive and modern
+31,34.1,7,Semi-Urban,Yes,Business,Online,Luxury,10391.0,7,391.6,4,3,4,5,7,Definitely,RealEstate Preferences exceeded my expectations
+60,6.25,1,Urban,No,Business,Hybrid,Luxury,63260.0,8,399.0,5,3,2,4,7,Definitely,I am unsure about long term value of RealEstate Preferences
+43,38.31,1,Semi-Urban,No,Business,Online,Luxury,44434.0,10,344.2,3,2,3,4,8,Maybe,I am unsure about long term value of RealEstate Preferences
+52,50.19,3,Rural,No,Business,Online,Luxury,2792.0,16,409.2,4,2,3,4,4,Definitely,RealEstate Preferences is impressive and modern
+65,59.97,2,Urban,Yes,Business,Offline,Premium,74557.0,13,476.7,4,2,1,4,4,Unlikely,I am unsure about long term value of RealEstate Preferences
+21,55.69,1,Urban,No,Family,Offline,Mass,56513.0,12,439.1,3,5,5,4,10,Definitely,RealEstate Preferences is impressive and modern
+69,9.94,5,Urban,No,Business,Online,Premium,5377.0,13,55.6,4,4,3,5,9,Definitely,I am unsure about long term value of RealEstate Preferences
+68,13.93,2,Urban,No,Business,Hybrid,Premium,28812.0,14,428.0,3,3,1,3,7,Definitely,RealEstate Preferences feels overpriced for what it offers
+29,12.63,2,Semi-Urban,Yes,Business,Offline,Premium,65572.0,7,395.1,5,3,1,4,0,Definitely,RealEstate Preferences is impressive and modern
+60,35.71,3,Urban,Yes,Business,Online,Mass,7195.0,15,464.8,5,4,3,5,9,Definitely,RealEstate Preferences needs serious improvement
+48,7.53,6,Semi-Urban,Yes,Family,Online,Premium,66790.0,13,375.0,4,4,1,1,8,Unlikely,I am unsure about long term value of RealEstate Preferences
+53,56.53,1,Rural,No,Personal,Hybrid,Mass,46431.0,15,441.4,2,3,2,4,10,Definitely,RealEstate Preferences feels overpriced for what it offers
+52,8.4,2,Semi-Urban,No,Business,Offline,Luxury,70891.0,10,24.9,4,3,3,5,0,Maybe,RealEstate Preferences is impressive and modern
+28,26.52,8,Rural,Yes,Leisure,Online,Mass,77261.0,10,489.3,4,3,2,4,1,Definitely,I am unsure about long term value of RealEstate Preferences
+57,54.17,3,Urban,No,Business,Online,Luxury,69563.0,12,111.6,2,1,1,5,6,Definitely,RealEstate Preferences needs serious improvement
+38,57.16,5,Semi-Urban,No,Leisure,Online,Luxury,8871.0,12,434.8,3,3,3,5,9,Maybe,I am unsure about long term value of RealEstate Preferences
+27,30.59,3,Urban,Yes,Business,Offline,Luxury,42513.0,20,466.2,3,4,2,4,10,Maybe,RealEstate Preferences feels overpriced for what it offers
+38,31.86,7,Urban,Yes,Leisure,Online,Luxury,30049.0,11,21.1,4,4,1,3,5,Definitely,RealEstate Preferences exceeded my expectations
+68,39.99,7,Urban,No,Business,Online,Premium,46747.0,12,458.6,4,3,2,5,1,Definitely,RealEstate Preferences exceeded my expectations
+32,27.42,7,Semi-Urban,No,Family,Online,Mass,86991.0,18,418.0,4,5,3,5,4,Definitely,RealEstate Preferences feels overpriced for what it offers
+24,22.86,3,Rural,No,Leisure,Hybrid,Premium,12947.0,10,462.8,4,4,1,5,9,Unlikely,RealEstate Preferences feels overpriced for what it offers
+33,45.67,6,Urban,No,Leisure,Hybrid,Luxury,78173.0,10,104.9,4,5,5,4,6,Definitely,RealEstate Preferences is impressive and modern
+31,37.74,7,Rural,Yes,Family,Online,Mass,89195.0,15,393.2,4,5,4,5,9,Definitely,RealEstate Preferences exceeded my expectations
+36,31.49,3,Rural,No,Leisure,Online,Premium,89122.0,12,254.0,4,5,2,5,6,Definitely,RealEstate Preferences is impressive and modern
+64,10.54,7,Semi-Urban,No,Personal,Online,Premium,72109.0,15,143.7,2,3,2,1,2,Definitely,I am unsure about long term value of RealEstate Preferences
+34,8.79,8,Semi-Urban,Yes,Business,Online,Premium,42971.0,17,383.0,4,3,4,5,7,Unlikely,RealEstate Preferences feels overpriced for what it offers
+36,33.09,1,Semi-Urban,No,Business,Offline,Mass,17664.0,10,247.2,3,1,2,5,6,Definitely,RealEstate Preferences is impressive and modern
+42,39.07,3,Semi-Urban,No,Family,Offline,Luxury,55523.0,20,451.9,5,3,4,4,6,Definitely,RealEstate Preferences feels overpriced for what it offers
+38,41.16,8,Urban,Yes,Business,Online,Luxury,55713.0,12,361.2,5,3,4,3,9,Definitely,RealEstate Preferences is impressive and modern
+60,54.22,5,Urban,No,Personal,Offline,Luxury,29846.0,21,86.8,4,2,1,5,6,Maybe,I am unsure about long term value of RealEstate Preferences
+45,49.89,2,Urban,Yes,Family,Hybrid,Premium,56280.0,14,140.4,1,5,4,5,8,Maybe,I am unsure about long term value of RealEstate Preferences
+55,12.74,7,Rural,Yes,Business,Online,Luxury,12256.0,16,147.0,3,4,3,5,2,Unlikely,RealEstate Preferences needs serious improvement
+27,48.69,7,Urban,Yes,Leisure,Offline,Premium,57793.0,14,185.1,5,5,3,4,6,Maybe,RealEstate Preferences exceeded my expectations
+40,42.2,4,Semi-Urban,Yes,Personal,Hybrid,Mass,80912.0,15,339.9,3,3,2,4,7,Definitely,RealEstate Preferences needs serious improvement
+47,50.54,7,Semi-Urban,No,Business,Online,Luxury,43542.0,14,449.3,4,3,1,3,3,Definitely,RealEstate Preferences exceeded my expectations
+49,51.38,6,Semi-Urban,No,Business,Offline,Luxury,69282.0,16,305.0,3,3,2,5,5,Maybe,I am unsure about long term value of RealEstate Preferences
+30,24.0,1,Rural,No,Business,Online,Luxury,57936.0,10,380.9,5,3,1,4,8,Definitely,RealEstate Preferences is impressive and modern
+31,19.48,8,Urban,Yes,Business,Offline,Mass,2270.0,17,172.0,5,3,2,3,4,Definitely,RealEstate Preferences feels overpriced for what it offers
+40,35.39,4,Urban,No,Leisure,Online,Mass,12736.0,10,270.8,4,5,1,2,3,Definitely,I am unsure about long term value of RealEstate Preferences
+53,21.42,7,Semi-Urban,No,Business,Hybrid,Mass,70186.0,9,262.0,4,2,4,2,5,Definitely,I am unsure about long term value of RealEstate Preferences
+63,24.23,6,Rural,No,Leisure,Online,Luxury,5560.0,11,356.5,3,1,1,5,9,Definitely,RealEstate Preferences is impressive and modern
+57,8.8,6,Semi-Urban,No,Business,Online,Premium,86150.0,16,268.6,4,2,4,3,8,Maybe,I am unsure about long term value of RealEstate Preferences
+33,59.53,3,Semi-Urban,No,Business,Hybrid,Mass,80679.0,16,180.4,4,5,5,1,8,Maybe,I am unsure about long term value of RealEstate Preferences
+36,22.01,1,Semi-Urban,No,Business,Hybrid,Mass,33889.0,14,137.1,4,4,1,3,5,Unlikely,RealEstate Preferences is impressive and modern
+31,47.9,5,Urban,No,Personal,Online,Premium,29314.0,17,142.3,5,4,2,5,2,Definitely,I am unsure about long term value of RealEstate Preferences
+25,59.62,4,Semi-Urban,No,Personal,Online,Premium,55938.0,22,490.8,5,3,4,3,1,Definitely,RealEstate Preferences exceeded my expectations
+58,58.3,2,Urban,No,Business,Online,Luxury,55838.0,13,191.6,4,4,4,4,7,Definitely,RealEstate Preferences exceeded my expectations
+23,39.86,6,Semi-Urban,Yes,Family,Online,Premium,9835.0,13,407.2,5,4,1,4,7,Maybe,RealEstate Preferences exceeded my expectations
+22,34.63,5,Semi-Urban,No,Business,Offline,Luxury,20954.0,5,54.3,4,3,1,4,5,Maybe,RealEstate Preferences exceeded my expectations
+58,22.01,5,Rural,No,Business,Online,Premium,58009.0,18,63.0,2,4,1,4,6,Definitely,I am unsure about long term value of RealEstate Preferences
+30,52.38,4,Rural,No,Business,Online,Luxury,72468.0,10,349.4,4,4,3,4,4,Definitely,RealEstate Preferences feels overpriced for what it offers
+26,23.59,8,Urban,Yes,Business,Offline,Mass,18896.0,15,239.5,5,3,1,2,5,Definitely,RealEstate Preferences exceeded my expectations
+41,10.87,2,Semi-Urban,No,Family,Offline,Luxury,63770.0,12,442.6,2,1,3,4,7,Definitely,RealEstate Preferences exceeded my expectations
+51,21.18,8,Semi-Urban,No,Business,Hybrid,Mass,78602.0,15,433.9,4,2,2,4,7,Definitely,I am unsure about long term value of RealEstate Preferences
+54,22.33,8,Semi-Urban,No,Business,Online,Premium,12367.0,19,382.7,5,4,3,3,1,Definitely,RealEstate Preferences needs serious improvement
+69,44.52,1,Urban,Yes,Leisure,Hybrid,Premium,40641.0,19,411.4,3,4,4,5,9,Maybe,I am unsure about long term value of RealEstate Preferences
+52,14.32,7,Urban,No,Leisure,Offline,Mass,76849.0,13,437.8,4,4,4,5,4,Maybe,RealEstate Preferences is impressive and modern
+49,22.43,5,Urban,Yes,Business,Online,Premium,34615.0,18,396.1,3,3,1,3,9,Maybe,RealEstate Preferences exceeded my expectations
+21,9.21,1,Semi-Urban,Yes,Family,Offline,Luxury,25712.0,16,272.9,5,3,5,4,6,Definitely,RealEstate Preferences is impressive and modern
+53,51.66,5,Urban,Yes,Family,Offline,Mass,67614.0,15,147.1,4,2,3,5,6,Maybe,RealEstate Preferences exceeded my expectations
+58,44.86,7,Semi-Urban,Yes,Leisure,Online,Mass,37268.0,21,397.9,4,4,4,3,6,Definitely,RealEstate Preferences needs serious improvement
+37,29.06,3,Urban,Yes,Personal,Online,Premium,64155.0,19,172.5,1,5,3,5,9,Definitely,RealEstate Preferences feels overpriced for what it offers
+54,28.65,7,Urban,No,Business,Offline,Premium,13122.0,13,137.5,5,3,3,5,4,Maybe,RealEstate Preferences needs serious improvement
+69,14.15,6,Semi-Urban,No,Business,Online,Premium,50709.0,7,102.4,4,2,4,4,7,Definitely,I am unsure about long term value of RealEstate Preferences
+36,26.15,7,Semi-Urban,Yes,Business,Online,Premium,35393.0,12,321.1,5,5,2,5,5,Definitely,I am unsure about long term value of RealEstate Preferences
+27,54.88,5,Semi-Urban,No,Business,Hybrid,Mass,89763.0,9,136.4,3,3,1,3,9,Definitely,RealEstate Preferences is impressive and modern
+56,12.63,1,Urban,No,Business,Online,Mass,54042.0,7,199.9,5,4,1,3,3,Unlikely,RealEstate Preferences is impressive and modern
+33,47.08,2,Urban,No,Business,Offline,Mass,62031.0,13,360.4,3,1,4,3,7,Definitely,I am unsure about long term value of RealEstate Preferences
+40,7.59,4,Semi-Urban,Yes,Leisure,Hybrid,Luxury,13531.0,22,401.0,3,4,5,5,6,Definitely,I am unsure about long term value of RealEstate Preferences
+24,22.14,2,Rural,Yes,Business,Online,Mass,89293.0,18,171.1,3,3,4,3,7,Definitely,I am unsure about long term value of RealEstate Preferences
+25,51.58,5,Semi-Urban,No,Business,Online,Premium,6524.0,10,424.5,2,3,5,2,3,Maybe,RealEstate Preferences exceeded my expectations
+36,29.47,1,Rural,Yes,Family,Online,Luxury,8234.0,16,47.8,4,5,5,4,5,Definitely,RealEstate Preferences needs serious improvement
+29,43.65,3,Rural,No,Leisure,Online,Luxury,8665.0,20,493.2,4,3,3,3,3,Definitely,RealEstate Preferences exceeded my expectations
+63,10.69,2,Rural,No,Business,Online,Mass,78613.0,19,220.1,2,1,1,1,10,Maybe,RealEstate Preferences feels overpriced for what it offers
+32,42.59,3,Rural,No,Business,Offline,Premium,66116.0,13,175.9,4,5,3,3,4,Unlikely,RealEstate Preferences exceeded my expectations
+34,50.05,4,Semi-Urban,Yes,Leisure,Hybrid,Premium,87629.0,16,463.4,3,1,2,5,10,Unlikely,I am unsure about long term value of RealEstate Preferences
+35,49.29,7,Rural,No,Business,Online,Mass,7857.0,12,83.5,5,4,2,5,6,Unlikely,RealEstate Preferences exceeded my expectations
+25,29.14,3,Semi-Urban,Yes,Family,Online,Luxury,62867.0,7,191.7,4,4,4,5,2,Maybe,RealEstate Preferences is impressive and modern
+62,54.73,7,Urban,Yes,Leisure,Offline,Luxury,48928.0,9,192.3,5,5,1,3,0,Maybe,I am unsure about long term value of RealEstate Preferences
+38,36.62,4,Rural,Yes,Family,Offline,Premium,58244.0,15,223.7,3,4,1,4,7,Definitely,RealEstate Preferences needs serious improvement
+28,49.98,3,Urban,No,Family,Online,Premium,47137.0,17,427.2,3,5,3,3,7,Definitely,RealEstate Preferences exceeded my expectations
+28,16.74,5,Rural,Yes,Personal,Online,Premium,61431.0,12,427.7,3,4,2,5,6,Definitely,I am unsure about long term value of RealEstate Preferences
+45,16.56,8,Semi-Urban,No,Personal,Offline,Luxury,81821.0,10,304.0,3,2,2,5,2,Definitely,RealEstate Preferences is impressive and modern
+24,46.49,3,Urban,No,Leisure,Online,Luxury,53698.0,9,496.0,5,4,2,2,5,Definitely,RealEstate Preferences is impressive and modern
+46,40.56,6,Rural,No,Family,Online,Mass,80885.0,9,425.2,3,4,3,4,5,Maybe,RealEstate Preferences exceeded my expectations
+31,42.2,2,Semi-Urban,No,Personal,Online,Luxury,70830.0,12,346.9,3,2,1,4,7,Maybe,I am unsure about long term value of RealEstate Preferences
+26,18.01,7,Semi-Urban,No,Family,Online,Luxury,78113.0,11,115.7,1,2,4,5,6,Definitely,RealEstate Preferences needs serious improvement
+53,26.98,2,Urban,Yes,Business,Online,Mass,60014.0,8,283.9,5,4,5,5,7,Definitely,RealEstate Preferences feels overpriced for what it offers
+42,19.21,2,Rural,No,Family,Offline,Mass,47637.0,19,122.7,5,5,4,2,5,Definitely,RealEstate Preferences is impressive and modern
+49,8.75,4,Semi-Urban,No,Family,Offline,Premium,8121.0,11,164.8,3,4,5,5,7,Unlikely,RealEstate Preferences feels overpriced for what it offers
+25,16.22,4,Urban,Yes,Business,Online,Premium,75471.0,16,349.2,4,4,5,2,1,Unlikely,RealEstate Preferences needs serious improvement
+21,59.73,5,Urban,No,Personal,Online,Luxury,23297.0,16,108.5,4,2,2,3,10,Definitely,RealEstate Preferences exceeded my expectations
+42,17.87,4,Semi-Urban,No,Business,Online,Premium,5226.0,10,63.6,2,2,4,1,7,Maybe,RealEstate Preferences is impressive and modern
+55,13.76,5,Rural,No,Leisure,Online,Premium,47678.0,18,275.1,4,4,3,2,3,Definitely,RealEstate Preferences feels overpriced for what it offers
+51,43.33,3,Semi-Urban,No,Business,Online,Premium,57661.0,15,20.5,2,1,2,1,7,Definitely,RealEstate Preferences is impressive and modern
+23,38.12,8,Urban,Yes,Personal,Online,Premium,60241.0,17,312.3,4,4,4,2,8,Maybe,RealEstate Preferences feels overpriced for what it offers
+23,46.03,1,Rural,No,Business,Online,Premium,60935.0,16,452.6,2,2,2,5,8,Maybe,I am unsure about long term value of RealEstate Preferences
+27,40.95,8,Rural,Yes,Business,Offline,Premium,59528.0,13,111.3,4,3,1,3,4,Definitely,I am unsure about long term value of RealEstate Preferences
+21,17.26,7,Semi-Urban,Yes,Leisure,Hybrid,Mass,73121.0,14,203.7,1,3,4,4,10,Definitely,RealEstate Preferences exceeded my expectations
+62,32.55,2,Semi-Urban,No,Personal,Online,Luxury,69704.0,14,459.9,4,2,2,4,0,Definitely,RealEstate Preferences needs serious improvement
+44,14.72,2,Urban,No,Family,Online,Mass,73529.0,13,357.9,4,4,2,5,5,Definitely,RealEstate Preferences is impressive and modern
+57,18.94,5,Urban,Yes,Business,Online,Mass,42503.0,18,85.0,4,3,4,4,3,Unlikely,RealEstate Preferences needs serious improvement
+50,59.28,4,Rural,No,Leisure,Online,Premium,7528.0,9,203.4,4,1,1,3,5,Maybe,RealEstate Preferences feels overpriced for what it offers
+52,45.08,6,Urban,No,Business,Hybrid,Premium,58283.0,12,382.9,2,3,4,5,2,Maybe,RealEstate Preferences exceeded my expectations
+52,48.06,8,Urban,Yes,Personal,Online,Premium,20499.0,16,339.1,1,4,2,4,7,Definitely,I am unsure about long term value of RealEstate Preferences
+41,6.65,7,Semi-Urban,Yes,Leisure,Online,Premium,77638.0,17,94.7,3,2,4,3,2,Maybe,I am unsure about long term value of RealEstate Preferences
+68,26.02,3,Semi-Urban,No,Family,Online,Premium,65507.0,8,50.0,5,4,2,3,7,Definitely,RealEstate Preferences exceeded my expectations
+36,35.54,5,Rural,Yes,Personal,Online,Premium,69397.0,11,347.2,4,3,2,2,4,Unlikely,RealEstate Preferences is impressive and modern
+24,13.23,2,Urban,No,Leisure,Offline,Mass,27205.0,18,312.3,2,3,2,4,3,Definitely,RealEstate Preferences needs serious improvement
+37,51.67,6,Semi-Urban,No,Business,Hybrid,Luxury,57709.0,15,48.5,4,4,4,5,5,Definitely,RealEstate Preferences feels overpriced for what it offers
+33,12.68,7,Semi-Urban,No,Personal,Online,Premium,48471.0,14,487.9,4,3,1,4,7,Definitely,RealEstate Preferences needs serious improvement
+55,40.01,7,Rural,Yes,Leisure,Online,Premium,25624.0,18,141.2,3,3,4,5,7,Definitely,I am unsure about long term value of RealEstate Preferences
+60,35.43,5,Semi-Urban,Yes,Business,Online,Luxury,73476.0,14,205.3,5,5,2,4,7,Unlikely,RealEstate Preferences exceeded my expectations
+54,51.71,1,Urban,Yes,Business,Offline,Luxury,50396.0,17,105.2,5,5,4,3,9,Maybe,I am unsure about long term value of RealEstate Preferences
+31,22.15,1,Semi-Urban,Yes,Leisure,Offline,Premium,18789.0,15,417.7,3,3,2,3,4,Maybe,I am unsure about long term value of RealEstate Preferences
+56,20.62,1,Semi-Urban,No,Business,Online,Premium,28862.0,13,482.0,4,1,2,3,6,Definitely,RealEstate Preferences feels overpriced for what it offers
+45,51.55,8,Urban,Yes,Personal,Online,Premium,21985.0,12,122.4,3,4,4,3,4,Maybe,RealEstate Preferences is impressive and modern
+60,17.18,3,Urban,Yes,Leisure,Online,Mass,29491.0,11,155.9,2,4,4,5,7,Definitely,RealEstate Preferences is impressive and modern
+50,46.03,8,Urban,Yes,Family,Offline,Luxury,18559.0,10,359.1,5,4,3,4,5,Definitely,RealEstate Preferences feels overpriced for what it offers
+33,15.51,1,Urban,No,Leisure,Offline,Premium,34660.0,13,273.4,5,4,2,4,7,Definitely,RealEstate Preferences exceeded my expectations
+44,53.16,3,Semi-Urban,Yes,Personal,Offline,Mass,63071.0,19,70.4,3,4,3,3,8,Unlikely,RealEstate Preferences needs serious improvement
+56,51.15,6,Semi-Urban,Yes,Business,Online,Luxury,86418.0,11,465.7,4,5,1,2,7,Definitely,RealEstate Preferences exceeded my expectations
+54,48.31,5,Semi-Urban,Yes,Business,Hybrid,Premium,20527.0,11,313.4,4,5,5,4,8,Unlikely,RealEstate Preferences needs serious improvement
+28,32.03,3,Urban,No,Leisure,Online,Luxury,28385.0,14,164.6,3,2,3,4,7,Unlikely,RealEstate Preferences is impressive and modern
+38,6.86,2,Rural,Yes,Business,Online,Premium,2190.0,11,255.1,2,3,2,2,9,Definitely,I am unsure about long term value of RealEstate Preferences
+27,12.29,4,Rural,No,Family,Hybrid,Premium,21827.0,15,260.1,5,3,4,5,9,Unlikely,I am unsure about long term value of RealEstate Preferences
+69,30.11,1,Semi-Urban,Yes,Family,Hybrid,Premium,38824.0,14,272.2,5,3,2,4,6,Unlikely,RealEstate Preferences exceeded my expectations
+66,7.4,8,Urban,Yes,Family,Online,Premium,42633.0,10,258.7,4,5,5,3,8,Maybe,RealEstate Preferences feels overpriced for what it offers
+42,8.49,4,Semi-Urban,Yes,Personal,Online,Mass,25437.0,16,289.7,2,3,3,5,6,Definitely,RealEstate Preferences needs serious improvement
+27,11.9,5,Semi-Urban,No,Business,Online,Luxury,15228.0,13,208.8,5,4,3,2,7,Definitely,I am unsure about long term value of RealEstate Preferences
+33,19.35,3,Semi-Urban,No,Leisure,Offline,Mass,51550.0,12,90.2,5,5,1,4,1,Definitely,RealEstate Preferences exceeded my expectations
+22,46.21,3,Semi-Urban,No,Business,Online,Premium,38009.0,9,339.0,5,1,3,4,10,Definitely,RealEstate Preferences feels overpriced for what it offers
+64,7.64,4,Urban,No,Business,Online,Mass,39511.0,10,400.4,3,5,1,5,9,Maybe,RealEstate Preferences is impressive and modern
+22,59.1,7,Urban,Yes,Business,Hybrid,Luxury,80758.0,19,423.7,4,4,4,4,9,Maybe,RealEstate Preferences feels overpriced for what it offers
+49,20.06,5,Urban,Yes,Business,Hybrid,Premium,51407.0,8,30.5,5,2,1,5,5,Maybe,RealEstate Preferences is impressive and modern
+47,22.61,4,Rural,No,Business,Online,Luxury,36174.0,12,214.2,3,3,2,5,5,Definitely,RealEstate Preferences exceeded my expectations
+60,18.63,2,Rural,Yes,Business,Online,Premium,24334.0,14,489.7,2,3,3,5,6,Definitely,RealEstate Preferences feels overpriced for what it offers
+38,38.13,8,Rural,No,Business,Online,Luxury,39717.0,16,50.0,5,2,4,5,9,Unlikely,RealEstate Preferences exceeded my expectations
+22,6.07,1,Urban,No,Business,Offline,Premium,77844.0,19,397.1,3,4,3,5,9,Maybe,RealEstate Preferences is impressive and modern
+24,10.15,1,Semi-Urban,Yes,Leisure,Offline,Premium,86929.0,10,80.5,5,5,4,3,5,Unlikely,I am unsure about long term value of RealEstate Preferences
+69,10.43,3,Semi-Urban,No,Leisure,Online,Premium,35196.0,24,415.8,4,2,2,4,6,Definitely,I am unsure about long term value of RealEstate Preferences
+66,41.55,6,Urban,Yes,Leisure,Online,Mass,20390.0,18,342.7,4,2,2,5,6,Unlikely,RealEstate Preferences is impressive and modern
+28,23.12,5,Semi-Urban,Yes,Personal,Online,Premium,82478.0,16,368.0,5,3,2,4,7,Maybe,RealEstate Preferences needs serious improvement
+56,29.06,8,Semi-Urban,No,Business,Online,Luxury,14710.0,14,489.1,1,5,1,5,4,Definitely,RealEstate Preferences needs serious improvement
+68,57.25,7,Rural,No,Business,Hybrid,Premium,28170.0,19,471.0,4,4,4,3,2,Maybe,I am unsure about long term value of RealEstate Preferences
+29,16.0,8,Urban,Yes,Business,Online,Luxury,19965.0,14,166.1,4,2,2,5,1,Unlikely,I am unsure about long term value of RealEstate Preferences
+38,8.86,5,Semi-Urban,Yes,Business,Offline,Mass,51793.0,13,200.1,4,5,1,5,5,Definitely,RealEstate Preferences feels overpriced for what it offers
+42,29.28,3,Rural,Yes,Business,Hybrid,Premium,37960.0,14,215.4,3,5,4,5,9,Definitely,RealEstate Preferences feels overpriced for what it offers
+65,14.02,5,Semi-Urban,Yes,Leisure,Offline,Mass,27271.0,20,106.7,5,3,5,5,7,Unlikely,I am unsure about long term value of RealEstate Preferences
+31,12.96,7,Urban,No,Leisure,Online,Premium,69578.0,12,202.9,3,2,3,5,8,Unlikely,RealEstate Preferences needs serious improvement
+47,27.56,5,Urban,No,Business,Online,Luxury,60442.0,16,489.9,4,3,2,3,9,Maybe,RealEstate Preferences feels overpriced for what it offers
+52,41.83,7,Rural,No,Leisure,Hybrid,Luxury,89605.0,14,255.0,3,2,2,5,6,Definitely,RealEstate Preferences is impressive and modern
+22,18.36,1,Urban,Yes,Business,Online,Mass,29455.0,14,477.2,5,2,2,5,6,Definitely,RealEstate Preferences feels overpriced for what it offers
+22,53.18,8,Rural,Yes,Family,Hybrid,Mass,76385.0,13,54.3,3,2,4,5,5,Maybe,RealEstate Preferences feels overpriced for what it offers
+50,24.93,8,Urban,Yes,Personal,Online,Premium,28621.0,9,38.9,5,5,2,4,4,Definitely,RealEstate Preferences feels overpriced for what it offers
+42,56.37,8,Rural,No,Personal,Online,Luxury,2795.0,16,296.2,3,1,1,5,8,Unlikely,RealEstate Preferences exceeded my expectations
+42,32.08,2,Semi-Urban,Yes,Business,Hybrid,Premium,15279.0,13,373.4,3,3,1,2,9,Maybe,RealEstate Preferences is impressive and modern
+44,44.97,2,Rural,Yes,Business,Hybrid,Premium,46745.0,10,124.4,4,1,3,1,8,Definitely,I am unsure about long term value of RealEstate Preferences
+47,51.7,3,Semi-Urban,Yes,Business,Online,Premium,73281.0,13,261.6,5,3,2,5,1,Definitely,RealEstate Preferences needs serious improvement
+31,34.13,2,Rural,Yes,Leisure,Online,Mass,7052.0,13,439.0,4,4,1,5,5,Definitely,RealEstate Preferences needs serious improvement
+33,51.77,2,Urban,No,Personal,Hybrid,Premium,75217.0,10,385.6,5,2,3,2,7,Maybe,I am unsure about long term value of RealEstate Preferences
+47,25.79,1,Semi-Urban,Yes,Leisure,Online,Premium,65015.0,14,131.3,1,5,2,3,5,Definitely,RealEstate Preferences exceeded my expectations
+35,24.99,2,Rural,No,Personal,Online,Premium,5038.0,10,180.5,5,1,1,5,3,Definitely,RealEstate Preferences needs serious improvement
+68,48.67,2,Urban,No,Leisure,Online,Premium,11354.0,17,166.8,2,2,1,5,6,Maybe,RealEstate Preferences feels overpriced for what it offers
+68,18.27,2,Semi-Urban,No,Leisure,Offline,Mass,8655.0,12,365.4,4,4,4,3,6,Definitely,RealEstate Preferences needs serious improvement
+69,44.44,6,Semi-Urban,Yes,Business,Hybrid,Luxury,61751.0,16,484.7,3,5,4,4,7,Definitely,RealEstate Preferences is impressive and modern
+37,9.24,7,Semi-Urban,Yes,Family,Online,Premium,51371.0,10,154.4,5,5,4,5,10,Definitely,RealEstate Preferences is impressive and modern
+59,39.96,6,Semi-Urban,No,Personal,Online,Luxury,33580.0,16,302.4,5,4,3,5,7,Unlikely,I am unsure about long term value of RealEstate Preferences
+29,56.81,7,Urban,No,Business,Online,Premium,9771.0,14,494.5,4,5,5,4,5,Definitely,RealEstate Preferences exceeded my expectations
+43,30.11,4,Urban,No,Family,Offline,Mass,36582.0,19,95.6,4,5,1,4,10,Definitely,RealEstate Preferences exceeded my expectations
+24,27.88,2,Urban,Yes,Business,Offline,Luxury,62031.0,9,336.4,5,1,3,4,7,Maybe,RealEstate Preferences needs serious improvement
+35,34.73,4,Semi-Urban,Yes,Business,Online,Luxury,10220.0,16,179.4,5,5,4,4,7,Definitely,RealEstate Preferences exceeded my expectations
+63,44.58,1,Urban,No,Business,Online,Mass,77379.0,12,496.0,4,3,1,2,5,Definitely,RealEstate Preferences exceeded my expectations
+51,24.74,2,Semi-Urban,Yes,Business,Online,Mass,7536.0,16,72.2,5,3,2,3,6,Maybe,RealEstate Preferences needs serious improvement
+26,5.01,5,Semi-Urban,Yes,Business,Online,Mass,55521.0,14,236.6,4,1,5,4,6,Definitely,RealEstate Preferences is impressive and modern
+46,32.61,8,Semi-Urban,No,Leisure,Online,Luxury,18645.0,15,142.4,4,4,4,3,9,Definitely,RealEstate Preferences feels overpriced for what it offers
+21,28.06,4,Semi-Urban,No,Business,Hybrid,Premium,10064.0,10,35.2,4,4,1,4,8,Definitely,I am unsure about long term value of RealEstate Preferences
+42,34.3,2,Semi-Urban,Yes,Family,Online,Premium,33237.0,9,482.5,4,4,3,5,2,Definitely,RealEstate Preferences is impressive and modern
+50,44.34,6,Urban,Yes,Leisure,Hybrid,Premium,60690.0,15,292.7,4,3,3,1,5,Maybe,RealEstate Preferences exceeded my expectations
+42,20.59,5,Rural,Yes,Business,Online,Luxury,12653.0,8,356.4,4,2,5,3,2,Definitely,RealEstate Preferences exceeded my expectations
+53,32.79,3,Urban,Yes,Business,Hybrid,Luxury,43861.0,17,317.7,4,3,4,4,6,Definitely,RealEstate Preferences needs serious improvement
+25,18.94,4,Semi-Urban,No,Business,Online,Premium,37737.0,20,91.3,5,3,3,3,4,Definitely,I am unsure about long term value of RealEstate Preferences
+56,30.26,8,Urban,No,Business,Online,Premium,39616.0,13,101.9,3,4,5,5,2,Definitely,RealEstate Preferences feels overpriced for what it offers
+66,23.95,1,Semi-Urban,Yes,Business,Online,Mass,85021.0,14,320.7,4,2,3,3,8,Definitely,RealEstate Preferences needs serious improvement
+30,25.3,3,Urban,No,Business,Offline,Premium,32715.0,11,394.3,1,2,5,4,2,Definitely,RealEstate Preferences needs serious improvement
+21,36.86,5,Urban,Yes,Business,Online,Premium,89263.0,20,313.3,4,3,3,5,4,Definitely,RealEstate Preferences feels overpriced for what it offers
+32,42.93,4,Urban,No,Business,Hybrid,Premium,49378.0,11,293.8,2,4,4,5,8,Definitely,RealEstate Preferences feels overpriced for what it offers
+69,5.7,4,Urban,Yes,Family,Offline,Premium,76138.0,15,378.1,4,3,3,1,6,Maybe,RealEstate Preferences exceeded my expectations
+23,53.22,2,Semi-Urban,Yes,Personal,Online,Luxury,32700.0,15,136.9,5,2,3,5,8,Unlikely,RealEstate Preferences needs serious improvement
+30,25.04,7,Semi-Urban,Yes,Leisure,Online,Premium,9460.0,15,371.2,4,3,2,3,6,Unlikely,RealEstate Preferences is impressive and modern
+21,40.4,3,Urban,Yes,Personal,Online,Premium,9428.0,17,217.4,4,5,5,4,8,Definitely,RealEstate Preferences is impressive and modern
+39,11.73,2,Urban,Yes,Personal,Online,Premium,52525.0,13,343.5,4,5,2,4,6,Definitely,RealEstate Preferences needs serious improvement
+38,36.43,7,Semi-Urban,No,Business,Online,Premium,83833.0,21,151.9,4,4,1,5,2,Definitely,RealEstate Preferences feels overpriced for what it offers
+65,42.32,1,Rural,Yes,Family,Online,Premium,8267.0,9,86.0,4,4,4,4,6,Definitely,I am unsure about long term value of RealEstate Preferences
+51,13.66,3,Semi-Urban,No,Family,Hybrid,Premium,62642.0,14,34.0,5,2,3,4,7,Maybe,RealEstate Preferences feels overpriced for what it offers
+69,55.17,4,Semi-Urban,No,Personal,Hybrid,Mass,51566.0,12,405.7,5,3,2,4,7,Unlikely,RealEstate Preferences feels overpriced for what it offers
+42,46.66,5,Semi-Urban,No,Business,Offline,Mass,59398.0,9,114.5,4,4,4,4,9,Unlikely,I am unsure about long term value of RealEstate Preferences
+24,34.37,1,Urban,Yes,Business,Online,Premium,20968.0,14,194.5,2,4,2,5,4,Definitely,RealEstate Preferences feels overpriced for what it offers
+61,14.13,8,Rural,Yes,Personal,Online,Luxury,8205.0,18,389.1,2,2,1,3,7,Definitely,I am unsure about long term value of RealEstate Preferences

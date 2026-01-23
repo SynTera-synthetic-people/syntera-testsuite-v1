@@ -1,0 +1,61 @@
+﻿Context,Question_ID,Question_Text,Option,Count
+Education_Tech_Usage,Q1,What is your age?,MEAN,39.61
+Education_Tech_Usage,Q1,What is your age?,MEDIAN,39.0
+Education_Tech_Usage,Q1,What is your age?,STD,13.31
+Education_Tech_Usage,Q2,What is your monthly income (in Lakhs)?,MEAN,20.5
+Education_Tech_Usage,Q2,What is your monthly income (in Lakhs)?,MEDIAN,19.13
+Education_Tech_Usage,Q2,What is your monthly income (in Lakhs)?,STD,10.66
+Education_Tech_Usage,Q3,How many people live in your household?,MEAN,3.68
+Education_Tech_Usage,Q3,How many people live in your household?,MEDIAN,4.0
+Education_Tech_Usage,Q3,How many people live in your household?,STD,1.65
+Education_Tech_Usage,Q4,What type of area do you live in?,Rural,27.0
+Education_Tech_Usage,Q4,What type of area do you live in?,Semi-Urban,90.0
+Education_Tech_Usage,Q4,What type of area do you live in?,Urban,150.0
+Education_Tech_Usage,Q5,Do you currently use this product/service?,No,94.0
+Education_Tech_Usage,Q5,Do you currently use this product/service?,Yes,173.0
+Education_Tech_Usage,Q6,What is your primary purpose of usage?,Business,62.0
+Education_Tech_Usage,Q6,What is your primary purpose of usage?,Family,60.0
+Education_Tech_Usage,Q6,What is your primary purpose of usage?,Leisure,70.0
+Education_Tech_Usage,Q6,What is your primary purpose of usage?,Personal,75.0
+Education_Tech_Usage,Q7,What is your preferred interaction channel?,Hybrid,87.0
+Education_Tech_Usage,Q7,What is your preferred interaction channel?,Offline,99.0
+Education_Tech_Usage,Q7,What is your preferred interaction channel?,Online,81.0
+Education_Tech_Usage,Q8,Which brand segment do you prefer?,Luxury,33.0
+Education_Tech_Usage,Q8,Which brand segment do you prefer?,Mass,152.0
+Education_Tech_Usage,Q8,Which brand segment do you prefer?,Premium,82.0
+Education_Tech_Usage,Q9,How much do you spend monthly on this category?,MEAN,26579.54
+Education_Tech_Usage,Q9,How much do you spend monthly on this category?,MEDIAN,26415.0
+Education_Tech_Usage,Q9,How much do you spend monthly on this category?,STD,14713.89
+Education_Tech_Usage,Q10,How many times do you use it per month?,MEAN,7.84
+Education_Tech_Usage,Q10,How many times do you use it per month?,MEDIAN,8.0
+Education_Tech_Usage,Q10,How many times do you use it per month?,STD,2.7
+Education_Tech_Usage,Q11,How far do you travel weekly (km)?,MEAN,155.55
+Education_Tech_Usage,Q11,How far do you travel weekly (km)?,MEDIAN,156.0
+Education_Tech_Usage,Q11,How far do you travel weekly (km)?,STD,88.71
+Education_Tech_Usage,Q12,Overall satisfaction (1-5),1,48.0
+Education_Tech_Usage,Q12,Overall satisfaction (1-5),2,61.0
+Education_Tech_Usage,Q12,Overall satisfaction (1-5),3,53.0
+Education_Tech_Usage,Q12,Overall satisfaction (1-5),4,59.0
+Education_Tech_Usage,Q12,Overall satisfaction (1-5),5,46.0
+Education_Tech_Usage,Q13,Ease of use (1-5),1,57.0
+Education_Tech_Usage,Q13,Ease of use (1-5),2,52.0
+Education_Tech_Usage,Q13,Ease of use (1-5),3,61.0
+Education_Tech_Usage,Q13,Ease of use (1-5),4,49.0
+Education_Tech_Usage,Q13,Ease of use (1-5),5,48.0
+Education_Tech_Usage,Q14,Value for money (1-5),1,59.0
+Education_Tech_Usage,Q14,Value for money (1-5),2,58.0
+Education_Tech_Usage,Q14,Value for money (1-5),3,45.0
+Education_Tech_Usage,Q14,Value for money (1-5),4,54.0
+Education_Tech_Usage,Q14,Value for money (1-5),5,51.0
+Education_Tech_Usage,Q15,Trust in brand (1-5),1,56.0
+Education_Tech_Usage,Q15,Trust in brand (1-5),2,48.0
+Education_Tech_Usage,Q15,Trust in brand (1-5),3,60.0
+Education_Tech_Usage,Q15,Trust in brand (1-5),4,50.0
+Education_Tech_Usage,Q15,Trust in brand (1-5),5,53.0
+Education_Tech_Usage,Q16,Likelihood to recommend (0-10),MEAN,4.73
+Education_Tech_Usage,Q16,Likelihood to recommend (0-10),MEDIAN,5.0
+Education_Tech_Usage,Q16,Likelihood to recommend (0-10),STD,3.1
+Education_Tech_Usage,Q17,Future intent to use,Definitely,112.0
+Education_Tech_Usage,Q17,Future intent to use,Maybe,91.0
+Education_Tech_Usage,Q17,Future intent to use,Unlikely,64.0
+Education_Tech_Usage,Q18,Any additional feedback?,TOTAL_RESPONSES,267.0

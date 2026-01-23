@@ -1,0 +1,61 @@
+﻿Context,Question_ID,Question_Text,Option,Count
+Travel_Tourism_Patterns,Q1,What is your age?,MEAN,40.6
+Travel_Tourism_Patterns,Q1,What is your age?,MEDIAN,40.0
+Travel_Tourism_Patterns,Q1,What is your age?,STD,13.01
+Travel_Tourism_Patterns,Q2,What is your monthly income (in Lakhs)?,MEAN,21.32
+Travel_Tourism_Patterns,Q2,What is your monthly income (in Lakhs)?,MEDIAN,21.43
+Travel_Tourism_Patterns,Q2,What is your monthly income (in Lakhs)?,STD,11.51
+Travel_Tourism_Patterns,Q3,How many people live in your household?,MEAN,3.67
+Travel_Tourism_Patterns,Q3,How many people live in your household?,MEDIAN,4.0
+Travel_Tourism_Patterns,Q3,How many people live in your household?,STD,1.76
+Travel_Tourism_Patterns,Q4,What type of area do you live in?,Rural,12.0
+Travel_Tourism_Patterns,Q4,What type of area do you live in?,Semi-Urban,54.0
+Travel_Tourism_Patterns,Q4,What type of area do you live in?,Urban,151.0
+Travel_Tourism_Patterns,Q5,Do you currently use this product/service?,No,77.0
+Travel_Tourism_Patterns,Q5,Do you currently use this product/service?,Yes,140.0
+Travel_Tourism_Patterns,Q6,What is your primary purpose of usage?,Business,59.0
+Travel_Tourism_Patterns,Q6,What is your primary purpose of usage?,Family,57.0
+Travel_Tourism_Patterns,Q6,What is your primary purpose of usage?,Leisure,56.0
+Travel_Tourism_Patterns,Q6,What is your primary purpose of usage?,Personal,45.0
+Travel_Tourism_Patterns,Q7,What is your preferred interaction channel?,Hybrid,76.0
+Travel_Tourism_Patterns,Q7,What is your preferred interaction channel?,Offline,73.0
+Travel_Tourism_Patterns,Q7,What is your preferred interaction channel?,Online,68.0
+Travel_Tourism_Patterns,Q8,Which brand segment do you prefer?,Luxury,37.0
+Travel_Tourism_Patterns,Q8,Which brand segment do you prefer?,Mass,118.0
+Travel_Tourism_Patterns,Q8,Which brand segment do you prefer?,Premium,62.0
+Travel_Tourism_Patterns,Q9,How much do you spend monthly on this category?,MEAN,24109.53
+Travel_Tourism_Patterns,Q9,How much do you spend monthly on this category?,MEDIAN,23240.0
+Travel_Tourism_Patterns,Q9,How much do you spend monthly on this category?,STD,13609.36
+Travel_Tourism_Patterns,Q10,How many times do you use it per month?,MEAN,8.06
+Travel_Tourism_Patterns,Q10,How many times do you use it per month?,MEDIAN,8.0
+Travel_Tourism_Patterns,Q10,How many times do you use it per month?,STD,2.71
+Travel_Tourism_Patterns,Q11,How far do you travel weekly (km)?,MEAN,150.35
+Travel_Tourism_Patterns,Q11,How far do you travel weekly (km)?,MEDIAN,157.6
+Travel_Tourism_Patterns,Q11,How far do you travel weekly (km)?,STD,86.64
+Travel_Tourism_Patterns,Q12,Overall satisfaction (1-5),1,43.0
+Travel_Tourism_Patterns,Q12,Overall satisfaction (1-5),2,42.0
+Travel_Tourism_Patterns,Q12,Overall satisfaction (1-5),3,45.0
+Travel_Tourism_Patterns,Q12,Overall satisfaction (1-5),4,47.0
+Travel_Tourism_Patterns,Q12,Overall satisfaction (1-5),5,40.0
+Travel_Tourism_Patterns,Q13,Ease of use (1-5),1,44.0
+Travel_Tourism_Patterns,Q13,Ease of use (1-5),2,38.0
+Travel_Tourism_Patterns,Q13,Ease of use (1-5),3,38.0
+Travel_Tourism_Patterns,Q13,Ease of use (1-5),4,61.0
+Travel_Tourism_Patterns,Q13,Ease of use (1-5),5,36.0
+Travel_Tourism_Patterns,Q14,Value for money (1-5),1,43.0
+Travel_Tourism_Patterns,Q14,Value for money (1-5),2,45.0
+Travel_Tourism_Patterns,Q14,Value for money (1-5),3,43.0
+Travel_Tourism_Patterns,Q14,Value for money (1-5),4,44.0
+Travel_Tourism_Patterns,Q14,Value for money (1-5),5,42.0
+Travel_Tourism_Patterns,Q15,Trust in brand (1-5),1,42.0
+Travel_Tourism_Patterns,Q15,Trust in brand (1-5),2,38.0
+Travel_Tourism_Patterns,Q15,Trust in brand (1-5),3,40.0
+Travel_Tourism_Patterns,Q15,Trust in brand (1-5),4,47.0
+Travel_Tourism_Patterns,Q15,Trust in brand (1-5),5,50.0
+Travel_Tourism_Patterns,Q16,Likelihood to recommend (0-10),MEAN,4.9
+Travel_Tourism_Patterns,Q16,Likelihood to recommend (0-10),MEDIAN,5.0
+Travel_Tourism_Patterns,Q16,Likelihood to recommend (0-10),STD,3.1
+Travel_Tourism_Patterns,Q17,Future intent to use,Definitely,89.0
+Travel_Tourism_Patterns,Q17,Future intent to use,Maybe,85.0
+Travel_Tourism_Patterns,Q17,Future intent to use,Unlikely,43.0
+Travel_Tourism_Patterns,Q18,Any additional feedback?,TOTAL_RESPONSES,217.0
