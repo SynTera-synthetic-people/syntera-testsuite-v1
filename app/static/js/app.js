@@ -185,7 +185,21 @@ async function loadIndustrySurveys() {
             accuracy: 92.5,
             tier: 'TIER_1',
             validatedDate: '2024-01-15',
-            testCount: 12
+            testCount: 12,
+            pdfReferences: [
+                { title: 'RBI - Financial Inclusion Survey Report', url: 'https://www.rbi.org.in/Scripts/BS_ViewBulletin.aspx?Id=21019' },
+                { title: 'NABARD - All India Rural Financial Inclusion Survey', url: 'https://www.nabard.org/content1.aspx?id=1060&catid=8&mid=536' },
+                { title: 'RBI - Digital Payment Index Report', url: 'https://www.rbi.org.in/Scripts/BS_ViewBulletin.aspx?Id=21020' },
+                { title: 'CRISIL - Banking Sector Report India', url: 'https://www.crisil.com/en/home/our-analysis/reports/banking-sector.html' },
+                { title: 'BCG - Digital Banking in India Report', url: 'https://www.bcg.com/publications/2023/digital-banking-india' }
+            ],
+            surveyReferences: [
+                { title: 'RBI Consumer Confidence Survey', url: 'https://www.rbi.org.in/Scripts/BS_ViewBulletin.aspx?Id=21018' },
+                { title: 'NPCI - Digital Payment Usage Survey', url: 'https://www.npci.org.in/' },
+                { title: 'IBEF - Banking Sector Survey India', url: 'https://www.ibef.org/industry/banking-india' },
+                { title: 'PwC India - Banking & FinTech Survey', url: 'https://www.pwc.in/industries/financial-services.html' },
+                { title: 'EY - Digital Banking Transformation India', url: 'https://www.ey.com/en_in/banking-capital-markets' }
+            ]
         },
         {
             id: 'healthcare-patient',
@@ -199,7 +213,21 @@ async function loadIndustrySurveys() {
             accuracy: 88.3,
             tier: 'TIER_1',
             validatedDate: '2024-01-18',
-            testCount: 12
+            testCount: 12,
+            pdfReferences: [
+                { title: 'NITI Aayog - Health System for New India Report', url: 'https://www.niti.gov.in/health-system-new-india' },
+                { title: 'Ministry of Health - National Health Profile', url: 'https://www.cbhidghs.nic.in/showfile.php?lid=1147' },
+                { title: 'ICMR - National Family Health Survey', url: 'https://www.nfhsindia.org/' },
+                { title: 'WHO India - Health Survey Reports', url: 'https://www.who.int/india/publications' },
+                { title: 'PHFI - India Health Report', url: 'https://phfi.org/the-work/research/' }
+            ],
+            surveyReferences: [
+                { title: 'NFHS-5 National Family Health Survey', url: 'https://www.nfhsindia.org/nfhs-5' },
+                { title: 'Ministry of Health - Ayushman Bharat Survey', url: 'https://www.pmjay.gov.in/' },
+                { title: 'ICMR Health Research Surveys', url: 'https://www.icmr.gov.in/' },
+                { title: 'NSSO - Health Expenditure Survey', url: 'https://www.mospi.gov.in/national-sample-survey-office-nsso' },
+                { title: 'PwC India - Healthcare Sector Survey', url: 'https://www.pwc.in/industries/healthcare.html' }
+            ]
         },
         {
             id: 'retail-consumer',
@@ -213,7 +241,21 @@ async function loadIndustrySurveys() {
             accuracy: 85.7,
             tier: 'TIER_2',
             validatedDate: '2024-01-20',
-            testCount: 12
+            testCount: 12,
+            pdfReferences: [
+                { title: 'IBEF - Retail Industry in India Report', url: 'https://www.ibef.org/industry/retail-india' },
+                { title: 'CRISIL - E-commerce Market Report India', url: 'https://www.crisil.com/en/home/our-analysis/reports/retail-ecommerce.html' },
+                { title: 'Deloitte India - Retail Sector Survey', url: 'https://www2.deloitte.com/in/en/pages/consumer-business/articles/retail-sector.html' },
+                { title: 'BCG - Future of Retail in India', url: 'https://www.bcg.com/publications/2023/future-of-retail-india' },
+                { title: 'RedSeer - E-commerce Market India Report', url: 'https://redseer.com/reports/india-ecommerce-market/' }
+            ],
+            surveyReferences: [
+                { title: 'IBEF E-commerce Industry Survey', url: 'https://www.ibef.org/industry/ecommerce-india' },
+                { title: 'NASSCOM - E-commerce Trends India', url: 'https://nasscom.in/knowledge-center/publications/ecommerce-trends' },
+                { title: 'PwC India - Retail & Consumer Survey', url: 'https://www.pwc.in/industries/retail-and-consumer.html' },
+                { title: 'EY India - Consumer Products & Retail', url: 'https://www.ey.com/en_in/consumer-products-retail' },
+                { title: 'KPMG India - Retail Sector Survey', url: 'https://home.kpmg/in/en/home/industries/consumer-markets.html' }
+            ]
         },
         {
             id: 'education-student',
@@ -227,7 +269,21 @@ async function loadIndustrySurveys() {
             accuracy: 90.2,
             tier: 'TIER_1',
             validatedDate: '2024-01-22',
-            testCount: 12
+            testCount: 12,
+            pdfReferences: [
+                { title: 'Ministry of Education - National Education Policy Report', url: 'https://www.education.gov.in/sites/upload_files/mhrd/files/NEP_Final_English_0.pdf' },
+                { title: 'NCERT - National Achievement Survey Report', url: 'https://ncert.nic.in/nas.php' },
+                { title: 'UGC - Higher Education Survey India', url: 'https://www.ugc.gov.in/page/Higher-Education-Survey.aspx' },
+                { title: 'NITI Aayog - School Education Quality Index', url: 'https://www.niti.gov.in/school-education-quality-index' },
+                { title: 'ASER - Annual Status of Education Report', url: 'https://www.asercentre.org/' }
+            ],
+            surveyReferences: [
+                { title: 'NCERT National Achievement Survey', url: 'https://ncert.nic.in/nas.php' },
+                { title: 'ASER Annual Education Survey', url: 'https://www.asercentre.org/annual-status-education-report' },
+                { title: 'UGC All India Survey on Higher Education', url: 'https://www.ugc.gov.in/page/AISHE.aspx' },
+                { title: 'Ministry of Education - Digital Learning Survey', url: 'https://www.education.gov.in/en' },
+                { title: 'NASSCOM - EdTech Sector India Report', url: 'https://nasscom.in/knowledge-center/publications/edtech-sector-india' }
+            ]
         },
         {
             id: 'technology-ai',
@@ -241,7 +297,21 @@ async function loadIndustrySurveys() {
             accuracy: 87.9,
             tier: 'TIER_2',
             validatedDate: '2024-01-25',
-            testCount: 12
+            testCount: 12,
+            pdfReferences: [
+                { title: 'NASSCOM - AI Adoption in India Report', url: 'https://nasscom.in/knowledge-center/publications/ai-adoption-india' },
+                { title: 'MeitY - National Strategy for AI', url: 'https://www.meity.gov.in/content/national-strategy-artificial-intelligence' },
+                { title: 'NITI Aayog - AI for All Report', url: 'https://www.niti.gov.in/ai-for-all' },
+                { title: 'BCG - AI in India Report', url: 'https://www.bcg.com/publications/2023/ai-adoption-india' },
+                { title: 'EY India - AI & Automation Survey', url: 'https://www.ey.com/en_in/technology/artificial-intelligence' }
+            ],
+            surveyReferences: [
+                { title: 'NASSCOM Technology Survey India', url: 'https://nasscom.in/knowledge-center/publications/technology-survey' },
+                { title: 'IBEF - IT & ITeS Sector India', url: 'https://www.ibef.org/industry/information-technology-india' },
+                { title: 'PwC India - AI & Analytics Survey', url: 'https://www.pwc.in/consulting/analytics.html' },
+                { title: 'Deloitte India - Technology Survey', url: 'https://www2.deloitte.com/in/en/pages/technology/articles/technology-survey.html' },
+                { title: 'KPMG India - Digital Transformation Survey', url: 'https://home.kpmg/in/en/home/insights/2023/digital-transformation.html' }
+            ]
         },
         {
             id: 'transportation-mobility',
@@ -255,7 +325,21 @@ async function loadIndustrySurveys() {
             accuracy: 83.4,
             tier: 'TIER_2',
             validatedDate: '2024-01-28',
-            testCount: 12
+            testCount: 12,
+            pdfReferences: [
+                { title: 'Ministry of Road Transport - National Transport Survey', url: 'https://morth.nic.in/' },
+                { title: 'Indian Railways - Passenger Satisfaction Survey', url: 'https://indianrailways.gov.in/' },
+                { title: 'NITI Aayog - India\'s Electric Mobility Report', url: 'https://www.niti.gov.in/electric-mobility' },
+                { title: 'BCG - Urban Mobility India Report', url: 'https://www.bcg.com/publications/2023/urban-mobility-india' },
+                { title: 'CRISIL - Transportation Sector India Report', url: 'https://www.crisil.com/en/home/our-analysis/reports/transportation.html' }
+            ],
+            surveyReferences: [
+                { title: 'Ministry of Road Transport Statistics', url: 'https://morth.nic.in/statistics' },
+                { title: 'Indian Railways Passenger Survey', url: 'https://indianrailways.gov.in/railwayboard/' },
+                { title: 'IBEF - Transportation & Logistics India', url: 'https://www.ibef.org/industry/transport-and-logistics-india' },
+                { title: 'PwC India - Automotive Sector Survey', url: 'https://www.pwc.in/industries/automotive.html' },
+                { title: 'EY India - Mobility & Transportation', url: 'https://www.ey.com/en_in/automotive-transportation' }
+            ]
         }
     ];
     
@@ -302,9 +386,54 @@ async function loadIndustrySurveys() {
                         <span>📄</span> Download PDF
                     </a>
                 </div>
+                <div class="industry-survey-references">
+                    <div class="reference-section">
+                        <button class="reference-toggle" onclick="toggleReferences('${survey.id}-pdfs')" style="border-color: ${survey.color}; color: ${survey.color};">
+                            <span>📚</span> Public Survey PDFs
+                            <span class="toggle-icon" id="icon-${survey.id}-pdfs">▼</span>
+                        </button>
+                        <div class="reference-list" id="${survey.id}-pdfs" style="display: none;">
+                            ${survey.pdfReferences.map(ref => `
+                                <a href="${ref.url}" target="_blank" class="reference-link" style="border-color: ${survey.color}40;">
+                                    <span class="reference-icon">📄</span>
+                                    <span class="reference-text">${ref.title}</span>
+                                    <span class="reference-arrow">→</span>
+                                </a>
+                            `).join('')}
+                        </div>
+                    </div>
+                    <div class="reference-section">
+                        <button class="reference-toggle" onclick="toggleReferences('${survey.id}-surveys')" style="border-color: ${survey.color}; color: ${survey.color};">
+                            <span>🔗</span> Survey Links & Resources
+                            <span class="toggle-icon" id="icon-${survey.id}-surveys">▼</span>
+                        </button>
+                        <div class="reference-list" id="${survey.id}-surveys" style="display: none;">
+                            ${survey.surveyReferences.map(ref => `
+                                <a href="${ref.url}" target="_blank" class="reference-link" style="border-color: ${survey.color}40;">
+                                    <span class="reference-icon">🔗</span>
+                                    <span class="reference-text">${ref.title}</span>
+                                    <span class="reference-arrow">→</span>
+                                </a>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
             </div>
         `;
     }).join('');
+}
+
+// Toggle function for reference sections
+function toggleReferences(id) {
+    const element = document.getElementById(id);
+    const icon = document.getElementById(`icon-${id}`);
+    if (element.style.display === 'none') {
+        element.style.display = 'block';
+        if (icon) icon.textContent = '▲';
+    } else {
+        element.style.display = 'none';
+        if (icon) icon.textContent = '▼';
+    }
 }
 
 // Pagination state
