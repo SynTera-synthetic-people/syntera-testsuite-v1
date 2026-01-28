@@ -41,21 +41,207 @@
                 </div>
                 <p class="sidebar-label">Workspace</p>
                 <ul class="nav-list">
+                    <li><button onclick="showSection('home')" id="nav-home" class="nav-item active">🏠 Home</button></li>
                     <li><button onclick="showSection('reports'); loadDashboard();" id="nav-dashboard-reports" class="nav-item">Dashboard & Reports</button></li>
                     <li><button onclick="showSection('surveys')" id="nav-surveys" class="nav-item">Surveys</button></li>
                     <li><button onclick="showSection('validation')" id="nav-validation" class="nav-item">Validation Runs</button></li>
                     <li><button onclick="showSection('results')" id="nav-results" class="nav-item">Test Results</button></li>
-                    <li><button onclick="showSection('industry-surveys')" id="nav-industry-surveys" class="nav-item active">Industry Surveys</button></li>
+                    <li><button onclick="showSection('industry-surveys')" id="nav-industry-surveys" class="nav-item">Industry Surveys</button></li>
                 </ul>
             </aside>
         <main class="main">
             <header class="top-bar">
                 <div>
-                    <h2 id="section-title">Dashboard & Reports</h2>
-                    <p class="subtitle" id="section-subtitle">Metrics, statistics, and validation reports for all completed surveys</p>
+                    <h2 id="section-title">Home</h2>
+                    <p class="subtitle" id="section-subtitle">Welcome to SynTera Test Suite - Statistical Validation Framework</p>
                 </div>
             </header>
-            <section id="reports" class="section active">
+            <section id="home" class="section active">
+                <div class="home-hero">
+                    <div class="hero-content">
+                        <div class="hero-icon">📊</div>
+                        <h1 class="hero-title">SynTera Test Suite</h1>
+                        <p class="hero-subtitle">Advanced Statistical Validation Framework for Synthetic Data</p>
+                        <div class="hero-badges">
+                            <span class="badge">97.8% Accuracy</span>
+                            <span class="badge">8 Statistical Tests</span>
+                            <span class="badge">Production Ready</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="home-section">
+                    <div class="section-card">
+                        <div class="card-icon">🎯</div>
+                        <h2>What is SynTera?</h2>
+                        <p>SynTera Test Suite is a comprehensive statistical validation framework designed to evaluate and compare synthetic survey data against real-world datasets. It provides rigorous statistical analysis to ensure synthetic data maintains the statistical properties and distributions of original data.</p>
+                        <div class="feature-grid">
+                            <div class="feature-item">
+                                <span class="feature-icon">🔬</span>
+                                <div>
+                                    <h4>Scientific Approach</h4>
+                                    <p>Based on proven statistical methodologies</p>
+                                </div>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-icon">⚡</span>
+                                <div>
+                                    <h4>Fast & Efficient</h4>
+                                    <p>Real-time validation and comparison</p>
+                                </div>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-icon">📈</span>
+                                <div>
+                                    <h4>Comprehensive Analysis</h4>
+                                    <p>Multiple statistical tests in one platform</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="home-section">
+                    <div class="section-card">
+                        <div class="card-icon">🎯</div>
+                        <h2>Purpose</h2>
+                        <p>SynTera Test Suite serves as a critical validation tool for organizations working with synthetic data, ensuring data quality, statistical accuracy, and reliability before deployment in production environments.</p>
+                        <div class="purpose-grid">
+                            <div class="purpose-card">
+                                <div class="purpose-number">01</div>
+                                <h3>Data Quality Assurance</h3>
+                                <p>Validate that synthetic data maintains statistical properties of original datasets</p>
+                            </div>
+                            <div class="purpose-card">
+                                <div class="purpose-number">02</div>
+                                <h3>Risk Mitigation</h3>
+                                <p>Identify discrepancies before deploying synthetic data in production</p>
+                            </div>
+                            <div class="purpose-card">
+                                <div class="purpose-number">03</div>
+                                <h3>Compliance & Standards</h3>
+                                <p>Ensure synthetic data meets regulatory and industry standards</p>
+                            </div>
+                            <div class="purpose-card">
+                                <div class="purpose-number">04</div>
+                                <h3>Research & Development</h3>
+                                <p>Support research initiatives requiring validated synthetic datasets</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="home-section">
+                    <div class="section-card">
+                        <div class="card-icon">🚀</div>
+                        <h2>How to Use</h2>
+                        <p>Getting started with SynTera Test Suite is simple and straightforward. Follow these steps to begin validating your synthetic data:</p>
+                        <div class="steps-container">
+                            <div class="step-item">
+                                <div class="step-number">1</div>
+                                <div class="step-content">
+                                    <h3>Upload Your Data</h3>
+                                    <p>Navigate to <strong>Validation Runs</strong> and upload your seed (real) and synthetic data files in CSV or Excel format</p>
+                                </div>
+                            </div>
+                            <div class="step-item">
+                                <div class="step-number">2</div>
+                                <div class="step-content">
+                                    <h3>Select Extraction Method</h3>
+                                    <p>Choose your preferred extraction method (JSON, CSV, or Excel) for data processing</p>
+                                </div>
+                            </div>
+                            <div class="step-item">
+                                <div class="step-number">3</div>
+                                <div class="step-content">
+                                    <h3>Run Comparison</h3>
+                                    <p>Click <strong>Compare Files</strong> to initiate statistical analysis across 8 different tests</p>
+                                </div>
+                            </div>
+                            <div class="step-item">
+                                <div class="step-number">4</div>
+                                <div class="step-content">
+                                    <h3>Review Results</h3>
+                                    <p>View detailed question-by-question comparisons and statistical methodology in <strong>Test Results</strong></p>
+                                </div>
+                            </div>
+                            <div class="step-item">
+                                <div class="step-number">5</div>
+                                <div class="step-content">
+                                    <h3>Access Reports</h3>
+                                    <p>Explore comprehensive reports in <strong>Dashboard & Reports</strong> with accuracy metrics and validation summaries</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="cta-buttons">
+                            <button onclick="showSection('validation')" class="cta-primary">Start Validation →</button>
+                            <button onclick="showSection('industry-surveys')" class="cta-secondary">Explore Industry Surveys →</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="home-section">
+                    <div class="section-card">
+                        <div class="card-icon">✨</div>
+                        <h2>Key Benefits</h2>
+                        <p>SynTera Test Suite provides numerous advantages for organizations working with synthetic data:</p>
+                        <div class="benefits-grid">
+                            <div class="benefit-card">
+                                <div class="benefit-icon">🎯</div>
+                                <h3>High Accuracy</h3>
+                                <p>Achieve 97.8% accuracy in statistical validation, ensuring reliable synthetic data generation</p>
+                            </div>
+                            <div class="benefit-card">
+                                <div class="benefit-icon">🔍</div>
+                                <h3>Comprehensive Testing</h3>
+                                <p>8 different statistical tests including Chi-square, Kolmogorov-Smirnov, Mann-Whitney U, and more</p>
+                            </div>
+                            <div class="benefit-card">
+                                <div class="benefit-icon">⚡</div>
+                                <h3>Real-time Analysis</h3>
+                                <p>Get instant results with question-by-question comparison and detailed statistical insights</p>
+                            </div>
+                            <div class="benefit-card">
+                                <div class="benefit-icon">📊</div>
+                                <h3>Visual Dashboards</h3>
+                                <p>Interactive dashboards with pagination, 2x2 grid layouts, and comprehensive reporting</p>
+                            </div>
+                            <div class="benefit-card">
+                                <div class="benefit-icon">🔐</div>
+                                <h3>Role-Based Access</h3>
+                                <p>Secure access control with User and Super User roles for different permission levels</p>
+                            </div>
+                            <div class="benefit-card">
+                                <div class="benefit-icon">🌐</div>
+                                <h3>Industry Standards</h3>
+                                <p>Access to industry survey references and validation reports across multiple domains</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="home-section">
+                    <div class="stats-showcase">
+                        <div class="stat-showcase-item">
+                            <div class="stat-value">8</div>
+                            <div class="stat-label">Statistical Tests</div>
+                        </div>
+                        <div class="stat-showcase-item">
+                            <div class="stat-value">97.8%</div>
+                            <div class="stat-label">Average Accuracy</div>
+                        </div>
+                        <div class="stat-showcase-item">
+                            <div class="stat-value">6</div>
+                            <div class="stat-label">Industry Domains</div>
+                        </div>
+                        <div class="stat-showcase-item">
+                            <div class="stat-value">∞</div>
+                            <div class="stat-label">Unlimited Validations</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section id="reports" class="section">
                 <div class="section-header-row">
                     <div>
                         <h2>Dashboard & Reports</h2>

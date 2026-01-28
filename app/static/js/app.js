@@ -1,8 +1,9 @@
 function showSection(id) {
     // Check if user is authenticated before showing protected sections
-    if (currentUserRole === null && id !== 'industry-surveys') {
+    // Home and Industry Surveys are accessible without login
+    if (currentUserRole === null && id !== 'industry-surveys' && id !== 'home') {
         showNotification('Please log in to access this page', 'warning');
-        id = 'industry-surveys'; // Redirect to Industry Surveys
+        id = 'home'; // Redirect to Home
     }
     
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
@@ -12,7 +13,7 @@ function showSection(id) {
     }
 
     // highlight nav - handle combined dashboard-reports
-    const sections = ['dashboard','surveys','validation','results','industry-surveys','reports'];
+    const sections = ['home','dashboard','surveys','validation','results','industry-surveys','reports'];
     sections.forEach(key => {
         const btn = document.getElementById(`nav-${key}`);
         if (btn) btn.classList.toggle('active', key === id);
@@ -25,6 +26,7 @@ function showSection(id) {
     }
 
     const titleMap = {
+        home: 'Home',
         dashboard: 'Dashboard & Reports',
         surveys: 'Surveys',
         validation: 'Validation Runs',
@@ -34,6 +36,7 @@ function showSection(id) {
     };
     
     const subtitleMap = {
+        home: 'Welcome to SynTera Test Suite - Statistical Validation Framework',
         dashboard: 'Metrics, statistics, and validation reports',
         surveys: 'Manage your survey comparisons',
         validation: 'Compare two questionnaires via file upload or manual data entry',
@@ -44,7 +47,7 @@ function showSection(id) {
     
     const titleEl = document.getElementById('section-title');
     const subtitleEl = document.getElementById('section-subtitle');
-    if (titleEl) titleEl.textContent = titleMap[id] || 'Dashboard & Reports';
+    if (titleEl) titleEl.textContent = titleMap[id] || 'Home';
     if (subtitleEl) subtitleEl.textContent = subtitleMap[id] || '';
 
     if(id==='surveys') loadSurveys();
@@ -59,6 +62,7 @@ function showSection(id) {
     else if(id==='results') {
         loadResultsPage();
     }
+    // Home section doesn't need any loading function
 }
 
 async function loadSurveys() {
@@ -972,12 +976,11 @@ async function login(username, password) {
 function logout() {
     authToken = null;
     localStorage.removeItem('authToken');
-    currentUserRole = null; // No role after logout - show only Industry Surveys
+    currentUserRole = null; // No role after logout - show Home
     updateNavigationForRole();
     updateUserDisplay();
-    // Navigate to Industry Surveys page after logout
-    showSection('industry-surveys');
-    loadIndustrySurveys();
+    // Navigate to Home page after logout
+    showSection('home');
     showNotification('Logged out successfully', 'info');
 }
 
@@ -1035,9 +1038,10 @@ function updateUserDisplay() {
 }
 
 function updateNavigationForRole() {
-    const sections = ['dashboard', 'surveys', 'validation', 'results', 'industry-surveys', 'reports'];
+    const sections = ['home', 'dashboard', 'surveys', 'validation', 'results', 'industry-surveys', 'reports'];
     
     // Get navigation items
+    const navHome = document.getElementById('nav-home');
     const navDashboardReports = document.getElementById('nav-dashboard-reports');
     const navSurveys = document.getElementById('nav-surveys');
     const navValidation = document.getElementById('nav-validation');
@@ -1045,21 +1049,24 @@ function updateNavigationForRole() {
     const navIndustrySurveys = document.getElementById('nav-industry-surveys');
     
     if (currentUserRole === null) {
-        // Not logged in: Show ONLY Industry Surveys
+        // Not logged in: Show Home and Industry Surveys
+        if (navHome) navHome.style.display = '';
         if (navDashboardReports) navDashboardReports.style.display = 'none';
         if (navSurveys) navSurveys.style.display = 'none';
         if (navValidation) navValidation.style.display = 'none';
         if (navResults) navResults.style.display = 'none';
         if (navIndustrySurveys) navIndustrySurveys.style.display = '';
     } else if (currentUserRole === 'user') {
-        // User: Show Dashboard+Reports (combined), Test Results, and Industry Surveys
+        // User: Show Home, Dashboard+Reports (combined), Test Results, and Industry Surveys
+        if (navHome) navHome.style.display = '';
         if (navDashboardReports) navDashboardReports.style.display = '';
         if (navSurveys) navSurveys.style.display = 'none';
         if (navValidation) navValidation.style.display = 'none';
         if (navResults) navResults.style.display = '';
         if (navIndustrySurveys) navIndustrySurveys.style.display = '';
     } else {
-        // Super User: Show all tabs (except individual dashboard/reports - use combined)
+        // Super User: Show all tabs
+        if (navHome) navHome.style.display = '';
         if (navDashboardReports) navDashboardReports.style.display = '';
         if (navSurveys) navSurveys.style.display = '';
         if (navValidation) navValidation.style.display = '';
@@ -1091,15 +1098,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             showSection('reports');
             loadReports(1);
         } else {
-            // If not logged in, show only Industry Surveys
-            showSection('industry-surveys');
-            loadIndustrySurveys();
+            // If not logged in, show Home page
+            showSection('home');
         }
     } catch (error) {
         console.error('Error during initialization:', error);
-        // Fallback: show Industry Surveys if anything fails
-        showSection('industry-surveys');
-        loadIndustrySurveys();
+        // Fallback: show Home if anything fails
+        showSection('home');
     }
     
     // Restore sidebar state - collapse by default
