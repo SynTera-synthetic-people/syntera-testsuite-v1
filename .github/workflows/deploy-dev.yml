@@ -1,17 +1,32 @@
-name: Docker Image CI
+name:  Deploy to Dev Server
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main
 
 jobs:
-
-  build:
-
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - name: checkout repository
-      uses: actions/checkout@v4
-    - name: print hello world
-      run: echo "Hello world"
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Run Deployment Script on Server
+        run: |
+          ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} \
+          "bash ~/deploy.sh \
+          '${{ secrets.IMAGE_NAME }}' \
+          '${{ secrets.CONTAINER_NAME }}' \
+          '${{ secrets.APP_DIR }}' \
+          '${{ secrets.APP_PORT }}' \
+          'main'"
+
