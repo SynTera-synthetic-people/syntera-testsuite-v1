@@ -16,17 +16,17 @@ jobs:
       - name: Setup SSH
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
+          echo "${{ secrets.DEV_EC2_SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+          ssh-keyscan -H ${{ secrets.DEV_EC2_HOST }} >> ~/.ssh/known_hosts 2>/dev/null || true
 
       - name: Run Deployment Script on Server
         run: |
-          ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} \
+          ssh ${{ secrets.DEV_EC2_USER }}@${{ secrets.DEV_EC2_HOST }} \
           "bash ~/deploy.sh \
-          '${{ secrets.IMAGE_NAME }}' \
-          '${{ secrets.CONTAINER_NAME }}' \
-          '${{ secrets.APP_DIR }}' \
-          '${{ secrets.APP_PORT }}' \
+          '${{ secrets.DEV_IMAGE_NAME }}' \
+          '${{ secrets.DEV_CONTAINER_NAME }}' \
+          '${{ secrets.DEV_APP_DIR }}' \
+          '${{ secrets.DEV_APP_PORT }}' \
           'main'"
 
