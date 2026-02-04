@@ -19,6 +19,11 @@ jobs:
           echo "${{ secrets.DEV_EC2_SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.DEV_EC2_HOST }} >> ~/.ssh/known_hosts 2>/dev/null || true
+      - name: Debug secrets presence
+        run: |
+          echo "User: ${{ secrets.DEV_EC2_USER }}"
+          echo "Host: ${{ secrets.DEV_EC2_HOST }}"
+
 
       - name: Run Deployment Script on Server
         run: |
