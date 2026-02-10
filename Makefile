@@ -5,7 +5,11 @@ install:
 	pip install -r requirements.txt
 
 dev:
-	python backend/main.py
+	python -m uvicorn backend.main:app --reload
+
+# Run without reload (use on Windows if --reload causes PermissionError)
+run:
+	python -m uvicorn backend.main:app --host 127.0.0.1 --port 8000
 
 test:
 	pytest

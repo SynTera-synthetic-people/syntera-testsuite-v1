@@ -1,6 +1,11 @@
 """Settings"""
 from pydantic_settings import BaseSettings
+from typing import Optional
 import os
+
+# Resolve project root (directory containing config/ and backend/) so .env is found regardless of cwd
+_PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+_ENV_PATH = os.path.join(_PROJECT_ROOT, ".env")
 
 class Settings(BaseSettings):
     APP_NAME: str = "SynTera Test Suite"
@@ -14,8 +19,15 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     BATCH_SIZE: int = 32
     NUM_WORKERS: int = 4
+    LOG_LEVEL: str = "INFO"
+    # Optional: Market Research Reverse Engineering (AI) – use OpenAI and/or Anthropic (Claude)
+    OPENAI_API_KEY: Optional[str] = None
+    OPENAI_MODEL: str = "gpt-4o"
+    ANTHROPIC_API_KEY: Optional[str] = None
+    ANTHROPIC_MODEL: str = "claude-sonnet-4-20250514"
 
     class Config:
         case_sensitive = True
-        env_file = ".env"
+        env_file = _ENV_PATH
+        env_file_encoding = "utf-8"
 

@@ -35,6 +35,10 @@ python backend/main.py
 
 The server will start on http://localhost:8000
 
+**No PostgreSQL?** Use SQLite for local dev: set `DATABASE_URL=sqlite:///./syntera.db` in your `.env` (or copy from `.env.example`). The app will create `syntera.db` in the project root.
+
+**Windows:** If `python -m uvicorn backend.main:app --reload` fails with "PermissionError" or "No pyvenv.cfg file", run without reload: `python backend/main.py` or `python -m uvicorn backend.main:app`.
+
 ### Docker
 ```bash
 docker-compose -f deployment/docker-compose.yml up -d

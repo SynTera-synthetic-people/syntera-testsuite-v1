@@ -13,7 +13,7 @@ function showSection(id) {
     }
 
     // highlight nav - handle combined dashboard-reports
-    const sections = ['home','dashboard','surveys','validation','results','industry-surveys','reports'];
+    const sections = ['home','dashboard','surveys','validation','results','industry-surveys','market-research','reports'];
     sections.forEach(key => {
         const btn = document.getElementById(`nav-${key}`);
         if (btn) btn.classList.toggle('active', key === id);
@@ -32,6 +32,7 @@ function showSection(id) {
         validation: 'Validation Runs',
         results: 'Test Results',
         'industry-surveys': 'Industry Surveys',
+        'market-research': 'Market Research Reverse Engineering',
         reports: 'Dashboard & Reports',
     };
     
@@ -42,6 +43,7 @@ function showSection(id) {
         validation: 'Compare two questionnaires via file upload or manual data entry',
         results: 'Compare synthetic vs real survey responses question-by-question',
         'industry-surveys': 'Explore standard industry surveys with validation data',
+        'market-research': 'Reverse-engineer the original research design from a market research report',
         reports: 'Metrics, statistics, and validation reports for all completed surveys',
     };
     
@@ -61,6 +63,9 @@ function showSection(id) {
     }
     else if(id==='results') {
         loadResultsPage();
+    }
+    else if(id==='market-research') {
+        // Optional: reset output panel when entering
     }
     // Home section doesn't need any loading function
 }
@@ -438,6 +443,409 @@ function toggleReferences(id) {
         element.style.display = 'none';
         if (icon) icon.textContent = '▼';
     }
+}
+
+// Market Research Reverse Engineering
+async function loadSamplePdfText() {
+    const textEl = document.getElementById('market-research-report-text');
+    const statusEl = document.getElementById('market-research-status');
+    if (!textEl || !statusEl) return;
+    statusEl.style.display = 'block';
+    statusEl.textContent = 'Loading sample PDF...';
+    statusEl.className = 'market-research-status loading';
+    try {
+        const opts = { method: 'GET' };
+        const token = localStorage.getItem('authToken');
+        if (token) opts.headers = { 'Authorization': 'Bearer ' + token };
+        const res = await fetch('/api/market-research/sample-pdf-text', opts);
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({ detail: res.statusText }));
+            throw new Error(err.detail || 'Failed to load sample PDF');
+        }
+        const data = await res.json();
+        textEl.value = data.report_text || '';
+        statusEl.textContent = 'Sample PDF loaded. You can now click Reverse-Engineer.';
+        statusEl.className = 'market-research-status success';
+    } catch (err) {
+        statusEl.textContent = err.message || 'Failed to load sample PDF';
+        statusEl.className = 'market-research-status error';
+        showNotification(err.message || 'Sample PDF not found. Place sample_market_research_report.pdf in project root.', 'warning');
+    }
+}
+
+let lastMarketResearchData = null;
+
+async function runMarketResearchReverseEngineer() {
+    const textEl = document.getElementById('market-research-report-text');
+    const fileEl = document.getElementById('market-research-file');
+    const statusEl = document.getElementById('market-research-status');
+    const outputPanel = document.getElementById('market-research-output-panel');
+    const objectivesEl = document.getElementById('market-research-output-objectives');
+    const questionnaireEl = document.getElementById('market-research-output-questionnaire');
+
+    if (!statusEl || !outputPanel || !objectivesEl || !questionnaireEl) return;
+
+    statusEl.style.display = 'block';
+    statusEl.textContent = 'Processing report...';
+    statusEl.className = 'market-research-status loading';
+    outputPanel.style.display = 'none';
+
+    try {
+        let body;
+        let contentType;
+        const file = fileEl?.files[0];
+        const reportText = (textEl?.value || '').trim();
+
+        if (file && file.size > 0) {
+            const formData = new FormData();
+            formData.append('file', file);
+            if (reportText.length >= 50) formData.append('report_text', reportText);
+            body = formData;
+            contentType = undefined;
+        } else if (reportText.length >= 50) {
+            body = JSON.stringify({ report_text: reportText });
+            contentType = 'application/json';
+        } else {
+            statusEl.textContent = 'Please paste at least 50 characters of report text or upload a .txt/.pdf file.';
+            statusEl.className = 'market-research-status error';
+            return;
+        }
+
+        const url = contentType ? '/api/market-research/reverse-engineer/json' : '/api/market-research/reverse-engineer';
+        const opts = {
+            method: 'POST',
+            headers: contentType ? { 'Content-Type': contentType } : {},
+            body: body,
+        };
+        const token = localStorage.getItem('authToken');
+        if (token) opts.headers['Authorization'] = 'Bearer ' + token;
+
+        const res = await fetch(url, opts);
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({ detail: res.statusText }));
+            throw new Error(err.detail || 'Reverse engineering failed');
+        }
+        const data = await res.json();
+        lastMarketResearchData = data;
+        renderMarketResearchOutput(data, objectivesEl, questionnaireEl);
+        outputPanel.style.display = 'block';
+        if (data.ai_used === false && data.message) {
+            statusEl.innerHTML = '<strong>Placeholder only.</strong> ' + escapeHtml(data.message);
+            statusEl.className = 'market-research-status error';
+        } else {
+            statusEl.textContent = 'Done.';
+            statusEl.className = 'market-research-status success';
+        }
+    } catch (err) {
+        statusEl.textContent = err.message || 'Request failed.';
+        statusEl.className = 'market-research-status error';
+        console.error('Market research reverse engineer error:', err);
+    }
+}
+
+/**
+ * Split raw markdown (actual AI output) into Research Objective (A+B) and Questionnaire (C) sections.
+ * Returns { researchObjective: string, questionnaire: string } so we display/download the real output.
+ */
+function parseRawMarkdownSections(raw) {
+    if (!raw || !raw.trim()) return { researchObjective: '', questionnaire: '' };
+    const r = raw.trim();
+    const blockA = r.match(/A\.\s*Overall Research Objectives\s*([\s\S]*?)(?=B\.|$)/i);
+    const blockB = r.match(/B\.\s*Section-wise Objectives\s*([\s\S]*?)(?=C\.|$)/i);
+    const blockC = r.match(/C\.\s*Reconstructed Questionnaire\s*([\s\S]*)$/i);
+    const partA = blockA ? blockA[1].trim() : '';
+    const partB = blockB ? blockB[1].trim() : '';
+    const partC = blockC ? blockC[1].trim() : '';
+    const researchObjective = [partA, partB].filter(Boolean).join('\n\n');
+    const questionnaire = partC || '';
+    return { researchObjective, questionnaire, full: r };
+}
+
+/** Remove markdown ** bold from text (e.g. **word** -> word, trailing **). */
+function stripMarkdownBold(s) {
+    if (s == null || typeof s !== 'string') return s;
+    let t = s.trim().replace(/\*\*([^*]*)\*\*/g, '$1').replace(/\*\*/g, '');
+    return t.trim();
+}
+
+/**
+ * Parse "C. Reconstructed Questionnaire" raw text into [{ survey_question, question_type, answer_options }].
+ */
+function parseQuestionnaireFromRaw(rawSectionC) {
+    if (!rawSectionC || !rawSectionC.trim()) return [];
+    let blocks = [];
+    if (rawSectionC.match(/-\s*Survey Question:/i)) {
+        blocks = rawSectionC.split(/(?=-\s*Survey Question:)/i).filter(b => b.trim().length > 0);
+    }
+    if (blocks.length <= 1 && rawSectionC.match(/Survey Question:\s*/i)) {
+        blocks = rawSectionC.split(/(?=Survey Question:\s*)/i).filter(b => b.trim().length > 0);
+    }
+    if (blocks.length <= 1) {
+        blocks = rawSectionC.split(/\n(?=-\s*Report Reference:|\n-\s*Research Intent:)/i).filter(b => b.trim().length > 0);
+    }
+    const questions = [];
+    const optRe = /Answer Options:\s*([\s\S]*?)(?=Target Segment:|Expected Output|-\s*Report Reference:|-\s*Research Intent:|-\s*Survey Question:|\Z)/i;
+    const surveyRe = /Survey Question:\s*([\s\S]*?)(?=Question Type:|Answer Options:|Target Segment:|$)/i;
+    const typeRe = /Question Type:\s*([\s\S]*?)(?=Answer Options:|Target Segment:|$)/i;
+    blocks.forEach(blk => {
+        const blkStr = blk.trim();
+        if (blkStr.length < 10) return;
+        const surveyM = blkStr.match(surveyRe);
+        const typeM = blkStr.match(typeRe);
+        const optM = blkStr.match(optRe);
+        let survey_question = surveyM ? surveyM[1].trim() : '';
+        if (!survey_question && (blkStr.includes('Survey Question') || blkStr.includes('Question Type'))) {
+            const afterLabel = blkStr.replace(/^[\s\S]*?Survey Question:\s*/i, '').trim();
+            survey_question = afterLabel.replace(/\n.*?(?=Question Type:|Answer Options:|Target Segment:|$)/is, '').trim();
+        }
+        if (!survey_question && blkStr.includes('Question Type:')) {
+            const beforeType = blkStr.replace(/\n\s*Question Type:[\s\S]*/i, '').replace(/^[\s\S]*?Survey Question:\s*/i, '').trim();
+            if (beforeType.length > 2) survey_question = beforeType;
+        }
+        const question_type = typeM ? typeM[1].trim() : '';
+        let answer_options = [];
+        if (optM && optM[1]) {
+            const optText = optM[1].replace(/^\s*[-•]\s*/gm, '').trim();
+            answer_options = optText.split(/[\n]+/).map(line => line.replace(/^\s*[-•]\s*/, '').trim()).filter(o => o && o.length > 0 && o !== 'Option');
+            if (answer_options.length === 0) {
+                answer_options = optM[1].split(/[-•]/).map(o => o.trim()).filter(o => o && o.length > 0);
+            }
+        }
+        survey_question = stripMarkdownBold(survey_question);
+        answer_options = answer_options.map(o => stripMarkdownBold(o)).filter(o => o);
+        if (survey_question) {
+            questions.push({ survey_question, question_type: stripMarkdownBold(question_type), answer_options });
+        }
+    });
+    return questions;
+}
+
+/**
+ * Get questionnaire list for display/export: parse from raw first, else use API structured data.
+ */
+function getQuestionnaireList(data) {
+    const raw = data.raw_markdown || '';
+    const sections = parseRawMarkdownSections(raw);
+    let list = parseQuestionnaireFromRaw(sections.questionnaire);
+    if (list.length === 0) {
+        list = (data.reconstructed_questionnaire || []).map(q => {
+            const opts = Array.isArray(q.answer_options) ? q.answer_options : [];
+            return {
+                survey_question: stripMarkdownBold(q.survey_question || ''),
+                question_type: stripMarkdownBold(q.question_type || ''),
+                answer_options: opts.map(o => stripMarkdownBold(String(o))).filter(o => o)
+            };
+        });
+    }
+    return list;
+}
+
+function renderMarketResearchOutput(data, objectivesEl, questionnaireEl) {
+    const raw = data.raw_markdown || '';
+    const aiUsed = data.ai_used !== false;
+    const message = data.message || '';
+
+    const sections = parseRawMarkdownSections(raw);
+    const hasRealOutput = sections.researchObjective.length > 0 || sections.questionnaire.length > 0;
+
+    let objectivesHtml = '';
+    if (!aiUsed && message) {
+        objectivesHtml += '<div class="mre-no-api-key-banner"><strong>No API key.</strong> ' + escapeHtml(message) + '</div>';
+    }
+    if (hasRealOutput && sections.researchObjective) {
+        objectivesHtml += '<pre class="mre-raw-section">' + escapeHtml(sections.researchObjective) + '</pre>';
+    } else {
+        const overall = data.overall_objectives || [];
+        const sectionObjs = data.section_objectives || [];
+        objectivesHtml += '<div class="mre-block"><h4>Overall objectives</h4><ul>';
+        overall.forEach(obj => { objectivesHtml += '<li>' + escapeHtml(obj) + '</li>'; });
+        objectivesHtml += '</ul></div>';
+        objectivesHtml += '<div class="mre-block"><h4>Section-wise objectives</h4>';
+        sectionObjs.forEach(sec => {
+            objectivesHtml += '<div class="mre-section"><strong>' + escapeHtml(sec.section_name || '') + '</strong><p>' + escapeHtml(sec.research_objective || '') + '</p></div>';
+        });
+        objectivesHtml += '</div>';
+    }
+
+    const questionnaireList = getQuestionnaireList(data);
+    let questionnaireHtml = '';
+    questionnaireList.forEach((q, i) => {
+        questionnaireHtml += '<div class="mre-q-item mre-q-survey-only">';
+        questionnaireHtml += '<div class="mre-q-survey">Question ' + (i + 1) + ': ' + escapeHtml(q.survey_question || '') + '</div>';
+        if (Array.isArray(q.answer_options) && q.answer_options.length) {
+            questionnaireHtml += '<div class="mre-q-options-label">Options:</div>';
+            questionnaireHtml += '<ul class="mre-q-options-list">';
+            q.answer_options.forEach(opt => { questionnaireHtml += '<li>' + escapeHtml(opt) + '</li>'; });
+            questionnaireHtml += '</ul>';
+        }
+        questionnaireHtml += '</div>';
+    });
+
+    if (objectivesEl) objectivesEl.innerHTML = objectivesHtml;
+    if (questionnaireEl) questionnaireEl.innerHTML = questionnaireHtml;
+}
+
+function downloadMarketResearchPdf() {
+    if (!lastMarketResearchData) {
+        showNotification('Run Reverse-Engineer first to generate a result.', 'warning');
+        return;
+    }
+    const raw = lastMarketResearchData.raw_markdown || '';
+    const sections = parseRawMarkdownSections(raw);
+    const useRaw = sections.full.length > 0;
+    try {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+        const pageW = doc.internal.pageSize.getWidth();
+        const pageH = doc.internal.pageSize.getHeight();
+        let y = 22;
+        const lineH = 5.5;
+        const margin = 22;
+        const optIndent = 8;
+        const maxW = pageW - margin * 2;
+        const maxWOpt = pageW - margin * 2 - optIndent;
+
+        function newPageIfNeeded(needLines) {
+            if (y + needLines * lineH > pageH - 25) {
+                doc.addPage();
+                y = 22;
+            }
+        }
+
+        const addText = (text, opts = {}) => {
+            const lines = doc.splitTextToSize(String(text || ''), opts.maxW || maxW);
+            newPageIfNeeded(lines.length);
+            lines.forEach(line => {
+                doc.text(line, opts.x ?? margin, y);
+                y += lineH;
+            });
+            if (opts.spaceAfter) y += lineH;
+        };
+
+        // Title
+        doc.setFontSize(18);
+        doc.setFont(undefined, 'bold');
+        doc.text('Market Research Reverse Engineering', margin, y);
+        y += 10;
+        doc.setFontSize(10);
+        doc.setFont(undefined, 'normal');
+        doc.setTextColor(100, 100, 100);
+        doc.text('Generated questionnaire from report', margin, y);
+        y += 12;
+        doc.setTextColor(0, 0, 0);
+
+        // Section 1: Research Objective
+        doc.setFont(undefined, 'bold');
+        doc.setFontSize(12);
+        addText('1. Research Objective', { spaceAfter: true });
+        doc.setFont(undefined, 'normal');
+        doc.setFontSize(10);
+        if (useRaw && sections.researchObjective) {
+            addText(sections.researchObjective);
+        } else {
+            const overall = lastMarketResearchData.overall_objectives || [];
+            overall.forEach(obj => { addText('• ' + obj, { spaceAfter: true }); });
+            (lastMarketResearchData.section_objectives || []).forEach(sec => {
+                addText(sec.section_name || '', { spaceAfter: true });
+                addText(sec.research_objective || '', { spaceAfter: true });
+            });
+        }
+        y += 10;
+
+        // Section 2: Questionnaire
+        doc.setFont(undefined, 'bold');
+        doc.setFontSize(12);
+        addText('2. Questionnaire', { spaceAfter: true });
+        doc.setFont(undefined, 'normal');
+        doc.setFontSize(10);
+
+        const questionnaireList = getQuestionnaireList(lastMarketResearchData);
+        if (questionnaireList.length === 0 && useRaw && sections.questionnaire) {
+            addText(sections.questionnaire);
+        } else {
+            questionnaireList.forEach((q, i) => {
+                newPageIfNeeded(4);
+                const qLabel = 'Question ' + (i + 1) + ':';
+                const qText = (q.survey_question || '').trim();
+                doc.setFont(undefined, 'bold');
+                doc.text(qLabel, margin, y);
+                y += lineH;
+                doc.setFont(undefined, 'normal');
+                const qLines = doc.splitTextToSize(qText, maxW);
+                qLines.forEach(line => {
+                    newPageIfNeeded(1);
+                    doc.text(line, margin, y);
+                    y += lineH;
+                });
+                const opts = Array.isArray(q.answer_options) ? q.answer_options : [];
+                if (opts.length > 0) {
+                    y += 2;
+                    opts.forEach(opt => {
+                        const optStr = (opt || '').trim();
+                        const optLines = doc.splitTextToSize('• ' + optStr, maxWOpt);
+                        optLines.forEach(line => {
+                            newPageIfNeeded(1);
+                            doc.text(line, margin + optIndent, y);
+                            y += lineH;
+                        });
+                    });
+                }
+                y += 8;
+            });
+        }
+
+        doc.save('market-research-result.pdf');
+        showNotification('PDF downloaded.', 'success');
+    } catch (e) {
+        console.error('PDF download failed:', e);
+        showNotification('PDF download failed. Ensure jsPDF is loaded.', 'error');
+    }
+}
+
+function csvEscape(s) {
+    const t = String(s == null ? '' : s).replace(/^["'\s]+|["'\s]+$/g, '').replace(/"/g, '""');
+    return '"' + t + '"';
+}
+
+function downloadMarketResearchCsv() {
+    if (!lastMarketResearchData) {
+        showNotification('Run Reverse-Engineer first to generate a result.', 'warning');
+        return;
+    }
+    const questionnaire = getQuestionnaireList(lastMarketResearchData);
+    const headers = ['Q No.', 'Question Description', 'Options'];
+    const rows = [];
+    questionnaire.forEach((q, i) => {
+        const qNo = i + 1;
+        const desc = (q.survey_question || '').trim().replace(/^["']+|["']+$/g, '');
+        const opts = Array.isArray(q.answer_options) && q.answer_options.length ? q.answer_options : [];
+        if (opts.length === 0) {
+            rows.push([qNo, desc, '']);
+        } else {
+            opts.forEach((opt, j) => {
+                const optVal = (opt || '').trim().replace(/^["']+|["']+$/g, '');
+                const rowQNo = j === 0 ? qNo : '';
+                const rowDesc = j === 0 ? desc : '';
+                rows.push([rowQNo, rowDesc, optVal]);
+            });
+        }
+    });
+    const csvContent = [headers.map(h => csvEscape(h)).join(','),
+        ...rows.map(r => r.map(c => csvEscape(c)).join(','))].join('\r\n');
+    const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'questionnaire.csv';
+    a.click();
+    URL.revokeObjectURL(a.href);
+    showNotification('Questionnaire CSV downloaded.', 'success');
+}
+
+function escapeHtml(s) {
+    if (s == null) return '';
+    const div = document.createElement('div');
+    div.textContent = s;
+    return div.innerHTML;
 }
 
 // Pagination state
@@ -1038,7 +1446,7 @@ function updateUserDisplay() {
 }
 
 function updateNavigationForRole() {
-    const sections = ['home', 'dashboard', 'surveys', 'validation', 'results', 'industry-surveys', 'reports'];
+    const sections = ['home', 'dashboard', 'surveys', 'validation', 'results', 'industry-surveys', 'market-research', 'reports'];
     
     // Get navigation items
     const navHome = document.getElementById('nav-home');
@@ -1047,6 +1455,7 @@ function updateNavigationForRole() {
     const navValidation = document.getElementById('nav-validation');
     const navResults = document.getElementById('nav-results');
     const navIndustrySurveys = document.getElementById('nav-industry-surveys');
+    const navMarketResearch = document.getElementById('nav-market-research');
     
     if (currentUserRole === null) {
         // Not logged in: Show Home and Industry Surveys
@@ -1056,14 +1465,16 @@ function updateNavigationForRole() {
         if (navValidation) navValidation.style.display = 'none';
         if (navResults) navResults.style.display = 'none';
         if (navIndustrySurveys) navIndustrySurveys.style.display = '';
+        if (navMarketResearch) navMarketResearch.style.display = 'none';
     } else if (currentUserRole === 'user') {
-        // User: Show Home, Dashboard+Reports (combined), Test Results, and Industry Surveys
+        // User: Show Home, Dashboard+Reports (combined), Test Results, Industry Surveys, Market Research
         if (navHome) navHome.style.display = '';
         if (navDashboardReports) navDashboardReports.style.display = '';
         if (navSurveys) navSurveys.style.display = 'none';
         if (navValidation) navValidation.style.display = 'none';
         if (navResults) navResults.style.display = '';
         if (navIndustrySurveys) navIndustrySurveys.style.display = '';
+        if (navMarketResearch) navMarketResearch.style.display = '';
     } else {
         // Super User: Show all tabs
         if (navHome) navHome.style.display = '';
@@ -1072,6 +1483,7 @@ function updateNavigationForRole() {
         if (navValidation) navValidation.style.display = '';
         if (navResults) navResults.style.display = '';
         if (navIndustrySurveys) navIndustrySurveys.style.display = '';
+        if (navMarketResearch) navMarketResearch.style.display = '';
     }
 }
 
@@ -1130,6 +1542,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('file-real-info').textContent = 
             file ? `${file.name} (${(file.size / 1024).toFixed(1)} KB)` : 'No file selected';
     });
+
+    document.getElementById('market-research-submit')?.addEventListener('click', runMarketResearchReverseEngineer);
+
+    document.getElementById('market-research-load-sample')?.addEventListener('click', loadSamplePdfText);
+    document.getElementById('market-research-download-pdf')?.addEventListener('click', downloadMarketResearchPdf);
+    document.getElementById('market-research-download-csv')?.addEventListener('click', downloadMarketResearchCsv);
 });
 
 // Display results in Semilattice.ai style

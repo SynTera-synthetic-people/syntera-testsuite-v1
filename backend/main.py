@@ -1,14 +1,27 @@
 """SynTera Test Suite - FastAPI Backend"""
+import os
+import sys
+
+# Project root (parent of backend/) so "config", "backend", "database" resolve when running python backend/main.py
+_project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+if _project_root not in sys.path:
+    sys.path.insert(0, _project_root)
+
+# Load .env from project root
+_env_file = os.path.join(_project_root, ".env")
+if os.path.isfile(_env_file):
+    from dotenv import load_dotenv
+    load_dotenv(_env_file)
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 import logging
 from contextlib import asynccontextmanager
-import os
 
 from config.settings import Settings
-from backend.routers import surveys, validation, reports, auth
+from backend.routers import surveys, validation, reports, auth, market_research
 from database.connection import init_db
 
 logging.basicConfig(level=logging.INFO)
@@ -49,6 +62,7 @@ app.include_router(auth.router, prefix="/api/auth", tags=["authentication"])
 app.include_router(surveys.router, prefix="/api/surveys", tags=["surveys"])
 app.include_router(validation.router, prefix="/api/validation", tags=["validation"])
 app.include_router(reports.router, prefix="/api/reports", tags=["reports"])
+app.include_router(market_research.router, prefix="/api/market-research", tags=["market-research"])
 
 
 @app.get("/health")
