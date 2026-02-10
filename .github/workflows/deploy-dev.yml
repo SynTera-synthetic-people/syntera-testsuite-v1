@@ -1,0 +1,34 @@
+name:  Deploy to Dev Server
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: DEV_EC2_HOST
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.DEV_EC2_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.DEV_EC2_HOST }} >> ~/.ssh/known_hosts 2>/dev/null || true
+          
+
+      - name: Run Deployment Script on Server
+        run: |
+          ssh ${{ secrets.DEV_EC2_USER }}@${{ secrets.DEV_EC2_HOST }} \
+          "bash ~/deploy.sh \
+          '${{ secrets.DEV_IMAGE_NAME }}' \
+          '${{ secrets.DEV_CONTAINER_NAME }}' \
+          '${{ secrets.DEV_APP_DIR }}' \
+          '${{ secrets.DEV_APP_PORT }}' \
+          'main'"
+
