@@ -1593,6 +1593,18 @@ input[type="checkbox"] {
     flex-wrap: wrap;
 }
 
+/* Industry Survey Reports: S3 section */
+.industry-s3-section .help-text {
+    margin-bottom: 12px;
+    color: var(--text-muted);
+}
+.industry-subsection-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 12px;
+}
+
 /* Industry Survey Cards */
 .industry-survey-card {
     background: radial-gradient(circle at top left, #1f2937 0, #020617 65%);

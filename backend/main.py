@@ -21,7 +21,7 @@ import logging
 from contextlib import asynccontextmanager
 
 from config.settings import Settings
-from backend.routers import surveys, validation, reports, auth, market_research
+from backend.routers import surveys, validation, reports, auth, market_research, industry_surveys
 from database.connection import init_db
 
 logging.basicConfig(level=logging.INFO)
@@ -63,6 +63,7 @@ app.include_router(surveys.router, prefix="/api/surveys", tags=["surveys"])
 app.include_router(validation.router, prefix="/api/validation", tags=["validation"])
 app.include_router(reports.router, prefix="/api/reports", tags=["reports"])
 app.include_router(market_research.router, prefix="/api/market-research", tags=["market-research"])
+app.include_router(industry_surveys.router, prefix="/api/industry-surveys", tags=["industry-surveys"])
 
 
 @app.get("/health")

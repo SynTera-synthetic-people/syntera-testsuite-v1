@@ -2,6 +2,7 @@
 from fastapi import APIRouter, HTTPException, UploadFile, File, Form
 from pydantic import BaseModel, Field
 from typing import Optional
+import hashlib
 import logging
 import os
 import re
@@ -28,9 +29,11 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 _settings = Settings()
 
-# Keep total request under provider TPM (e.g. OpenAI 30k). System prompt ~2k tokens; reserve for response.
-# ~4 chars/token → cap report at ~22k tokens (~88k chars). Use 70k to be safe.
-MAX_REPORT_CHARS = 70_000
+# Cap report size to reduce tokens/cost. 50k chars ≈ ~12.5k tokens input.
+MAX_REPORT_CHARS = 50_000
+# In-memory cache: same report text → skip API call (saves credits).
+_reverse_engineer_cache: dict[str, dict] = {}
+REVERSE_ENGINEER_CACHE_MAX = 50
 
 
 def _parse_env_file(path: str) -> tuple[Optional[str], Optional[str]]:
@@ -87,78 +90,33 @@ def _get_anthropic_key() -> Optional[str]:
     _, v = _read_keys_from_env_file()
     return v
 
-REVERSE_ENGINEER_SYSTEM_PROMPT = """You are a senior Market Research Methodologist and Survey Designer.
+# Shorter prompt to reduce input tokens (API cost). Output format must stay for parser.
+REVERSE_ENGINEER_SYSTEM_PROMPT = """You are a Market Research Methodologist. Reverse-engineer the research design from the report.
 
-You are given a market research report that contains:
-- Executive summaries
-- Charts and figures with percentages
-- Category-wise insights
-- Consumer quotes
-- Key findings and recommendations
+Tasks: (1) Infer overall research objectives. (2) Section-wise objectives per report section. (3) For each chart/insight: latent question, survey question, answer options (MCQ/Likert), target segment, expected output pattern. Use plain text only (no **). Do not copy report sentences as questions.
 
-Your task is to reverse-engineer the *original research design* behind the report.
-
-From the report content, you must:
-
-1. Infer the **overall research objective(s)** of the study.
-2. Derive **section-wise research objectives** (e.g., motivation, platform preference, payment behavior, category behavior, trust, influencers, etc.).
-3. For each chart, insight, or quantitative finding:
-   - Identify the **latent research question** that must have been asked.
-   - Reconstruct the **exact survey question** in natural market-research language.
-   - Provide the **most likely answer options** (MCQ / Likert / multi-select) that could produce the reported outputs.
-4. Maintain:
-   - Neutral, professional survey tone
-   - Clear segmentation logic (Urban vs Rest of India, Gen Z, Millennials, Gen X, etc.)
-   - Consistency with the percentages and comparisons shown in the report
-
-Output in the following structured format:
+Output exactly this format:
 
 A. Overall Research Objectives
 - Objective 1
 - Objective 2
-- ...
 
 B. Section-wise Objectives
-For each section in the report:
-- Section Name
-- Research Objective
+- Section Name: Research Objective
 
 C. Reconstructed Questionnaire
-
-For each inferred question:
-
-- Report Reference:
-  (e.g., "Figure 4: Factors leading to stickiness", Page 11)
-
-- Research Intent:
-  (What the researchers wanted to understand)
-
-- Survey Question:
-  (Exact question as it would appear in a survey)
-
-- Question Type:
-  (Single choice / Multiple choice / Likert scale / Ranking)
-
+For each question:
+- Report Reference: (e.g. Figure 4, Page 11)
+- Research Intent: (one line)
+- Survey Question: (exact question text)
+- Question Type: Single choice / Multiple choice / Likert scale / Ranking
 - Answer Options:
   - Option 1
   - Option 2
-  - Option 3
-  - ...
+- Target Segment: (e.g. All respondents / Urban / Gen Z)
+- Expected Output Pattern: (chart or insight type)
 
-- Target Segment:
-  (All respondents / Urban / Rest of India / Gen Z / etc.)
-
-- Expected Output Pattern:
-  (What kind of chart or insight this question would generate)
-
-Rules:
-- Use plain text only for Survey Question and Answer Options (no markdown: no ** for bold).
-- Do NOT copy sentences from the report as questions.
-- Convert insights and charts into *original survey questions*.
-- Ensure that each reconstructed question logically explains the reported percentages.
-- Where multiple charts stem from the same construct (e.g., trust, value, convenience), group them under a common research theme.
-- If qualitative quotes exist, infer the *open-ended* question that could have generated them.
-"""
+Rules: Plain text only. Convert insights to original survey questions. Group related charts under one theme."""
 
 
 class ReverseEngineerRequest(BaseModel):
@@ -272,7 +230,7 @@ def _call_openai(report_text: str, api_key: Optional[str] = None) -> str:
                 {"role": "user", "content": f"Input Report:\n\n{report_to_send}"}
             ],
             temperature=0.3,
-            max_tokens=4096,
+            max_tokens=2048,
         )
         content = response.choices[0].message.content if response.choices else None
         if isinstance(content, list):
@@ -303,7 +261,7 @@ def _call_anthropic(report_text: str, api_key: Optional[str] = None) -> str:
         model = _settings.ANTHROPIC_MODEL or os.getenv("ANTHROPIC_MODEL", "claude-sonnet-4-20250514")
         response = client.messages.create(
             model=model,
-            max_tokens=4096,
+            max_tokens=2048,
             system=REVERSE_ENGINEER_SYSTEM_PROMPT,
             messages=[{"role": "user", "content": f"Input Report:\n\n{report_to_send}"}],
         )
@@ -462,19 +420,28 @@ def _run_reverse_engineer(
     openai_key: Optional[str] = None,
     anthropic_key: Optional[str] = None,
 ) -> dict:
-    """Core logic: take report text, return structured output. Uses Anthropic (Claude) first, then OpenAI, then heuristic.
-    Keys can be passed in so the same values resolved in the request handler are used for the LLM calls."""
+    """Core logic: take report text, return structured output. Uses OpenAI first by default (OPENAI_FIRST) to save Claude credits; else Anthropic then OpenAI. Caches result by report hash to avoid repeat API calls."""
+    # Cache: same report text → return cached result (no API call)
+    norm_text = (text or "").strip()[:MAX_REPORT_CHARS]
+    cache_key = hashlib.sha256(norm_text.encode("utf-8")).hexdigest()
+    if cache_key in _reverse_engineer_cache:
+        return _reverse_engineer_cache[cache_key]
+
     raw_md = None
     ai_used = False
     no_key_message = (
         "No API key. Set OPENAI_API_KEY or ANTHROPIC_API_KEY in your .env file (see .env.example) "
         "and restart the server to get AI-powered questionnaire reconstruction from your report."
     )
-    # Try Anthropic (Claude, claude-sonnet-4-20250514) first, then OpenAI; use passed-in keys
-    for name, call_llm, key in [
+    openai_first = getattr(_settings, "OPENAI_FIRST", True) or (os.getenv("OPENAI_FIRST", "true").lower() in ("1", "true", "yes"))
+    providers = [
+        ("OpenAI", _call_openai, openai_key),
+        ("Anthropic", _call_anthropic, anthropic_key),
+    ] if openai_first else [
         ("Anthropic", _call_anthropic, anthropic_key),
         ("OpenAI", _call_openai, openai_key),
-    ]:
+    ]
+    for name, call_llm, key in providers:
         try:
             raw_md = call_llm(text, api_key=key)
             if raw_md and len(raw_md.strip()) > 0:
@@ -500,7 +467,7 @@ def _run_reverse_engineer(
         overall, section_objs, questionnaire, raw_md = _heuristic_reverse_engineer(text)
     section_objectives = [SectionObjective(section_name=s["section_name"], research_objective=s["research_objective"]) for s in section_objs]
     reconstructed = [ReconstructedQuestion(**q) for q in questionnaire]
-    return {
+    result = {
         "overall_objectives": overall,
         "section_objectives": [s.model_dump() for s in section_objectives],
         "reconstructed_questionnaire": [q.model_dump() for q in reconstructed],
@@ -508,14 +475,22 @@ def _run_reverse_engineer(
         "ai_used": ai_used,
         "message": None if ai_used else no_key_message,
     }
+    # Cache result (evict oldest if over limit)
+    if len(_reverse_engineer_cache) >= REVERSE_ENGINEER_CACHE_MAX:
+        _reverse_engineer_cache.pop(next(iter(_reverse_engineer_cache)))
+    _reverse_engineer_cache[cache_key] = result
+    return result
 
 
 @router.get("/ai-status")
 async def ai_status():
-    """Return whether OpenAI or Anthropic API keys are configured (for debugging)."""
+    """Return whether OpenAI or Anthropic API keys are configured; provider order and cache size."""
+    openai_first = getattr(_settings, "OPENAI_FIRST", True) or (os.getenv("OPENAI_FIRST", "true").lower() in ("1", "true", "yes"))
     return {
         "openai_configured": _get_openai_key() is not None,
         "anthropic_configured": _get_anthropic_key() is not None,
+        "openai_first": openai_first,
+        "cache_size": len(_reverse_engineer_cache),
         "env_paths_checked": _env_paths,
         "env_file_exists": any(os.path.isfile(p) for p in _env_paths),
     }

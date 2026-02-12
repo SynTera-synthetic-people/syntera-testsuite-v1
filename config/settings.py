@@ -25,6 +25,14 @@ class Settings(BaseSettings):
     OPENAI_MODEL: str = "gpt-4o"
     ANTHROPIC_API_KEY: Optional[str] = None
     ANTHROPIC_MODEL: str = "claude-sonnet-4-20250514"
+    # Try OpenAI first (saves Claude credits). Set to False to try Claude first.
+    OPENAI_FIRST: bool = True
+    # S3 industry surveys bucket (Industry Survey Reports tab)
+    AWS_ACCESS_KEY_ID: Optional[str] = None
+    AWS_SECRET_ACCESS_KEY: Optional[str] = None
+    AWS_REGION: str = "ap-south-1"
+    S3_INDUSTRY_BUCKET: str = "model-training1"
+    S3_INDUSTRY_PREFIX: str = "Dat_for_model_Training/"
 
     class Config:
         case_sensitive = True

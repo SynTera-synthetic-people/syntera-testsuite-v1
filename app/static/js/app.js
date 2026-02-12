@@ -175,12 +175,59 @@ function downloadReport(surveyId, format) {
 async function loadIndustrySurveys() {
     console.log('loadIndustrySurveys() called');
     const surveysList = document.getElementById('industry-surveys-list');
+    const s3List = document.getElementById('industry-surveys-s3-list');
+    const s3Help = document.getElementById('industry-s3-help');
     if (!surveysList) {
         console.error('Industry surveys list element not found');
         return;
     }
-    
-    // Industry survey data with 6 domains
+
+    // Load S3 bucket contents (model-training1 / Dat_for_model_Training/)
+    if (s3List && s3Help) {
+        try {
+            const r = await fetch('/api/industry-surveys/s3');
+            if (r.ok) {
+                const data = await r.json();
+                const items = data.items || [];
+                if (items.length > 0) {
+                    s3Help.textContent = 'Bucket: ' + (data.bucket || '') + ' / ' + (data.prefix || '');
+                    s3List.innerHTML = items.map(item => {
+                        const sizeStr = item.size != null ? (item.size < 1024 ? item.size + ' B' : (item.size < 1024 * 1024 ? (item.size / 1024).toFixed(1) + ' KB' : (item.size / (1024 * 1024)).toFixed(1) + ' MB')) : '';
+                        const dateStr = item.last_modified ? new Date(item.last_modified).toLocaleDateString() : '';
+                        return `
+                            <div class="industry-survey-card industry-s3-card">
+                                <div class="industry-survey-header">
+                                    <div class="industry-survey-icon" style="background: rgba(59, 130, 246, 0.2); border-color: #3b82f6;">📁</div>
+                                    <div class="industry-survey-title-section">
+                                        <div class="industry-survey-domain" style="color: #3b82f6;">S3 Data</div>
+                                        <h3 class="industry-survey-title">${escapeHtml(item.name)}</h3>
+                                    </div>
+                                </div>
+                                <p class="industry-survey-description">${sizeStr ? sizeStr + (dateStr ? ' · ' + dateStr : '') : 'Industry survey or data file'}</p>
+                                <div class="industry-survey-links">
+                                    <a href="${escapeHtml(item.url)}" target="_blank" rel="noopener" class="industry-link-button" style="border-color: #3b82f6; color: #3b82f6;">
+                                        <span>⬇</span> Download / Open
+                                    </a>
+                                </div>
+                            </div>`;
+                    }).join('');
+                } else {
+                    s3Help.textContent = 'No files in bucket. Configure AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY in .env if the bucket is private.';
+                    s3List.innerHTML = '';
+                }
+            } else {
+                const err = await r.json().catch(() => ({ detail: r.statusText }));
+                s3Help.textContent = err.detail || 'Could not load S3 list. Add AWS credentials in .env for private bucket.';
+                s3List.innerHTML = '';
+            }
+        } catch (e) {
+            console.error('S3 industry surveys load failed', e);
+            s3Help.textContent = 'S3 unavailable. Configure AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY in .env to list the bucket.';
+            s3List.innerHTML = '';
+        }
+    }
+
+    // Industry survey reference data (6 domains)
     const industrySurveys = [
         {
             id: 'banking-fintech',
