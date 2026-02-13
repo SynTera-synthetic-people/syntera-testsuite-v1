@@ -522,9 +522,30 @@ async function loadSamplePdfText() {
 
 let lastMarketResearchData = null;
 
-// Keep request body under ~900KB to avoid 413 Request Entity Too Large (proxy default 1MB)
+// Chunk size for upload (stay under ~1MB to avoid 413). No limit on total file or text length.
 var MAX_UPLOAD_CHARS = 300000;
-var MAX_UPLOAD_FILE_BYTES = 900 * 1024;
+var MAX_UPLOAD_FILE_BYTES = 900 * 1024;  // files larger than this are sent in chunked upload
+var FILE_CHUNK_BYTES = 256 * 1024;        // 256KB per chunk (base64 stays under 1MB)
+
+function generateSessionId() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+    });
+}
+
+function readFileChunkAsBase64(file, start, end) {
+    return new Promise(function(resolve, reject) {
+        var blob = file.slice(start, end);
+        var r = new FileReader();
+        r.onload = function() {
+            var s = r.result;
+            resolve(s.substring(s.indexOf(',') + 1));
+        };
+        r.onerror = reject;
+        r.readAsDataURL(blob);
+    });
+}
 
 async function runMarketResearchReverseEngineer() {
     const textEl = document.getElementById('market-research-report-text');
@@ -537,58 +558,149 @@ async function runMarketResearchReverseEngineer() {
     if (!statusEl || !outputPanel || !objectivesEl || !questionnaireEl) return;
 
     statusEl.style.display = 'block';
-    statusEl.textContent = 'Processing report...';
     statusEl.className = 'market-research-status loading';
     outputPanel.style.display = 'none';
 
+    const token = localStorage.getItem('authToken');
+    const authHeader = token ? { 'Authorization': 'Bearer ' + token } : {};
+
     try {
-        let body;
-        let contentType;
         const file = fileEl?.files[0];
         let reportText = (textEl?.value || '').trim();
 
         if (file && file.size > 0) {
-            if (file.size > MAX_UPLOAD_FILE_BYTES) {
-                statusEl.textContent = 'File too large (max ~900 KB). Paste report text instead or use a shorter file to avoid upload limits.';
-                statusEl.className = 'market-research-status error';
+            var totalFileChunks = Math.ceil(file.size / FILE_CHUNK_BYTES);
+            if (file.size <= MAX_UPLOAD_FILE_BYTES) {
+                statusEl.textContent = 'Processing report...';
+                var formData = new FormData();
+                formData.append('file', file);
+                if (reportText.length >= 50) formData.append('report_text', reportText.length > MAX_UPLOAD_CHARS ? reportText.substring(0, MAX_UPLOAD_CHARS) : reportText);
+                var res = await fetch('/api/market-research/reverse-engineer', { method: 'POST', headers: authHeader, body: formData });
+                if (!res.ok) {
+                    var err = await res.json().catch(function() { return { detail: res.statusText }; });
+                    throw new Error(err.detail || 'Reverse engineering failed');
+                }
+                var data = await res.json();
+                lastMarketResearchData = data;
+                renderMarketResearchOutput(data, objectivesEl, questionnaireEl);
+                outputPanel.style.display = 'block';
+                if (data.ai_used === false && data.message) {
+                    statusEl.innerHTML = '<strong>Placeholder only.</strong> ' + escapeHtml(data.message);
+                    statusEl.className = 'market-research-status error';
+                } else {
+                    statusEl.textContent = 'Done.';
+                    statusEl.className = 'market-research-status success';
+                }
                 return;
             }
-            const formData = new FormData();
-            formData.append('file', file);
-            if (reportText.length >= 50) {
-                if (reportText.length > MAX_UPLOAD_CHARS) reportText = reportText.substring(0, MAX_UPLOAD_CHARS);
-                formData.append('report_text', reportText);
+            // Chunked file upload: no size limit (e.g. 30MB+)
+            var sessionId = generateSessionId();
+            for (var fc = 0; fc < totalFileChunks; fc++) {
+                statusEl.textContent = 'Uploading file part ' + (fc + 1) + ' of ' + totalFileChunks + '...';
+                var fStart = fc * FILE_CHUNK_BYTES;
+                var fEnd = Math.min(fStart + FILE_CHUNK_BYTES, file.size);
+                var b64 = await readFileChunkAsBase64(file, fStart, fEnd);
+                var chunkRes = await fetch('/api/market-research/append-chunk', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', ...authHeader },
+                    body: JSON.stringify({
+                        session_id: sessionId,
+                        chunk_index: fc,
+                        total_chunks: totalFileChunks,
+                        content: b64,
+                        is_file_part: true,
+                        filename: fc === 0 ? file.name : undefined
+                    })
+                });
+                if (!chunkRes.ok) {
+                    var err = await chunkRes.json().catch(function() { return { detail: chunkRes.statusText }; });
+                    throw new Error(err.detail || 'File chunk upload failed');
+                }
             }
-            body = formData;
-            contentType = undefined;
-        } else if (reportText.length >= 50) {
-            if (reportText.length > MAX_UPLOAD_CHARS) {
-                reportText = reportText.substring(0, MAX_UPLOAD_CHARS);
-                showNotification('Report truncated to ' + MAX_UPLOAD_CHARS + ' characters to fit upload limit.', 'info');
+            statusEl.textContent = 'Extracting text and processing report...';
+            var runRes = await fetch('/api/market-research/reverse-engineer-session', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', ...authHeader },
+                body: JSON.stringify({ session_id: sessionId })
+            });
+            if (!runRes.ok) {
+                var runErr = await runRes.json().catch(function() { return { detail: runRes.statusText }; });
+                throw new Error(runErr.detail || 'Processing failed');
             }
-            body = JSON.stringify({ report_text: reportText });
-            contentType = 'application/json';
-        } else {
+            var data = await runRes.json();
+            lastMarketResearchData = data;
+            renderMarketResearchOutput(data, objectivesEl, questionnaireEl);
+            outputPanel.style.display = 'block';
+            if (data.ai_used === false && data.message) {
+                statusEl.innerHTML = '<strong>Placeholder only.</strong> ' + escapeHtml(data.message);
+                statusEl.className = 'market-research-status error';
+            } else {
+                statusEl.textContent = 'Done.';
+                statusEl.className = 'market-research-status success';
+            }
+            return;
+        }
+
+        if (reportText.length < 50) {
             statusEl.textContent = 'Please paste at least 50 characters of report text or upload a .txt/.pdf file.';
             statusEl.className = 'market-research-status error';
             return;
         }
 
-        const url = contentType ? '/api/market-research/reverse-engineer/json' : '/api/market-research/reverse-engineer';
-        const opts = {
-            method: 'POST',
-            headers: contentType ? { 'Content-Type': contentType } : {},
-            body: body,
-        };
-        const token = localStorage.getItem('authToken');
-        if (token) opts.headers['Authorization'] = 'Bearer ' + token;
-
-        const res = await fetch(url, opts);
-        if (!res.ok) {
-            const err = await res.json().catch(() => ({ detail: res.statusText }));
-            throw new Error(err.detail || 'Reverse engineering failed');
+        // Pasted text: no length limit. If over MAX_UPLOAD_CHARS, send in chunks then process.
+        if (reportText.length <= MAX_UPLOAD_CHARS) {
+            statusEl.textContent = 'Processing report...';
+            const res = await fetch('/api/market-research/reverse-engineer/json', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', ...authHeader },
+                body: JSON.stringify({ report_text: reportText })
+            });
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({ detail: res.statusText }));
+                throw new Error(err.detail || 'Reverse engineering failed');
+            }
+            const data = await res.json();
+            lastMarketResearchData = data;
+            renderMarketResearchOutput(data, objectivesEl, questionnaireEl);
+            outputPanel.style.display = 'block';
+            if (data.ai_used === false && data.message) {
+                statusEl.innerHTML = '<strong>Placeholder only.</strong> ' + escapeHtml(data.message);
+                statusEl.className = 'market-research-status error';
+            } else {
+                statusEl.textContent = 'Done.';
+                statusEl.className = 'market-research-status success';
+            }
+            return;
         }
-        const data = await res.json();
+
+        // Chunked upload: send in parts then reverse-engineer-session (no limit on total length)
+        var sessionId = generateSessionId();
+        var totalChunks = Math.ceil(reportText.length / MAX_UPLOAD_CHARS);
+        for (var c = 0; c < totalChunks; c++) {
+            statusEl.textContent = 'Uploading part ' + (c + 1) + ' of ' + totalChunks + '...';
+            var start = c * MAX_UPLOAD_CHARS;
+            var content = reportText.substring(start, start + MAX_UPLOAD_CHARS);
+            var chunkRes = await fetch('/api/market-research/append-chunk', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', ...authHeader },
+                body: JSON.stringify({ session_id: sessionId, chunk_index: c, total_chunks: totalChunks, content: content })
+            });
+            if (!chunkRes.ok) {
+                var err = await chunkRes.json().catch(function() { return { detail: chunkRes.statusText }; });
+                throw new Error(err.detail || 'Chunk upload failed');
+            }
+        }
+        statusEl.textContent = 'Processing report (' + reportText.length + ' chars, ' + totalChunks + ' parts)...';
+        var runRes = await fetch('/api/market-research/reverse-engineer-session', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', ...authHeader },
+            body: JSON.stringify({ session_id: sessionId })
+        });
+        if (!runRes.ok) {
+            var runErr = await runRes.json().catch(function() { return { detail: runRes.statusText }; });
+            throw new Error(runErr.detail || 'Processing failed');
+        }
+        var data = await runRes.json();
         lastMarketResearchData = data;
         renderMarketResearchOutput(data, objectivesEl, questionnaireEl);
         outputPanel.style.display = 'block';

@@ -47,8 +47,12 @@ app = FastAPI(
 # Serve static assets (CSS, JS)
 STATIC_DIR = os.path.join(os.path.dirname(__file__), "..", "app", "static")
 INDEX_HTML = os.path.join(os.path.dirname(__file__), "..", "app", "index.html")
+# Brand assets from frontend/Brand Assets
+BRAND_DIR = os.path.join(os.path.dirname(__file__), "..", "frontend", "Brand Assets", "Brand Assets")
 
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+if os.path.isdir(BRAND_DIR):
+    app.mount("/brand", StaticFiles(directory=BRAND_DIR), name="brand")
 
 app.add_middleware(
     CORSMiddleware,

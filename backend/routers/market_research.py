@@ -2,10 +2,12 @@
 from fastapi import APIRouter, HTTPException, UploadFile, File, Form
 from pydantic import BaseModel, Field
 from typing import Optional
+import base64
 import hashlib
 import logging
 import os
 import re
+import time
 
 # Project root: parent of backend/ (this file is backend/routers/market_research.py)
 _project_root = os.path.normpath(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
@@ -29,11 +31,17 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 _settings = Settings()
 
-# Cap report size to reduce tokens/cost. 50k chars ≈ ~12.5k tokens input.
+# Cap report size per LLM call. Chunked processing uses this for each chunk.
 MAX_REPORT_CHARS = 50_000
+# Chunk overlap when splitting long reports (chars) to avoid cutting mid-sentence.
+CHUNK_OVERLAP = 2_000
 # In-memory cache: same report text → skip API call (saves credits).
 _reverse_engineer_cache: dict[str, dict] = {}
 REVERSE_ENGINEER_CACHE_MAX = 50
+# Chunked upload: session_id -> { chunks: {index: str}, total_chunks: int, created_at: float }
+_upload_chunks_store: dict[str, dict] = {}
+UPLOAD_CHUNKS_TTL_SEC = 3600
+UPLOAD_CHUNKS_MAX_SESSIONS = 100
 
 
 def _parse_env_file(path: str) -> tuple[Optional[str], Optional[str]]:
@@ -121,6 +129,19 @@ Rules: Plain text only. Convert insights to original survey questions. Group rel
 
 class ReverseEngineerRequest(BaseModel):
     report_text: str = Field(..., min_length=50, description="Full text of the market research report")
+
+
+class AppendChunkRequest(BaseModel):
+    session_id: str = Field(..., min_length=1)
+    chunk_index: int = Field(..., ge=0)
+    total_chunks: int = Field(..., ge=1)
+    content: str = Field(..., min_length=1)
+    is_file_part: bool = False
+    filename: Optional[str] = None
+
+
+class ReverseEngineerSessionRequest(BaseModel):
+    session_id: str = Field(..., min_length=1)
 
 
 class SectionObjective(BaseModel):
@@ -419,13 +440,16 @@ def _run_reverse_engineer(
     text: str,
     openai_key: Optional[str] = None,
     anthropic_key: Optional[str] = None,
+    use_cache: bool = True,
 ) -> dict:
-    """Core logic: take report text, return structured output. Uses OpenAI first by default (OPENAI_FIRST) to save Claude credits; else Anthropic then OpenAI. Caches result by report hash to avoid repeat API calls."""
-    # Cache: same report text → return cached result (no API call)
-    norm_text = (text or "").strip()[:MAX_REPORT_CHARS]
-    cache_key = hashlib.sha256(norm_text.encode("utf-8")).hexdigest()
-    if cache_key in _reverse_engineer_cache:
-        return _reverse_engineer_cache[cache_key]
+    """Core logic: take report text, return structured output. Uses OpenAI first by default. When use_cache=False (chunked flow), skips cache."""
+    if use_cache:
+        norm_text = (text or "").strip()[:MAX_REPORT_CHARS]
+        cache_key = hashlib.sha256(norm_text.encode("utf-8")).hexdigest()
+        if cache_key in _reverse_engineer_cache:
+            return _reverse_engineer_cache[cache_key]
+    else:
+        cache_key = None
 
     raw_md = None
     ai_used = False
@@ -475,11 +499,112 @@ def _run_reverse_engineer(
         "ai_used": ai_used,
         "message": None if ai_used else no_key_message,
     }
-    # Cache result (evict oldest if over limit)
-    if len(_reverse_engineer_cache) >= REVERSE_ENGINEER_CACHE_MAX:
-        _reverse_engineer_cache.pop(next(iter(_reverse_engineer_cache)))
-    _reverse_engineer_cache[cache_key] = result
+    if use_cache and cache_key is not None:
+        if len(_reverse_engineer_cache) >= REVERSE_ENGINEER_CACHE_MAX:
+            _reverse_engineer_cache.pop(next(iter(_reverse_engineer_cache)))
+        _reverse_engineer_cache[cache_key] = result
     return result
+
+
+def _split_into_chunks(text: str, chunk_size: int = MAX_REPORT_CHARS, overlap: int = CHUNK_OVERLAP) -> list[str]:
+    """Split text into overlapping chunks for chunked LLM processing."""
+    text = (text or "").strip()
+    if len(text) <= chunk_size:
+        return [text] if text else []
+    chunks = []
+    start = 0
+    while start < len(text):
+        end = start + chunk_size
+        chunk = text[start:end]
+        if chunk.strip():
+            chunks.append(chunk)
+        start = end - overlap
+        if start >= len(text):
+            break
+    return chunks
+
+
+def _merge_chunk_results(results: list[dict]) -> dict:
+    """Merge multiple _run_reverse_engineer results into one (dedupe objectives/sections/questions)."""
+    if not results:
+        return {
+            "overall_objectives": [],
+            "section_objectives": [],
+            "reconstructed_questionnaire": [],
+            "raw_markdown": "",
+            "ai_used": False,
+            "message": None,
+        }
+    if len(results) == 1:
+        return results[0]
+    seen_overall = set()
+    overall = []
+    for r in results:
+        for o in r.get("overall_objectives") or []:
+            k = (o or "").strip().lower()[:200]
+            if k and k not in seen_overall:
+                seen_overall.add(k)
+                overall.append(o)
+    seen_section = set()
+    sections = []
+    for r in results:
+        for s in r.get("section_objectives") or []:
+            name = (s.get("section_name") or "").strip()
+            if name and name not in seen_section:
+                seen_section.add(name)
+                sections.append(s)
+    seen_question = set()
+    questions = []
+    for r in results:
+        for q in r.get("reconstructed_questionnaire") or []:
+            sq = (q.get("survey_question") or "").strip().lower()[:300]
+            if sq and sq not in seen_question:
+                seen_question.add(sq)
+                questions.append(q)
+    raw_parts = [r.get("raw_markdown") or "" for r in results if r.get("raw_markdown")]
+    ai_used = any(r.get("ai_used") for r in results)
+    raw_merged = "\n\n".join(f"--- Part {i+1} ---\n\n{p}" for i, p in enumerate(raw_parts)) if raw_parts else ""
+    return {
+        "overall_objectives": overall,
+        "section_objectives": sections,
+        "reconstructed_questionnaire": questions,
+        "raw_markdown": raw_merged,
+        "ai_used": ai_used,
+        "message": None if ai_used else (results[0].get("message") or None),
+    }
+
+
+def _run_reverse_engineer_maybe_chunked(
+    text: str,
+    openai_key: Optional[str] = None,
+    anthropic_key: Optional[str] = None,
+) -> dict:
+    """Run reverse engineer on full text; if text exceeds MAX_REPORT_CHARS, process in chunks and merge."""
+    text = (text or "").strip()
+    if not text or len(text) < 50:
+        return _run_reverse_engineer("", openai_key=openai_key, anthropic_key=anthropic_key, use_cache=False)
+    if len(text) <= MAX_REPORT_CHARS:
+        return _run_reverse_engineer(text, openai_key=openai_key, anthropic_key=anthropic_key)
+    chunks = _split_into_chunks(text)
+    if not chunks:
+        return _run_reverse_engineer(text[:MAX_REPORT_CHARS], openai_key=openai_key, anthropic_key=anthropic_key)
+    logger.info("Processing report in %d chunks (total %d chars)", len(chunks), len(text))
+    results = []
+    for i, chunk in enumerate(chunks):
+        try:
+            r = _run_reverse_engineer(chunk, openai_key=openai_key, anthropic_key=anthropic_key, use_cache=False)
+            results.append(r)
+        except Exception as e:
+            logger.warning("Chunk %s failed: %s", i + 1, e)
+            results.append({
+                "overall_objectives": [],
+                "section_objectives": [],
+                "reconstructed_questionnaire": [],
+                "raw_markdown": "",
+                "ai_used": False,
+                "message": str(e),
+            })
+    return _merge_chunk_results(results)
 
 
 @router.get("/ai-status")
@@ -511,18 +636,83 @@ async def reverse_engineer_report(
         text = _extract_text_from_file(content, file.filename)
     if not text or len(text) < 50:
         raise HTTPException(status_code=400, detail="Provide report_text (min 50 chars) or upload a .txt/.pdf file.")
-    # Resolve keys once in request context (same as ai-status) and pass into runner
     openai_key = _get_openai_key()
     anthropic_key = _get_anthropic_key()
-    return _run_reverse_engineer(text, openai_key=openai_key, anthropic_key=anthropic_key)
+    return _run_reverse_engineer_maybe_chunked(text, openai_key=openai_key, anthropic_key=anthropic_key)
 
 
 @router.post("/reverse-engineer/json")
 async def reverse_engineer_json(body: ReverseEngineerRequest):
-    """Same as reverse-engineer but accepts JSON body with report_text."""
+    """Same as reverse-engineer but accepts JSON body with report_text. No length limit; long reports are processed in chunks."""
     openai_key = _get_openai_key()
     anthropic_key = _get_anthropic_key()
-    return _run_reverse_engineer(body.report_text.strip(), openai_key=openai_key, anthropic_key=anthropic_key)
+    return _run_reverse_engineer_maybe_chunked(body.report_text.strip(), openai_key=openai_key, anthropic_key=anthropic_key)
+
+
+def _evict_upload_sessions():
+    """Remove expired sessions from chunk store."""
+    now = time.time()
+    expired = [sid for sid, data in _upload_chunks_store.items() if (now - data.get("created_at", 0)) > UPLOAD_CHUNKS_TTL_SEC]
+    for sid in expired:
+        _upload_chunks_store.pop(sid, None)
+    while len(_upload_chunks_store) > UPLOAD_CHUNKS_MAX_SESSIONS:
+        _upload_chunks_store.pop(next(iter(_upload_chunks_store)))
+
+
+@router.post("/append-chunk")
+async def append_chunk(body: AppendChunkRequest):
+    """Upload one chunk of a long report (for chunked upload). Call reverse-engineer-session when complete."""
+    _evict_upload_sessions()
+    sid = body.session_id
+    if sid not in _upload_chunks_store:
+        _upload_chunks_store[sid] = {
+            "chunks": {},
+            "total_chunks": body.total_chunks,
+            "created_at": time.time(),
+            "is_file": bool(body.is_file_part),
+            "filename": body.filename if body.is_file_part else None,
+        }
+    store = _upload_chunks_store[sid]
+    if store["total_chunks"] != body.total_chunks:
+        raise HTTPException(status_code=400, detail="total_chunks mismatch for this session")
+    if body.is_file_part and body.filename:
+        store["filename"] = body.filename
+    store["chunks"][body.chunk_index] = body.content
+    received = len(store["chunks"])
+    complete = received == body.total_chunks
+    return {"session_id": sid, "received": received, "total": body.total_chunks, "complete": complete}
+
+
+@router.post("/reverse-engineer-session")
+async def reverse_engineer_session(body: ReverseEngineerSessionRequest):
+    """Run reverse-engineer on the report assembled from append-chunk uploads. No length limit; processed in chunks if long."""
+    _evict_upload_sessions()
+    sid = body.session_id
+    if sid not in _upload_chunks_store:
+        raise HTTPException(status_code=404, detail="Session not found or expired. Upload chunks first.")
+    store = _upload_chunks_store[sid]
+    total = store["total_chunks"]
+    chunks = store["chunks"]
+    if len(chunks) != total:
+        raise HTTPException(status_code=400, detail=f"Missing chunks: have {len(chunks)}, need {total}. Send all chunks first.")
+    parts = [chunks[i] for i in range(total)]
+    _upload_chunks_store.pop(sid, None)
+
+    if store.get("is_file") and store.get("filename"):
+        try:
+            assembled = b"".join(base64.b64decode(p) for p in parts)
+            full_text = _extract_text_from_file(assembled, store["filename"]).strip()
+        except Exception as e:
+            logger.exception("Assemble/decode file chunks failed")
+            raise HTTPException(status_code=400, detail=f"File assembly or extraction failed: {e}")
+    else:
+        full_text = "".join(parts).strip()
+
+    if len(full_text) < 50:
+        raise HTTPException(status_code=400, detail="Assembled report has fewer than 50 characters.")
+    openai_key = _get_openai_key()
+    anthropic_key = _get_anthropic_key()
+    return _run_reverse_engineer_maybe_chunked(full_text, openai_key=openai_key, anthropic_key=anthropic_key)
 
 
 # Sample PDF for testing: place a file named "sample_market_research_report.pdf" in project root
