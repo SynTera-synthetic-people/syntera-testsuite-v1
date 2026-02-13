@@ -522,6 +522,10 @@ async function loadSamplePdfText() {
 
 let lastMarketResearchData = null;
 
+// Keep request body under ~900KB to avoid 413 Request Entity Too Large (proxy default 1MB)
+var MAX_UPLOAD_CHARS = 300000;
+var MAX_UPLOAD_FILE_BYTES = 900 * 1024;
+
 async function runMarketResearchReverseEngineer() {
     const textEl = document.getElementById('market-research-report-text');
     const fileEl = document.getElementById('market-research-file');
@@ -541,15 +545,27 @@ async function runMarketResearchReverseEngineer() {
         let body;
         let contentType;
         const file = fileEl?.files[0];
-        const reportText = (textEl?.value || '').trim();
+        let reportText = (textEl?.value || '').trim();
 
         if (file && file.size > 0) {
+            if (file.size > MAX_UPLOAD_FILE_BYTES) {
+                statusEl.textContent = 'File too large (max ~900 KB). Paste report text instead or use a shorter file to avoid upload limits.';
+                statusEl.className = 'market-research-status error';
+                return;
+            }
             const formData = new FormData();
             formData.append('file', file);
-            if (reportText.length >= 50) formData.append('report_text', reportText);
+            if (reportText.length >= 50) {
+                if (reportText.length > MAX_UPLOAD_CHARS) reportText = reportText.substring(0, MAX_UPLOAD_CHARS);
+                formData.append('report_text', reportText);
+            }
             body = formData;
             contentType = undefined;
         } else if (reportText.length >= 50) {
+            if (reportText.length > MAX_UPLOAD_CHARS) {
+                reportText = reportText.substring(0, MAX_UPLOAD_CHARS);
+                showNotification('Report truncated to ' + MAX_UPLOAD_CHARS + ' characters to fit upload limit.', 'info');
+            }
             body = JSON.stringify({ report_text: reportText });
             contentType = 'application/json';
         } else {
@@ -2066,6 +2082,11 @@ async function compareFiles() {
     
     if (!validExtensions.includes(synExt) || !validExtensions.includes(realExt)) {
         showNotification('Invalid file type. Please upload Excel (.xlsx, .xls) or CSV (.csv) files only.', 'error');
+        return;
+    }
+    if ((syntheticFile.size || 0) > (typeof MAX_UPLOAD_FILE_BYTES !== 'undefined' ? MAX_UPLOAD_FILE_BYTES : 900 * 1024) ||
+        (realFile.size || 0) > (typeof MAX_UPLOAD_FILE_BYTES !== 'undefined' ? MAX_UPLOAD_FILE_BYTES : 900 * 1024)) {
+        showNotification('One or both files are too large (max ~900 KB each) to avoid upload limits. Use smaller files.', 'error');
         return;
     }
     

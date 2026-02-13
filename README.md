@@ -46,10 +46,21 @@ docker-compose -f deployment/docker-compose.yml up -d
 
 ### Production: "Request Entity Too Large" (413)
 
-If you see **413 Request Entity Too Large** when uploading files or pasting large report text (e.g. Market Research), the limit is usually set by your **reverse proxy** (e.g. Nginx), not the app.
+If you see **413 Request Entity Too Large** when uploading files or pasting large report text (e.g. Market Research), the limit is set by your **reverse proxy**, not the app.
 
-- **Nginx:** In your `server` or `http` block add: `client_max_body_size 50M;` then reload nginx. See `deployment/nginx.conf.example`.
-- **Other proxies:** Increase the allowed request body size (e.g. 50MB) for the app’s location.
+**Nginx quick fix:**
+
+1. Edit your site config (e.g. `/etc/nginx/sites-available/your-site`) and inside the `server { ... }` block add one line:
+   ```nginx
+   client_max_body_size 50M;
+   ```
+2. Or include the snippet: `include /path/to/deployment/nginx-client-max-body.conf;`
+3. Test and reload:
+   ```bash
+   sudo nginx -t && sudo systemctl reload nginx
+   ```
+
+See `deployment/nginx.conf.example` for a full server block. **Other proxies** (Caddy, Apache, cloud load balancer): increase the allowed request body size to at least 50MB for the app.
 
 ## Features
 - 8 Statistical tests
