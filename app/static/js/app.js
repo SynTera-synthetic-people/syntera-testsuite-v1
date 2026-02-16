@@ -796,23 +796,45 @@ function parseQuestionnaireFromRaw(rawSectionC) {
 }
 
 /**
- * Get questionnaire list for display/export: parse from raw first, else use API structured data.
+ * If value is a percentage (e.g. "45%") and sample_size_n is set, compute count and show number first: No. of respondents * %.
+ * Returns e.g. "225 (45%)" when n=500, so the numeric count is the main output; else returns value as-is.
+ */
+function formatOptionValueWithCount(val, sampleSizeN) {
+    if (val == null || val === '') return val;
+    var s = String(val).trim();
+    var pctMatch = s.match(/^(\d+(?:\.\d+)?)\s*%$/);
+    if (pctMatch && sampleSizeN > 0) {
+        var pct = parseFloat(pctMatch[1]);
+        var count = Math.round(sampleSizeN * pct / 100);
+        return count + ' (' + s + ')';
+    }
+    return s;
+}
+
+/**
+ * Get questionnaire list for display/export: prefer API structured data (includes option_values), else parse from raw.
  */
 function getQuestionnaireList(data) {
-    const raw = data.raw_markdown || '';
-    const sections = parseRawMarkdownSections(raw);
-    let list = parseQuestionnaireFromRaw(sections.questionnaire);
-    if (list.length === 0) {
-        list = (data.reconstructed_questionnaire || []).map(q => {
+    const structured = data.reconstructed_questionnaire || [];
+    if (structured.length > 0) {
+        const overallN = (data.overall_sample_size_n != null && data.overall_sample_size_n > 0) ? parseInt(data.overall_sample_size_n, 10) : null;
+        return structured.map(q => {
             const opts = Array.isArray(q.answer_options) ? q.answer_options : [];
+            const vals = Array.isArray(q.option_values) ? q.option_values : [];
+            const qN = q.sample_size_n != null && q.sample_size_n > 0 ? parseInt(q.sample_size_n, 10) : null;
+            const n = qN != null ? qN : overallN;
             return {
                 survey_question: stripMarkdownBold(q.survey_question || ''),
                 question_type: stripMarkdownBold(q.question_type || ''),
-                answer_options: opts.map(o => stripMarkdownBold(String(o))).filter(o => o)
+                answer_options: opts.map(o => stripMarkdownBold(String(o))).filter(o => o),
+                option_values: vals.map(v => stripMarkdownBold(String(v))).filter(v => v !== undefined && v !== null),
+                sample_size_n: n
             };
         });
     }
-    return list;
+    const raw = data.raw_markdown || '';
+    const sections = parseRawMarkdownSections(raw);
+    return parseQuestionnaireFromRaw(sections.questionnaire);
 }
 
 function renderMarketResearchOutput(data, objectivesEl, questionnaireEl) {
@@ -847,10 +869,22 @@ function renderMarketResearchOutput(data, objectivesEl, questionnaireEl) {
     questionnaireList.forEach((q, i) => {
         questionnaireHtml += '<div class="mre-q-item mre-q-survey-only">';
         questionnaireHtml += '<div class="mre-q-survey">Question ' + (i + 1) + ': ' + escapeHtml(q.survey_question || '') + '</div>';
-        if (Array.isArray(q.answer_options) && q.answer_options.length) {
-            questionnaireHtml += '<div class="mre-q-options-label">Options:</div>';
+        const opts = Array.isArray(q.answer_options) ? q.answer_options : [];
+        const vals = Array.isArray(q.option_values) ? q.option_values : [];
+        const n = q.sample_size_n;
+        const hasValues = vals.length > 0;
+        if (opts.length) {
+            questionnaireHtml += '<div class="mre-q-options-label">' + (hasValues ? 'Options & value from report' + (n ? ' (n=' + n + ')' : '') : 'Options') + ':</div>';
             questionnaireHtml += '<ul class="mre-q-options-list">';
-            q.answer_options.forEach(opt => { questionnaireHtml += '<li>' + escapeHtml(opt) + '</li>'; });
+            opts.forEach(function(opt, j) {
+                const val = vals[j];
+                if (hasValues && val !== undefined && val !== '') {
+                    const displayVal = formatOptionValueWithCount(val, n);
+                    questionnaireHtml += '<li><span class="mre-q-opt-text">' + escapeHtml(opt) + '</span> <span class="mre-q-opt-value">' + escapeHtml(displayVal) + '</span></li>';
+                } else {
+                    questionnaireHtml += '<li>' + escapeHtml(opt) + '</li>';
+                }
+            });
             questionnaireHtml += '</ul>';
         }
         questionnaireHtml += '</div>';
@@ -953,11 +987,17 @@ function downloadMarketResearchPdf() {
                     y += lineH;
                 });
                 const opts = Array.isArray(q.answer_options) ? q.answer_options : [];
+                const vals = Array.isArray(q.option_values) ? q.option_values : [];
+                const n = q.sample_size_n;
+                const hasV = vals.length > 0;
                 if (opts.length > 0) {
                     y += 2;
-                    opts.forEach(opt => {
+                    opts.forEach((opt, j) => {
                         const optStr = (opt || '').trim();
-                        const optLines = doc.splitTextToSize('• ' + optStr, maxWOpt);
+                        const rawVal = (hasV && vals[j] != null && vals[j] !== '') ? String(vals[j]).trim() : '';
+                        const valStr = formatOptionValueWithCount(rawVal, n);
+                        const lineStr = valStr ? '• ' + optStr + ' — ' + valStr : '• ' + optStr;
+                        const optLines = doc.splitTextToSize(lineStr, maxWOpt);
                         optLines.forEach(line => {
                             newPageIfNeeded(1);
                             doc.text(line, margin + optIndent, y);
@@ -988,20 +1028,25 @@ function downloadMarketResearchCsv() {
         return;
     }
     const questionnaire = getQuestionnaireList(lastMarketResearchData);
-    const headers = ['Q No.', 'Question Description', 'Options'];
+    const hasAnyValues = questionnaire.some(q => Array.isArray(q.option_values) && q.option_values.length > 0);
+    const headers = hasAnyValues ? ['Q No.', 'Question Description', 'Options', 'Value from report'] : ['Q No.', 'Question Description', 'Options'];
     const rows = [];
     questionnaire.forEach((q, i) => {
         const qNo = i + 1;
         const desc = (q.survey_question || '').trim().replace(/^["']+|["']+$/g, '');
-        const opts = Array.isArray(q.answer_options) && q.answer_options.length ? q.answer_options : [];
+        const opts = Array.isArray(q.answer_options) ? q.answer_options : [];
+        const vals = Array.isArray(q.option_values) ? q.option_values : [];
+        const n = q.sample_size_n;
         if (opts.length === 0) {
-            rows.push([qNo, desc, '']);
+            rows.push(hasAnyValues ? [qNo, desc, '', ''] : [qNo, desc, '']);
         } else {
             opts.forEach((opt, j) => {
                 const optVal = (opt || '').trim().replace(/^["']+|["']+$/g, '');
+                const rawReportVal = (vals[j] != null && vals[j] !== '') ? String(vals[j]).trim() : '';
+                const reportVal = formatOptionValueWithCount(rawReportVal, n).replace(/^["']+|["']+$/g, '');
                 const rowQNo = j === 0 ? qNo : '';
                 const rowDesc = j === 0 ? desc : '';
-                rows.push([rowQNo, rowDesc, optVal]);
+                rows.push(hasAnyValues ? [rowQNo, rowDesc, optVal, reportVal] : [rowQNo, rowDesc, optVal]);
             });
         }
     });

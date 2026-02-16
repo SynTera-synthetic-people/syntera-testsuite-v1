@@ -101,11 +101,14 @@ def _get_anthropic_key() -> Optional[str]:
 # Shorter prompt to reduce input tokens (API cost). Output format must stay for parser.
 REVERSE_ENGINEER_SYSTEM_PROMPT = """You are a Market Research Methodologist. Reverse-engineer the research design from the report.
 
-Tasks: (1) Infer overall research objectives. (2) Section-wise objectives per report section. (3) For each chart/insight: latent question, survey question, answer options (MCQ/Likert), target segment, expected output pattern. Use plain text only (no **). Do not copy report sentences as questions.
+CRITICAL: List EVERY survey question in the report. One block per question. Do not skip or merge. Use short lines so you can fit all questions. Prefer more questions over long text.
+
+Tasks: (1) Infer overall research objectives and overall sample size if stated. (2) Section-wise objectives. (3) For EACH chart/table/finding: one block with survey question, options, and numeric values.
 
 Output exactly this format:
 
 A. Overall Research Objectives
+- Overall sample size (n): (integer if report states total respondents anywhere, e.g. 1000; else omit this line)
 - Objective 1
 - Objective 2
 
@@ -113,18 +116,23 @@ B. Section-wise Objectives
 - Section Name: Research Objective
 
 C. Reconstructed Questionnaire
-For each question:
-- Report Reference: (e.g. Figure 4, Page 11)
+For EVERY question (one block each; be exhaustive):
+- Report Reference: (e.g. Figure 4)
 - Research Intent: (one line)
 - Survey Question: (exact question text)
-- Question Type: Single choice / Multiple choice / Likert scale / Ranking
+- Question Type: Single choice / Multiple choice / Likert scale
 - Answer Options:
   - Option 1
   - Option 2
-- Target Segment: (e.g. All respondents / Urban / Gen Z)
-- Expected Output Pattern: (chart or insight type)
+- Report Output: (numeric values from report: prefer counts e.g. 225, or if only % given use e.g. 45% and we will compute count from n)
+  - 225
+  - 150
+  - 125
+- Sample size (n): (integer for this question if stated; else repeat overall n from A if known)
+- Target Segment: (e.g. All respondents)
+- Expected Output Pattern: (e.g. Bar chart)
 
-Rules: Plain text only. Convert insights to original survey questions. Group related charts under one theme."""
+Rules: Plain text only. Output numeric counts when the report gives them; if only % is given, output the % and include Sample size (n). List every question."""
 
 
 class ReverseEngineerRequest(BaseModel):
@@ -155,12 +163,15 @@ class ReconstructedQuestion(BaseModel):
     survey_question: str = ""
     question_type: str = ""
     answer_options: list[str] = Field(default_factory=list)
+    option_values: list[str] = Field(default_factory=list, description="Quantitative values from report per option (e.g. 45%, n=120)")
+    sample_size_n: Optional[int] = Field(None, description="Total respondents for this question when report states it; used to compute counts from %")
     target_segment: str = ""
     expected_output_pattern: str = ""
 
 
 class ReverseEngineerResponse(BaseModel):
     overall_objectives: list[str] = Field(default_factory=list)
+    overall_sample_size_n: Optional[int] = Field(None, description="Total respondents from report when stated once; used to compute counts from %")
     section_objectives: list[SectionObjective] = Field(default_factory=list)
     reconstructed_questionnaire: list[ReconstructedQuestion] = Field(default_factory=list)
     raw_markdown: Optional[str] = None  # Full AI output when using LLM
@@ -251,7 +262,7 @@ def _call_openai(report_text: str, api_key: Optional[str] = None) -> str:
                 {"role": "user", "content": f"Input Report:\n\n{report_to_send}"}
             ],
             temperature=0.3,
-            max_tokens=2048,
+            max_tokens=8192,
         )
         content = response.choices[0].message.content if response.choices else None
         if isinstance(content, list):
@@ -282,7 +293,7 @@ def _call_anthropic(report_text: str, api_key: Optional[str] = None) -> str:
         model = _settings.ANTHROPIC_MODEL or os.getenv("ANTHROPIC_MODEL", "claude-sonnet-4-20250514")
         response = client.messages.create(
             model=model,
-            max_tokens=2048,
+            max_tokens=8192,
             system=REVERSE_ENGINEER_SYSTEM_PROMPT,
             messages=[{"role": "user", "content": f"Input Report:\n\n{report_to_send}"}],
         )
@@ -318,19 +329,51 @@ def _strip_markdown_bold(s: str) -> str:
     return s
 
 
-def _parse_structured_output(raw: str) -> tuple[list[str], list[dict], list[dict]]:
-    """Parse raw markdown into overall_objectives, section_objectives, reconstructed_questionnaire."""
+def _extract_overall_sample_size(report_text: str) -> Optional[int]:
+    """Try to find total sample size from report text (e.g. n=1000, 1,000 respondents)."""
+    if not report_text or len(report_text) < 20:
+        return None
+    # n=1000, n = 1000, N=500, (n=500), sample size 1000, 1,000 respondents, 500 participants
+    patterns = [
+        r"\bn\s*=\s*([0-9,]+)",
+        r"\bN\s*=\s*([0-9,]+)",
+        r"\(n\s*=\s*([0-9,]+)\)",
+        r"sample\s+size\s+(?:of\s+)?([0-9,]+)",
+        r"([0-9,]+)\s+respondents",
+        r"([0-9,]+)\s+participants",
+        r"total\s+(?:of\s+)?([0-9,]+)\s+(?:respondents|participants|samples)",
+    ]
+    for pat in patterns:
+        m = re.search(pat, report_text[:15000], re.IGNORECASE)
+        if m:
+            try:
+                n = int(m.group(1).replace(",", ""))
+                if 10 <= n <= 10000000:
+                    return n
+            except ValueError:
+                continue
+    return None
+
+
+def _parse_structured_output(raw: str) -> tuple[list[str], Optional[int], list[dict], list[dict]]:
+    """Parse raw markdown into overall_objectives, overall_sample_size_n, section_objectives, reconstructed_questionnaire."""
     overall = []
+    overall_n: Optional[int] = None
     sections = []
     questions = []
 
-    # A. Overall Research Objectives
+    # A. Overall Research Objectives (and optional Overall sample size (n):)
     block_a = re.search(r"A\.\s*Overall Research Objectives\s*(.*?)(?=B\.|$)", raw, re.DOTALL | re.IGNORECASE)
     if block_a:
         text = block_a.group(1).strip()
         for line in text.split("\n"):
             line = line.strip()
-            if line.startswith("-") and len(line) > 2:
+            if re.match(r"^-\s*Overall sample size\s*\(n\):\s*(\d+)", line, re.IGNORECASE):
+                try:
+                    overall_n = int(re.search(r"(\d+)", line).group(1))
+                except (ValueError, AttributeError):
+                    pass
+            elif line.startswith("-") and len(line) > 2 and "Overall sample size" not in line:
                 overall.append(line[1:].strip())
 
     # B. Section-wise Objectives
@@ -360,20 +403,38 @@ def _parse_structured_output(raw: str) -> tuple[list[str], list[dict], list[dict
                 continue
             q = {}
             for key, pattern in [
-                ("report_reference", r"Report Reference:\s*(.*?)(?=Research Intent:|$)", re.DOTALL),
-                ("research_intent", r"Research Intent:\s*(.*?)(?=Survey Question:|$)", re.DOTALL),
-                ("survey_question", r"Survey Question:\s*(.*?)(?=Question Type:|$)", re.DOTALL),
-                ("question_type", r"Question Type:\s*(.*?)(?=Answer Options:|$)", re.DOTALL),
-                ("answer_options", r"Answer Options:\s*(.*?)(?=Target Segment:|Expected Output|$)", re.DOTALL),
-                ("target_segment", r"Target Segment:\s*(.*?)(?=Expected Output|$)", re.DOTALL),
-                ("expected_output_pattern", r"Expected Output Pattern:\s*(.*?)(?=Report Output:|-\s*Report Reference:|\Z)", re.DOTALL),
+                ("report_reference", r"Report Reference:\s*(.*?)(?=Research Intent:|$)"),
+                ("research_intent", r"Research Intent:\s*(.*?)(?=Survey Question:|$)"),
+                ("survey_question", r"Survey Question:\s*(.*?)(?=Question Type:|$)"),
+                ("question_type", r"Question Type:\s*(.*?)(?=Answer Options:|$)"),
+                ("answer_options", r"Answer Options:\s*(.*?)(?=Report Output:|Target Segment:|Expected Output|$)"),
+                ("option_values", r"Report Output:\s*(.*?)(?=Sample size|Target Segment:|Expected Output|-\s*Report Reference:|\Z)"),
+                ("sample_size_n", r"Sample size\s*\(n\):\s*(\d+)"),
+                ("target_segment", r"Target Segment:\s*(.*?)(?=Expected Output|$)"),
+                ("expected_output_pattern", r"Expected Output Pattern:\s*(.*?)(?=Report Output:|-\s*Report Reference:|\Z)"),
             ]:
-                m = re.search(pattern, blk, re.IGNORECASE)
+                m = re.search(pattern, blk, re.IGNORECASE | re.DOTALL)
                 if m:
                     val = m.group(1).strip()
                     if key == "answer_options":
                         opts = [_strip_markdown_bold(o.strip()) for o in re.split(r"[\n-]", val) if o.strip() and o.strip() != "Option"]
                         q[key] = [o for o in opts if o]
+                    elif key == "option_values":
+                        # Parse lines like "45%" or "- 45%" or "Option A: 45%" -> take the value part
+                        lines = [ln.strip() for ln in re.split(r"[\n-]", val) if ln.strip()]
+                        values = []
+                        for ln in lines:
+                            ln = _strip_markdown_bold(ln)
+                            if ":" in ln:
+                                ln = ln.split(":", 1)[1].strip()
+                            if ln:
+                                values.append(ln)
+                        q[key] = values
+                    elif key == "sample_size_n":
+                        try:
+                            q[key] = int(val.strip()) if val.strip() else None
+                        except ValueError:
+                            q[key] = None
                     else:
                         q[key] = _strip_markdown_bold(val)
             if q.get("survey_question") or q.get("research_intent"):
@@ -383,11 +444,13 @@ def _parse_structured_output(raw: str) -> tuple[list[str], list[dict], list[dict
                     "survey_question": _strip_markdown_bold(q.get("survey_question", "")),
                     "question_type": _strip_markdown_bold(q.get("question_type", "")),
                     "answer_options": q.get("answer_options", []),
+                    "option_values": q.get("option_values", []),
+                    "sample_size_n": q.get("sample_size_n"),
                     "target_segment": _strip_markdown_bold(q.get("target_segment", "")),
                     "expected_output_pattern": _strip_markdown_bold(q.get("expected_output_pattern", "")),
                 })
 
-    return overall, sections, questions
+    return overall, overall_n, sections, questions
 
 
 def _heuristic_reverse_engineer(report_text: str) -> tuple[list[str], list[dict], list[dict], str]:
@@ -419,6 +482,8 @@ def _heuristic_reverse_engineer(report_text: str) -> tuple[list[str], list[dict]
         "survey_question": "Upload the report and set OPENAI_API_KEY for full questionnaire reconstruction.",
         "question_type": "Single choice / Multiple choice / Likert scale (inferred by AI)",
         "answer_options": ["Option 1", "Option 2", "..."],
+        "option_values": [],
+        "sample_size_n": None,
         "target_segment": "All respondents / Urban / Rest of India / Gen Z / etc.",
         "expected_output_pattern": "Bar chart, pie chart, or insight table matching report.",
     })
@@ -470,11 +535,11 @@ def _run_reverse_engineer(
             raw_md = call_llm(text, api_key=key)
             if raw_md and len(raw_md.strip()) > 0:
                 try:
-                    overall, section_objs, questionnaire = _parse_structured_output(raw_md)
+                    overall, overall_n, section_objs, questionnaire = _parse_structured_output(raw_md)
                 except Exception as parse_err:
                     logger.warning("Parse of %s output failed, using fallback structure: %s", name, parse_err)
                     h_overall, h_sections, h_questions, _ = _heuristic_reverse_engineer(text)
-                    overall, section_objs, questionnaire = h_overall, h_sections, h_questions
+                    overall, overall_n, section_objs, questionnaire = [], None, h_sections, h_questions
                 ai_used = True
                 break
         except ValueError as e:
@@ -489,10 +554,22 @@ def _run_reverse_engineer(
             bool(anthropic_key and anthropic_key.strip().startswith("sk-ant-")),
         )
         overall, section_objs, questionnaire, raw_md = _heuristic_reverse_engineer(text)
+        overall_n = None
+    # Use overall n from parser, or extract from report text when LLM didn't return it
+    if overall_n is None and text:
+        overall_n = _extract_overall_sample_size(text)
+    # Fill per-question sample_size_n when missing but we have overall n and question has % values
+    _pct_re = re.compile(r"^\s*\d+(?:\.\d+)?\s*%\s*$")
+    for q in questionnaire:
+        if q.get("sample_size_n") is None and overall_n is not None:
+            vals = q.get("option_values") or []
+            if vals and any(_pct_re.match(str(v).strip()) for v in vals):
+                q["sample_size_n"] = overall_n
     section_objectives = [SectionObjective(section_name=s["section_name"], research_objective=s["research_objective"]) for s in section_objs]
     reconstructed = [ReconstructedQuestion(**q) for q in questionnaire]
     result = {
         "overall_objectives": overall,
+        "overall_sample_size_n": overall_n,
         "section_objectives": [s.model_dump() for s in section_objectives],
         "reconstructed_questionnaire": [q.model_dump() for q in reconstructed],
         "raw_markdown": raw_md,
@@ -529,6 +606,7 @@ def _merge_chunk_results(results: list[dict]) -> dict:
     if not results:
         return {
             "overall_objectives": [],
+            "overall_sample_size_n": None,
             "section_objectives": [],
             "reconstructed_questionnaire": [],
             "raw_markdown": "",
@@ -553,19 +631,24 @@ def _merge_chunk_results(results: list[dict]) -> dict:
             if name and name not in seen_section:
                 seen_section.add(name)
                 sections.append(s)
+    # Dedupe by report_reference + survey_question so we keep all distinct questions (different ref or different text)
     seen_question = set()
     questions = []
     for r in results:
         for q in r.get("reconstructed_questionnaire") or []:
-            sq = (q.get("survey_question") or "").strip().lower()[:300]
-            if sq and sq not in seen_question:
-                seen_question.add(sq)
+            ref = (q.get("report_reference") or "").strip()[:100]
+            sq = (q.get("survey_question") or "").strip()
+            key = (ref + "\n" + sq).lower()[:500]
+            if key and key not in seen_question:
+                seen_question.add(key)
                 questions.append(q)
     raw_parts = [r.get("raw_markdown") or "" for r in results if r.get("raw_markdown")]
     ai_used = any(r.get("ai_used") for r in results)
     raw_merged = "\n\n".join(f"--- Part {i+1} ---\n\n{p}" for i, p in enumerate(raw_parts)) if raw_parts else ""
+    overall_n = next((r.get("overall_sample_size_n") for r in results if r.get("overall_sample_size_n") is not None), None)
     return {
         "overall_objectives": overall,
+        "overall_sample_size_n": overall_n,
         "section_objectives": sections,
         "reconstructed_questionnaire": questions,
         "raw_markdown": raw_merged,

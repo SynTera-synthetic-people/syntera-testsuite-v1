@@ -4434,6 +4434,12 @@ input[type="checkbox"] {
     margin-top: 4px;
 }
 
+.mre-q-opt-value {
+    font-weight: 600;
+    color: #67e8f9;
+    margin-left: 6px;
+}
+
 .mre-raw-section {
     margin: 0;
     padding: 16px;
