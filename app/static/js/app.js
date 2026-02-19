@@ -513,7 +513,8 @@ async function loadIndustrySurveys() {
         const tierColors = {
             'TIER_1': '#10b981',
             'TIER_2': '#f59e0b',
-            'TIER_3': '#ef4444'
+            'TIER_3': '#ef4444',
+            'TIER_4': '#7c3aed'
         };
         const tierColor = tierColors[survey.tier] || '#6b7280';
         
@@ -1243,7 +1244,8 @@ async function loadReports(page = 1) {
             const tierColors = {
                 'TIER_1': '#10b981',
                 'TIER_2': '#f59e0b',
-                'TIER_3': '#ef4444'
+                'TIER_3': '#ef4444',
+                'TIER_4': '#7c3aed'
             };
             const tierColor = tierColors[tier] || '#6b7280';
             const validatedDate = s.validated_at ? new Date(s.validated_at).toLocaleDateString() : 'N/A';
@@ -1261,6 +1263,7 @@ async function loadReports(page = 1) {
             const tier1Tests = tests.filter(t => t.tier === 'TIER_1' && !t.error).length;
             const tier2Tests = tests.filter(t => t.tier === 'TIER_2' && !t.error).length;
             const tier3Tests = tests.filter(t => t.tier === 'TIER_3' && !t.error).length;
+            const tier4Tests = tests.filter(t => t.tier === 'TIER_4' && !t.error).length;
             const totalTests = tests.filter(t => !t.error).length;
             
             // Get file info for seed characteristics
@@ -1350,6 +1353,10 @@ async function loadReports(page = 1) {
                                 <div class="summary-stat">
                                     <span class="summary-label">Tier 3</span>
                                     <span class="summary-value" style="color: #ef4444;">${tier3Tests}</span>
+                                </div>
+                                <div class="summary-stat">
+                                    <span class="summary-label">Tier 4</span>
+                                    <span class="summary-value" style="color: #7c3aed;">${tier4Tests}</span>
                                 </div>
                             </div>
                         </div>
@@ -1906,7 +1913,8 @@ function displaySemilatticeStyleResults(data, surveyId, targetDiv) {
     const tierColors = {
         'TIER_1': '#10b981',
         'TIER_2': '#f59e0b',
-        'TIER_3': '#ef4444'
+        'TIER_3': '#ef4444',
+        'TIER_4': '#7c3aed'
     };
     const tierColor = tierColors[tier] || '#6b7280';
     
@@ -2065,7 +2073,7 @@ function displaySemilatticeStyleResults(data, surveyId, targetDiv) {
                 </div>
             </div>
             <div class="methodology-note">
-                <strong>Note:</strong> Each test provides a match score (0-100%) and tier classification (TIER_1: Excellent, TIER_2: Good, TIER_3: Needs Improvement). 
+                <strong>Note:</strong> Each test provides a match score (0-100%) and tier classification (TIER_1: >85%, TIER_2: >75%, TIER_3: >50%, TIER_4: ≤50%). 
                 The overall accuracy is calculated as the average of all test match scores.
             </div>
         </div>
@@ -2083,13 +2091,16 @@ function displaySemilatticeStyleResults(data, surveyId, targetDiv) {
     const tier1Count = questionComparisons.length > 0 ? questionComparisons.filter(q => q.tier === 'TIER_1').length : (data.tests ? data.tests.filter(t => t.tier === 'TIER_1').length : 0);
     const tier2Count = questionComparisons.length > 0 ? questionComparisons.filter(q => q.tier === 'TIER_2').length : 0;
     const tier3Count = questionComparisons.length > 0 ? questionComparisons.filter(q => q.tier === 'TIER_3').length : 0;
+    const tier4Count = questionComparisons.length > 0 ? questionComparisons.filter(q => q.tier === 'TIER_4').length : (data.tests ? data.tests.filter(t => t.tier === 'TIER_4').length : 0);
     const totalQuestions = questionComparisons.length > 0 ? questionComparisons.length : (fileInfo.synthetic_question_count || fileInfo.real_question_count || 0);
     const tier1Percent = totalQuestions > 0 ? (tier1Count / totalQuestions * 100).toFixed(0) : 0;
     const tier2Percent = totalQuestions > 0 ? (tier2Count / totalQuestions * 100).toFixed(0) : 0;
+    const tier3Percent = totalQuestions > 0 ? (tier3Count / totalQuestions * 100).toFixed(0) : 0;
+    const tier4Percent = totalQuestions > 0 ? (tier4Count / totalQuestions * 100).toFixed(0) : 0;
     
     // Get tier emoji and description
-    const tierEmoji = tier === 'TIER_1' ? '🎯' : tier === 'TIER_2' ? '✨' : '📊';
-    const tierDesc = tier === 'TIER_1' ? 'Excellent Match' : tier === 'TIER_2' ? 'Good Match' : 'Needs Improvement';
+    const tierEmoji = tier === 'TIER_1' ? '🎯' : tier === 'TIER_2' ? '✨' : tier === 'TIER_3' ? '📊' : '⚠️';
+    const tierDesc = tier === 'TIER_1' ? 'Excellent Match' : tier === 'TIER_2' ? 'Good Match' : tier === 'TIER_3' ? 'Needs Improvement' : 'Needs Significant Improvement';
     
     
     // Question-by-question table with option-level comparison and sparklines
@@ -2566,7 +2577,8 @@ function displayValidationResults(data, surveyId, resultsDiv = null) {
     const tierColors = {
         'TIER_1': '#10b981',
         'TIER_2': '#f59e0b',
-        'TIER_3': '#ef4444'
+        'TIER_3': '#ef4444',
+        'TIER_4': '#7c3aed'
     };
     const tierColor = tierColors[tier] || '#6b7280';
     
@@ -2575,7 +2587,7 @@ function displayValidationResults(data, surveyId, resultsDiv = null) {
     if (data.tests && data.tests.length > 0) {
         // Filter out error tests and sort by tier (best first)
         const validTests = data.tests.filter(t => !t.error && t.tier).sort((a, b) => {
-            const tierOrder = { 'TIER_1': 1, 'TIER_2': 2, 'TIER_3': 3 };
+            const tierOrder = { 'TIER_1': 1, 'TIER_2': 2, 'TIER_3': 3, 'TIER_4': 4 };
             return (tierOrder[a.tier] || 99) - (tierOrder[b.tier] || 99);
         });
         
@@ -2584,8 +2596,8 @@ function displayValidationResults(data, surveyId, resultsDiv = null) {
             const testTierColor = tierColors[testTier] || '#6b7280';
             const metrics = formatTestMetrics(test);
             
-            const tierEmoji = testTier === 'TIER_1' ? '✅' : testTier === 'TIER_2' ? '⚠️' : '❌';
-            const tierText = testTier === 'TIER_1' ? 'Excellent' : testTier === 'TIER_2' ? 'Good' : 'Needs Work';
+            const tierEmoji = testTier === 'TIER_1' ? '✅' : testTier === 'TIER_2' ? '⚠️' : testTier === 'TIER_3' ? '❌' : '🔴';
+            const tierText = testTier === 'TIER_1' ? 'Excellent' : testTier === 'TIER_2' ? 'Good' : testTier === 'TIER_3' ? 'Needs Work' : 'Poor Match';
             
             testsHtml += `
                 <div class="test-item-simple">
@@ -2622,6 +2634,12 @@ function displayValidationResults(data, surveyId, resultsDiv = null) {
                 title: 'Needs Improvement', 
                 description: 'Significant differences detected. Consider refining your synthetic data generation.',
                 color: '#ef4444'
+            },
+            'TIER_4': { 
+                icon: '🔴', 
+                title: 'Needs Significant Improvement', 
+                description: 'Poor match. Review detailed results and adjust your data generation strategy.',
+                color: '#7c3aed'
             }
         };
         return descriptions[tier] || { icon: '❓', title: 'Unknown', description: '', color: '#6b7280' };
@@ -2709,7 +2727,7 @@ function displayValidationResults(data, surveyId, resultsDiv = null) {
     }
     
     const tierInfo = getTierDescription(tier);
-    const progressPercent = tier === 'TIER_1' ? 95 : tier === 'TIER_2' ? 75 : 50;
+    const progressPercent = tier === 'TIER_1' ? 95 : tier === 'TIER_2' ? 80 : tier === 'TIER_3' ? 60 : 30;
     
     // Count successful tests
     const successfulTests = data.tests ? data.tests.filter(t => t.tier && !t.error).length : 0;
@@ -2808,12 +2826,20 @@ function displayValidationResults(data, surveyId, resultsDiv = null) {
                     <li>Adjusting parameters to better match real patterns</li>
                     <li>Collecting more training data if possible</li>
                 </ul>
-            ` : `
+            ` : tier === 'TIER_3' ? `
                 <p>Your synthetic data needs improvement. There are significant differences from real data. Consider:</p>
                 <ul>
                     <li>Revisiting your data generation model</li>
                     <li>Checking for systematic biases</li>
                     <li>Using different generation techniques</li>
+                    <li>Consulting with data science experts</li>
+                </ul>
+            ` : `
+                <p>Your synthetic data needs significant improvement. Match quality is below 50%. Consider:</p>
+                <ul>
+                    <li>Revisiting your data generation model and parameters</li>
+                    <li>Checking for systematic biases and data alignment</li>
+                    <li>Using different generation techniques or more representative training data</li>
                     <li>Consulting with data science experts</li>
                 </ul>
             `}

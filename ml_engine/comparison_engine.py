@@ -449,7 +449,7 @@ class ComparisonEngine:
                 "test": "data_validation",
                 "error": "One or both datasets are empty"
             })
-            results["overall_tier"] = "TIER_3"
+            results["overall_tier"] = "TIER_4"
             return results
         
         # Run all statistical tests
@@ -470,13 +470,14 @@ class ComparisonEngine:
         tiers = [t.get("tier") for t in results["tests"] if "tier" in t and "error" not in t]
         
         if len(tiers) == 0:
-            results["overall_tier"] = "TIER_3"
+            results["overall_tier"] = "TIER_4"
             return results
         
         tier_counts = {
             "TIER_1": tiers.count("TIER_1"),
             "TIER_2": tiers.count("TIER_2"),
-            "TIER_3": tiers.count("TIER_3")
+            "TIER_3": tiers.count("TIER_3"),
+            "TIER_4": tiers.count("TIER_4"),
         }
         
         # Calculate overall accuracy based on actual match scores from all tests
@@ -509,17 +510,15 @@ class ComparisonEngine:
         tier_1_ratio = tier_counts["TIER_1"] / len(tiers) if len(tiers) > 0 else 0
         tier_2_ratio = tier_counts["TIER_2"] / len(tiers) if len(tiers) > 0 else 0
         
-        # Determine overall tier using a combination of tier distribution and accuracy
-        # Prioritize accuracy score since it reflects actual match quality
-        # TIER_1: High accuracy (≥90%) OR (High tier ratio ≥70% AND accuracy ≥85%)
-        # TIER_2: Moderate accuracy (≥70%) OR (Moderate tier ratio ≥50% AND accuracy ≥65%)
-        # TIER_3: Everything else
-        if overall_accuracy_score >= 0.90 or (tier_1_ratio >= 0.70 and overall_accuracy_score >= 0.85):
+        # Overall tier by accuracy: >85% TIER_1, >75% TIER_2, >50% TIER_3, else TIER_4
+        if overall_accuracy_score > 0.85:
             overall_tier = "TIER_1"
-        elif overall_accuracy_score >= 0.70 or (tier_1_ratio + tier_2_ratio >= 0.50 and overall_accuracy_score >= 0.65):
+        elif overall_accuracy_score > 0.75:
             overall_tier = "TIER_2"
-        else:
+        elif overall_accuracy_score > 0.50:
             overall_tier = "TIER_3"
+        else:
+            overall_tier = "TIER_4"
         
         results["overall_tier"] = overall_tier
         results["overall_accuracy"] = overall_accuracy_score  # Store calculated accuracy
@@ -531,6 +530,7 @@ class ComparisonEngine:
             "tier_1_count": tier_counts["TIER_1"],
             "tier_2_count": tier_counts["TIER_2"],
             "tier_3_count": tier_counts["TIER_3"],
+            "tier_4_count": tier_counts["TIER_4"],
             "average_match_score": overall_accuracy_score,
             "tier_1_ratio": tier_1_ratio,
             "tier_2_ratio": tier_2_ratio,
@@ -542,10 +542,13 @@ class ComparisonEngine:
             recommendations.append(f"Your synthetic data is an excellent match for the real data (accuracy: {overall_accuracy_score:.1%}). It's ready for use in critical applications!")
         elif overall_tier == "TIER_2":
             recommendations.append(f"Your synthetic data shows a good match (accuracy: {overall_accuracy_score:.1%}), but there's room for improvement. Consider refining your data generation process or reviewing specific test results for areas to enhance.")
-            recommendations.append(f"Focus on tests that returned 'TIER_2' or 'TIER_3' (currently {tier_counts['TIER_2'] + tier_counts['TIER_3']} out of {len(tiers)} tests) to pinpoint specific discrepancies.")
-        else:  # TIER_3
-            recommendations.append(f"Your synthetic data needs significant improvement to match the real data (accuracy: {overall_accuracy_score:.1%}). Review the detailed test results to identify major discrepancies and adjust your data generation strategy.")
-            recommendations.append(f"Pay close attention to tests with 'TIER_3' status ({tier_counts['TIER_3']} out of {len(tiers)} tests) and consider generating more diverse or representative synthetic samples.")
+            recommendations.append(f"Focus on tests that returned 'TIER_2', 'TIER_3' or 'TIER_4' to pinpoint specific discrepancies.")
+        elif overall_tier == "TIER_3":
+            recommendations.append(f"Your synthetic data needs improvement to match the real data (accuracy: {overall_accuracy_score:.1%}). Review the detailed test results to identify discrepancies and adjust your data generation strategy.")
+            recommendations.append(f"Pay close attention to tests with 'TIER_3' or 'TIER_4' status and consider generating more diverse or representative synthetic samples.")
+        else:  # TIER_4
+            recommendations.append(f"Your synthetic data needs significant improvement (accuracy: {overall_accuracy_score:.1%}). Review the detailed test results to identify major discrepancies and adjust your data generation strategy.")
+            recommendations.append(f"Focus on tests with 'TIER_4' status ({tier_counts['TIER_4']} out of {len(tiers)} tests) and consider generating more diverse or representative synthetic samples.")
         
         results["recommendations"] = recommendations
         

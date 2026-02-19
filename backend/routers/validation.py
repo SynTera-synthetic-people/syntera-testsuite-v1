@@ -37,14 +37,16 @@ def _run_comparison(survey: Survey, synthetic: list[float], real: list[float], d
     
     # Fallback to tier-based accuracy if not calculated by engine
     if overall_accuracy is None or (isinstance(overall_accuracy, float) and math.isnan(overall_accuracy)):
-        overall_tier = results.get("overall_tier", "TIER_3")
-        # Use tier-based fallback with more granular values
+        overall_tier = results.get("overall_tier", "TIER_4")
+        # Use tier-based fallback: >85% TIER_1, >75% TIER_2, >50% TIER_3, else TIER_4
         if overall_tier == "TIER_1":
-            overall_accuracy = 0.90  # High accuracy, but not always 97.8%
+            overall_accuracy = 0.90
         elif overall_tier == "TIER_2":
-            overall_accuracy = 0.75  # Moderate accuracy
+            overall_accuracy = 0.80
+        elif overall_tier == "TIER_3":
+            overall_accuracy = 0.62
         else:
-            overall_accuracy = 0.55  # Lower accuracy for TIER_3
+            overall_accuracy = 0.45  # TIER_4
     
     # Ensure accuracy is a valid number
     overall_accuracy = float(overall_accuracy) if overall_accuracy is not None else 0.0
@@ -373,13 +375,15 @@ async def compare_files(
                         match_score = 0.0
                     match_score = max(0.0, min(1.0, float(match_score)))
                     
-                    # Determine tier based on match score
-                    if match_score >= 0.95:
+                    # Determine tier based on match score: >85% TIER_1, >75% TIER_2, >50% TIER_3, else TIER_4
+                    if match_score > 0.85:
                         tier = "TIER_1"
-                    elif match_score >= 0.85:
+                    elif match_score > 0.75:
                         tier = "TIER_2"
-                    else:
+                    elif match_score > 0.50:
                         tier = "TIER_3"
+                    else:
+                        tier = "TIER_4"
                     
                     # Build option-level comparison data
                     option_comparisons = []
@@ -431,9 +435,27 @@ async def compare_files(
         # Run comparison (this will set test_suite_report)
         result = _run_comparison(survey, synthetic_responses, real_responses, db)
         
-        # Add question comparisons to result
+        # When we have question-by-question comparisons, overall file accuracy = average of per-question match scores
+        # (not the engine's overall from global statistical tests, which can be much lower)
         if question_comparisons:
             result["question_comparisons"] = question_comparisons
+            scores = [float(q.get("match_score", 0)) for q in question_comparisons if q.get("match_score") is not None]
+            if scores:
+                file_overall_accuracy = sum(scores) / len(scores)
+                file_overall_accuracy = max(0.0, min(1.0, file_overall_accuracy))
+                file_tier = "TIER_1" if file_overall_accuracy > 0.85 else "TIER_2" if file_overall_accuracy > 0.75 else "TIER_3" if file_overall_accuracy > 0.50 else "TIER_4"
+                result["overall_accuracy"] = file_overall_accuracy
+                result["overall_tier"] = file_tier
+                survey.accuracy_score = file_overall_accuracy
+                survey.confidence_tier = file_tier
+                logger.info(f"File overall accuracy from {len(scores)} questions: {file_overall_accuracy:.1%} (tier: {file_tier})")
+                # Update latest ValidationRun for this survey to use file-based accuracy
+                last_run = db.query(ValidationRun).filter(ValidationRun.survey_id == survey.id).order_by(ValidationRun.id.desc()).first()
+                if last_run:
+                    last_run.overall_accuracy = file_overall_accuracy
+                    last_run.overall_tier = file_tier
+                    db.commit()
+                    db.refresh(survey)
         
         # Add file information to result
         result["file_info"] = {
@@ -463,6 +485,10 @@ async def compare_files(
                 # Create a new dict by copying existing data and adding question_comparisons
                 updated_report = dict(survey.test_suite_report)  # Copy existing dict
                 updated_report["question_comparisons"] = sanitized_qc  # Add question_comparisons
+                # Use file-based overall accuracy/tier (from question match scores), not engine's
+                if result.get("overall_accuracy") is not None and result.get("overall_tier"):
+                    updated_report["overall_accuracy"] = result["overall_accuracy"]
+                    updated_report["overall_tier"] = result["overall_tier"]
                 logger.info(f"Created updated test_suite_report with question_comparisons. Keys: {list(updated_report.keys())}")
             else:
                 # If test_suite_report is not a dict, initialize it with all data
@@ -474,7 +500,7 @@ async def compare_files(
                     "recommendations": result.get("recommendations", []),
                     "synthetic_size": result.get("synthetic_size", 0),
                     "real_size": result.get("real_size", 0),
-                    "overall_tier": result.get("overall_tier", "TIER_3"),
+                    "overall_tier": result.get("overall_tier", "TIER_4"),
                     "overall_accuracy": result.get("overall_accuracy", 0.0),
                 }
             
