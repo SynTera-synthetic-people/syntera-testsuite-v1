@@ -72,3 +72,30 @@ Prefer **environment variables** or **Secrets Manager → env** for production/s
 - `ENVIRONMENT`: set to `staging` or `production` as needed.
 
 See `.env.example` for the full list of optional variables.
+
+## Server deploy script and `git pull`
+
+If your server runs a deploy script that does `git pull origin main` inside the app directory, you may see:
+
+```text
+error: Your local changes to the following files would be overwritten by merge:
+    backend/routers/__pycache__/validation.cpython-312.pyc
+    ml_engine/__pycache__/comparison_engine.cpython-312.pyc
+Please commit your changes or stash them before you merge.
+```
+
+Those files are Python cache and are no longer tracked in the repo. To fix the deploy, **before** `git pull` in your server script, discard local changes under `__pycache__`:
+
+**Option A – run the script (from repo root):**
+```bash
+bash scripts/discard-pycache-before-pull.sh
+git pull origin main
+```
+
+**Option B – one-liner in your deploy script:**
+```bash
+git restore backend/routers/__pycache__/ ml_engine/__pycache__/ 2>/dev/null || git checkout -- backend/routers/__pycache__/ ml_engine/__pycache__/ 2>/dev/null || true
+git pull origin main
+```
+
+After the pull, `__pycache__` is ignored by `.gitignore` and will not block future pulls.
