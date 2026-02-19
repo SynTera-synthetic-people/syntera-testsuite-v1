@@ -190,7 +190,7 @@ async function loadIndustrySurveys() {
                 const data = await r.json();
                 const items = (data.items || []).slice();
                 if (items.length > 0) {
-                    s3Help.textContent = 'Bucket: ' + (data.bucket || '') + ' / ' + (data.prefix || '');
+                    s3Help.textContent = 'Industry data';
 
                     // Group by group_display (short name); keep original group for keying
                     const groups = {};
