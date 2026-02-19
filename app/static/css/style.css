@@ -4354,6 +4354,172 @@ input[type="checkbox"] {
     color: #fca5a5;
 }
 
+/* Industry Surveys - S3 filter dropdown */
+.industry-s3-filter-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.industry-s3-filter-label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #94a3b8;
+}
+
+.industry-s3-filter-select {
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(148, 163, 184, 0.3);
+    background: rgba(15, 23, 42, 0.8);
+    color: #e2e8f0;
+    font-size: 0.9rem;
+    min-width: 180px;
+}
+
+.industry-s3-filter-select:hover,
+.industry-s3-filter-select:focus {
+    border-color: #3b82f6;
+    outline: none;
+}
+
+/* Industry Surveys - S3 grouping, collapse, pagination */
+.industry-s3-group {
+    margin-bottom: 16px;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    border-radius: 10px;
+    overflow: hidden;
+    background: rgba(15, 23, 42, 0.4);
+}
+
+.industry-s3-group-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    cursor: pointer;
+    user-select: none;
+    color: #e2e8f0;
+    transition: background 0.15s ease;
+}
+
+.industry-s3-group-header:hover {
+    background: rgba(59, 130, 246, 0.08);
+}
+
+.industry-s3-group-chevron {
+    font-size: 0.7rem;
+    color: #93c5fd;
+    transition: transform 0.2s ease;
+}
+
+.industry-s3-group-header h3 {
+    flex: 1;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #93c5fd;
+    margin: 0;
+    text-transform: none;
+    letter-spacing: 0.02em;
+}
+
+.industry-s3-group-count {
+    font-size: 0.8rem;
+    color: #94a3b8;
+}
+
+.industry-s3-group-body {
+    padding: 0 16px 16px;
+    transition: max-height 0.25s ease;
+}
+
+.industry-s3-group-body.collapsed {
+    display: none;
+}
+
+.industry-s3-group-items {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.industry-s3-card {
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(148, 163, 184, 0.15);
+    background: rgba(30, 41, 59, 0.5);
+    transition: border-color 0.15s ease;
+}
+
+.industry-s3-card:hover {
+    border-color: rgba(59, 130, 246, 0.4);
+}
+
+.industry-s3-card .industry-survey-title {
+    font-size: 0.9rem;
+    margin: 0 0 6px 0;
+    line-height: 1.3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.industry-s3-card .industry-survey-description {
+    font-size: 0.8rem;
+    color: #94a3b8;
+    margin: 0 0 10px 0;
+}
+
+.industry-s3-card .industry-s3-dl {
+    font-size: 0.8rem;
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid #3b82f6;
+    color: #93c5fd;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.industry-s3-card .industry-s3-dl:hover {
+    background: rgba(59, 130, 246, 0.15);
+}
+
+.industry-s3-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 10px 0;
+    border-top: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.industry-s3-page-btn {
+    padding: 6px 14px;
+    border-radius: 6px;
+    border: 1px solid rgba(148, 163, 184, 0.4);
+    background: transparent;
+    color: #e2e8f0;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+.industry-s3-page-btn:hover:not(:disabled) {
+    border-color: #3b82f6;
+    color: #93c5fd;
+}
+
+.industry-s3-page-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.industry-s3-page-info {
+    font-size: 0.85rem;
+    color: #94a3b8;
+}
+
 .market-research-download-row {
     display: flex;
     gap: 12px;

@@ -188,29 +188,139 @@ async function loadIndustrySurveys() {
             const r = await fetch('/api/industry-surveys/s3');
             if (r.ok) {
                 const data = await r.json();
-                const items = data.items || [];
+                const items = (data.items || []).slice();
                 if (items.length > 0) {
                     s3Help.textContent = 'Bucket: ' + (data.bucket || '') + ' / ' + (data.prefix || '');
-                    s3List.innerHTML = items.map(item => {
+
+                    // Group by group_display (short name); keep original group for keying
+                    const groups = {};
+                    items.forEach(item => {
+                        const g = (item.group_display || item.group || 'Other').trim() || 'Other';
+                        if (!groups[g]) groups[g] = [];
+                        groups[g].push(item);
+                    });
+
+                    const groupNames = Object.keys(groups).sort((a, b) => a.localeCompare(b));
+                    const PAGE_SIZE = 3;
+                    window._industryS3GroupItems = window._industryS3GroupItems || {};
+                    groupNames.forEach((_, idx) => {
+                        const id = 's3-group-' + idx;
+                        window._industryS3GroupItems[id] = groups[groupNames[idx]];
+                    });
+
+                    // Populate industry type dropdown and show filter row
+                    const filterRow = document.getElementById('industry-s3-filter-row');
+                    const filterSelect = document.getElementById('industry-s3-filter');
+                    if (filterRow && filterSelect) {
+                        filterSelect.innerHTML = '<option value="">All industries</option>' +
+                            groupNames.map(function (g) { return '<option value="' + escapeHtml(g) + '">' + escapeHtml(g) + '</option>'; }).join('');
+                        filterRow.style.display = 'flex';
+                    }
+                    const renderCard = (item) => {
                         const sizeStr = item.size != null ? (item.size < 1024 ? item.size + ' B' : (item.size < 1024 * 1024 ? (item.size / 1024).toFixed(1) + ' KB' : (item.size / (1024 * 1024)).toFixed(1) + ' MB')) : '';
                         const dateStr = item.last_modified ? new Date(item.last_modified).toLocaleDateString() : '';
+                        const title = item.name_display || item.name || '';
                         return `
-                            <div class="industry-survey-card industry-s3-card">
+                            <div class="industry-s3-card">
                                 <div class="industry-survey-header">
                                     <div class="industry-survey-icon" style="background: rgba(59, 130, 246, 0.2); border-color: #3b82f6;">📁</div>
                                     <div class="industry-survey-title-section">
-                                        <div class="industry-survey-domain" style="color: #3b82f6;">S3 Data</div>
-                                        <h3 class="industry-survey-title">${escapeHtml(item.name)}</h3>
+                                        <h3 class="industry-survey-title">${escapeHtml(title)}</h3>
                                     </div>
                                 </div>
-                                <p class="industry-survey-description">${sizeStr ? sizeStr + (dateStr ? ' · ' + dateStr : '') : 'Industry survey or data file'}</p>
+                                <p class="industry-survey-description">${sizeStr ? sizeStr + (dateStr ? ' · ' + dateStr : '') : '—'}</p>
                                 <div class="industry-survey-links">
-                                    <a href="${escapeHtml(item.url)}" target="_blank" rel="noopener" class="industry-link-button" style="border-color: #3b82f6; color: #3b82f6;">
-                                        <span>⬇</span> Download / Open
-                                    </a>
+                                    <a href="${escapeHtml(item.url)}" target="_blank" rel="noopener" class="industry-link-button industry-s3-dl">⬇ Download</a>
                                 </div>
                             </div>`;
-                    }).join('');
+                    };
+
+                    let html = '';
+                    groupNames.forEach((groupName, groupIdx) => {
+                        const groupItems = groups[groupName];
+                        const totalPages = Math.max(1, Math.ceil(groupItems.length / PAGE_SIZE));
+                        const groupId = 's3-group-' + groupIdx;
+                        const bodyId = groupId + '-body';
+                        const paginationId = groupId + '-pagination';
+                        html += `<div class="industry-s3-group" id="${groupId}" data-expanded="true" data-group-name="${escapeHtml(groupName)}">`;
+                        html += `<div class="industry-s3-group-header" role="button" tabindex="0" aria-expanded="true" data-toggle="${groupId}">`;
+                        html += `<span class="industry-s3-group-chevron">▼</span>`;
+                        html += `<h3>${escapeHtml(groupName)}</h3>`;
+                        html += `<span class="industry-s3-group-count">${groupItems.length} file${groupItems.length !== 1 ? 's' : ''}</span>`;
+                        html += `</div>`;
+                        html += `<div class="industry-s3-group-body" id="${bodyId}">`;
+                        html += `<div class="industry-s3-group-items" data-page="1" data-total-pages="${totalPages}">`;
+                        const page1 = groupItems.slice(0, PAGE_SIZE);
+                        page1.forEach(it => { html += renderCard(it); });
+                        html += `</div>`;
+                        if (totalPages > 1) {
+                            html += `<div class="industry-s3-pagination" id="${paginationId}">`;
+                            html += `<button type="button" class="industry-s3-page-btn" data-group="${groupId}" data-dir="prev" disabled>Previous</button>`;
+                            html += `<span class="industry-s3-page-info">Page 1 of ${totalPages}</span>`;
+                            html += `<button type="button" class="industry-s3-page-btn" data-group="${groupId}" data-dir="next">Next</button>`;
+                            html += `</div>`;
+                        }
+                        html += `</div></div>`;
+                    });
+
+                    s3List.innerHTML = html;
+
+                    // Collapse/expand group header
+                    s3List.querySelectorAll('.industry-s3-group-header[data-toggle]').forEach(header => {
+                        header.addEventListener('click', function () {
+                            const id = this.getAttribute('data-toggle');
+                            const groupEl = document.getElementById(id);
+                            if (!groupEl) return;
+                            const expanded = groupEl.getAttribute('data-expanded') !== 'false';
+                            groupEl.setAttribute('data-expanded', expanded ? 'false' : 'true');
+                            const body = groupEl.querySelector('.industry-s3-group-body');
+                            const chevron = this.querySelector('.industry-s3-group-chevron');
+                            if (body) body.classList.toggle('collapsed', expanded);
+                            if (chevron) chevron.textContent = expanded ? '▶' : '▼';
+                            this.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+                        });
+                    });
+
+                    // Industry filter dropdown: show only selected industry or all
+                    if (filterSelect) {
+                        filterSelect.addEventListener('change', function () {
+                            const value = (this.value || '').trim();
+                            s3List.querySelectorAll('.industry-s3-group').forEach(function (el) {
+                                const name = el.getAttribute('data-group-name') || '';
+                                el.style.display = value === '' || name === value ? '' : 'none';
+                            });
+                        });
+                    }
+
+                    // Pagination: re-render current page for that group
+                    s3List.querySelectorAll('.industry-s3-page-btn').forEach(btn => {
+                        btn.addEventListener('click', function () {
+                            const groupId = this.getAttribute('data-group');
+                            const dir = this.getAttribute('data-dir');
+                            const groupEl = document.getElementById(groupId);
+                            if (!groupEl) return;
+                            const itemsEl = groupEl.querySelector('.industry-s3-group-items');
+                            if (!itemsEl) return;
+                            let page = parseInt(itemsEl.getAttribute('data-page'), 10) || 1;
+                            const totalPages = parseInt(itemsEl.getAttribute('data-total-pages'), 10) || 1;
+                            const items = (window._industryS3GroupItems && window._industryS3GroupItems[groupId]) || [];
+                            if (dir === 'next' && page < totalPages) page += 1;
+                            else if (dir === 'prev' && page > 1) page -= 1;
+                            itemsEl.setAttribute('data-page', String(page));
+                            const start = (page - 1) * PAGE_SIZE;
+                            const pageItems = items.slice(start, start + PAGE_SIZE);
+                            itemsEl.innerHTML = pageItems.map(it => renderCard(it)).join('');
+                            const paginationDiv = groupEl.querySelector('.industry-s3-pagination');
+                            if (paginationDiv) {
+                                const prevBtn = paginationDiv.querySelector('[data-dir="prev"]');
+                                const nextBtn = paginationDiv.querySelector('[data-dir="next"]');
+                                const infoSpan = paginationDiv.querySelector('.industry-s3-page-info');
+                                if (prevBtn) prevBtn.disabled = page <= 1;
+                                if (nextBtn) nextBtn.disabled = page >= totalPages;
+                                if (infoSpan) infoSpan.textContent = 'Page ' + page + ' of ' + totalPages;
+                            }
+                        });
+                    });
                 } else {
                     s3Help.textContent = 'No files in bucket. Configure AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY in .env if the bucket is private.';
                     s3List.innerHTML = '';

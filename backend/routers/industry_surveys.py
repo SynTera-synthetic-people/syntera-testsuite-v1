@@ -14,6 +14,36 @@ _settings = Settings()
 S3_PUBLIC_BASE = "https://{bucket}.s3.{region}.amazonaws.com/{key}"
 
 
+def _short_display_name(folder: str) -> str:
+    """Short, non-numeric display name for folder: strip digits, keep letters, first token or two."""
+    if not folder or not folder.strip():
+        return "Other"
+    import re
+    s = folder.strip().replace("_", " ").replace("-", " ")
+    s = re.sub(r"[0-9]+", "", s)
+    s = re.sub(r"\s+", " ", s).strip()
+    parts = [p for p in s.split() if p.isalpha()][:2]
+    out = " ".join(parts).strip() or "Other"
+    return out[:20] if len(out) > 20 else out
+
+
+def _pretty_file_title(name: str) -> str:
+    """Human-friendly title: strip extension, strip leading numbers/separators so title starts with a letter."""
+    if not name:
+        return ""
+    import os
+    import re
+    base = os.path.splitext(name)[0]
+    # Strip from the start any run of digits, underscores, hyphens, dots, spaces (so we start with a letter)
+    s = re.sub(r"^[\d_\-\s\.]+", "", base).strip()
+    # Replace remaining separators with space for readability
+    s = s.replace("_", " ").replace("-", " ")
+    s = re.sub(r"\s+", " ", s).strip()
+    if not s:
+        return base[:50]  # fallback if name was all numbers/symbols
+    return s[:60] if len(s) > 60 else s
+
+
 @router.get("/s3")
 async def list_industry_surveys_s3():
     """
@@ -65,7 +95,13 @@ async def list_industry_surveys_s3():
                     key = obj.get("Key", "")
                     if not key or key.endswith("/"):
                         continue
+                    # Derive group/industry from key; short non-numeric display name
+                    rel = key[len(prefix):] if key.startswith(prefix) else key
+                    folder = rel.split("/", 1)[0] if "/" in rel else ""
+                    group = folder or "Other"
+                    group_display = _short_display_name(group)
                     name = key.split("/")[-1]
+                    title = _pretty_file_title(name)
                     try:
                         url = client.generate_presigned_url(
                             "get_object",
@@ -77,6 +113,9 @@ async def list_industry_surveys_s3():
                     items.append({
                         "key": key,
                         "name": name,
+                        "name_display": title,
+                        "group": group,
+                        "group_display": group_display,
                         "size": obj.get("Size", 0),
                         "last_modified": (obj.get("LastModified") or "").isoformat() if obj.get("LastModified") else None,
                         "url": url,
@@ -99,11 +138,19 @@ async def list_industry_surveys_s3():
                         key = obj.get("Key", "")
                         if not key or key.endswith("/"):
                             continue
+                        rel = key[len(prefix):] if key.startswith(prefix) else key
+                        folder = rel.split("/", 1)[0] if "/" in rel else ""
+                        group = folder or "Other"
+                        group_display = _short_display_name(group)
                         name = key.split("/")[-1]
+                        title = _pretty_file_title(name)
                         url = S3_PUBLIC_BASE.format(bucket=bucket, region=region, key=key)
                         items.append({
                             "key": key,
                             "name": name,
+                            "name_display": title,
+                            "group": group,
+                            "group_display": group_display,
                             "size": obj.get("Size", 0),
                             "last_modified": (obj.get("LastModified") or "").isoformat() if obj.get("LastModified") else None,
                             "url": url,
