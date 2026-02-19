@@ -35,14 +35,32 @@ async def list_industry_surveys_s3():
             import boto3
             from botocore.exceptions import ClientError
 
-            client = boto3.client(
-                "s3",
-                region_name=region,
-                aws_access_key_id=access_key.strip(),
-                aws_secret_access_key=secret_key.strip(),
-            )
-            paginator = client.get_paginator("list_objects_v2")
-            for page in paginator.paginate(Bucket=bucket, Prefix=prefix):
+            try:
+                client = boto3.client(
+                    "s3",
+                    region_name=region,
+                    aws_access_key_id=access_key.strip(),
+                    aws_secret_access_key=secret_key.strip(),
+                )
+                paginator = client.get_paginator("list_objects_v2")
+            except Exception as e:
+                logger.warning("S3 client init failed: %s", e)
+                raise HTTPException(
+                    status_code=503,
+                    detail="Failed to create S3 client. Check AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY in .env.",
+                )
+            try:
+                paginate = paginator.paginate(Bucket=bucket, Prefix=prefix)
+            except ClientError as e:
+                err = e.response.get("Error", {}) or {}
+                if err.get("Code") == "AccessDenied":
+                    logger.warning("S3 AccessDenied: %s", e)
+                    raise HTTPException(
+                        status_code=403,
+                        detail="S3 access denied. Check that AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY have ListBucket permission on the bucket.",
+                    )
+                raise
+            for page in paginate:
                 for obj in page.get("Contents") or []:
                     key = obj.get("Key", "")
                     if not key or key.endswith("/"):
@@ -93,14 +111,14 @@ async def list_industry_surveys_s3():
             except Exception as e:
                 logger.warning("S3 list (anonymous) failed: %s. Set AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY for private bucket.", e)
                 raise HTTPException(
-                    status_code=502,
-                    detail="S3 bucket list failed. Configure AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY in .env for model-training1 bucket access.",
+                    status_code=403,
+                    detail="S3 access denied. The bucket is private. Set AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY in .env (see .env.example) and restart the server.",
                 )
     except HTTPException:
         raise
     except Exception as e:
         logger.exception("S3 list_industry_surveys_s3 failed")
-        raise HTTPException(status_code=502, detail=f"S3 error: {str(e)}")
+        raise HTTPException(status_code=503, detail=f"S3 error: {str(e)}")
 
     return {
         "bucket": bucket,

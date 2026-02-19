@@ -124,7 +124,7 @@ For EVERY question (one block each; be exhaustive):
 - Answer Options:
   - Option 1
   - Option 2
-- Report Output: (numeric values from report: prefer counts e.g. 225, or if only % given use e.g. 45% and we will compute count from n)
+- Report Output: (response COUNT only: one integer per option, same order as Answer Options. No percentages, no text. Sum of counts must equal sample size n. Every option must have a number.)
   - 225
   - 150
   - 125
@@ -132,7 +132,7 @@ For EVERY question (one block each; be exhaustive):
 - Target Segment: (e.g. All respondents)
 - Expected Output Pattern: (e.g. Bar chart)
 
-Rules: Plain text only. Output numeric counts when the report gives them; if only % is given, output the % and include Sample size (n). List every question."""
+Rules: Plain text only. Report Output must be integers only (counts). No % symbols, no words. Sum of all option counts = n. No blank values. List every question."""
 
 
 class ReverseEngineerRequest(BaseModel):
@@ -329,6 +329,90 @@ def _strip_markdown_bold(s: str) -> str:
     return s
 
 
+def _extract_numeric_from_value(raw: str) -> tuple[Optional[float], bool]:
+    """Extract a single number from a string. Returns (number or None, is_percentage). Rejects non-numeric garbage."""
+    if not raw or not isinstance(raw, str):
+        return None, False
+    s = _strip_markdown_bold(raw).strip()
+    if ":" in s:
+        s = s.split(":", 1)[1].strip()
+    # Match integer or decimal, optional % at end; allow leading/trailing whitespace
+    m = re.search(r"(\d+(?:\.\d+)?)\s*%?", s)
+    if not m:
+        return None, False
+    try:
+        num = float(m.group(1))
+        is_pct = "%" in s
+        return num, is_pct
+    except ValueError:
+        return None, False
+
+
+def _normalize_option_values_to_counts(
+    option_values: list[str],
+    num_options: int,
+    n: Optional[int],
+) -> list[str]:
+    """
+    Ensure option_values are numeric counts only: no %, no blanks, sum <= n.
+    - Parse only numbers from each value; if % and n known, convert to count.
+    - Pad to num_options with 0; fill single missing as n - sum(others).
+    - If sum > n, scale down so total = n.
+    Returns list of string integers (counts only).
+    """
+    if num_options <= 0:
+        return []
+    counts: list[int] = []
+    for v in option_values[:num_options] if option_values else []:
+        num, is_pct = _extract_numeric_from_value(str(v) if v else "")
+        if num is None:
+            counts.append(0)
+        elif is_pct and n is not None and n > 0:
+            counts.append(round(n * num / 100))
+        elif is_pct and (n is None or n <= 0):
+            counts.append(0)
+        else:
+            counts.append(max(0, int(round(num))))
+    # Pad to num_options
+    while len(counts) < num_options:
+        counts.append(0)
+    counts = counts[:num_options]
+    total = sum(counts)
+    if n is not None and n > 0:
+        if total > n:
+            # Scale down proportionally so sum = n
+            if total > 0:
+                scale = n / total
+                counts = [max(0, int(round(c * scale))) for c in counts]
+                # Fix rounding so sum exactly n
+                diff = n - sum(counts)
+                if diff != 0 and counts:
+                    idx = 0
+                    while diff > 0 and idx < len(counts):
+                        counts[idx] += 1
+                        diff -= 1
+                        idx += 1
+                    while diff < 0 and idx > 0:
+                        idx -= 1
+                        if counts[idx] > 0:
+                            counts[idx] -= 1
+                            diff += 1
+        elif total < n and counts.count(0) == 1:
+            # Single missing: set that option to n - sum(others)
+            idx = counts.index(0)
+            counts[idx] = n - total
+        elif total < n and counts.count(0) > 1:
+            # Multiple blanks: put remainder in first zero
+            remainder = n - total
+            for i in range(len(counts)):
+                if remainder <= 0:
+                    break
+                if counts[i] == 0:
+                    counts[i] = min(remainder, n)
+                    remainder -= counts[i]
+    return [str(c) for c in counts]
+
+
 def _extract_overall_sample_size(report_text: str) -> Optional[int]:
     """Try to find total sample size from report text (e.g. n=1000, 1,000 respondents)."""
     if not report_text or len(report_text) < 20:
@@ -420,15 +504,13 @@ def _parse_structured_output(raw: str) -> tuple[list[str], Optional[int], list[d
                         opts = [_strip_markdown_bold(o.strip()) for o in re.split(r"[\n-]", val) if o.strip() and o.strip() != "Option"]
                         q[key] = [o for o in opts if o]
                     elif key == "option_values":
-                        # Parse lines like "45%" or "- 45%" or "Option A: 45%" -> take the value part
+                        # Parse lines: extract only numeric values (number or number%); reject text/garbage
                         lines = [ln.strip() for ln in re.split(r"[\n-]", val) if ln.strip()]
                         values = []
                         for ln in lines:
-                            ln = _strip_markdown_bold(ln)
-                            if ":" in ln:
-                                ln = ln.split(":", 1)[1].strip()
-                            if ln:
-                                values.append(ln)
+                            num, is_pct = _extract_numeric_from_value(ln)
+                            if num is not None:
+                                values.append(f"{num}%" if is_pct else str(int(round(num))))
                         q[key] = values
                     elif key == "sample_size_n":
                         try:
@@ -565,6 +647,14 @@ def _run_reverse_engineer(
             vals = q.get("option_values") or []
             if vals and any(_pct_re.match(str(v).strip()) for v in vals):
                 q["sample_size_n"] = overall_n
+    # Normalize option_values: counts only, no blanks, sum <= n, no text/%
+    num_opts_key = "answer_options"
+    for q in questionnaire:
+        opts = q.get(num_opts_key) or []
+        n_q = q.get("sample_size_n") or overall_n
+        q["option_values"] = _normalize_option_values_to_counts(
+            q.get("option_values") or [], len(opts), n_q
+        )
     section_objectives = [SectionObjective(section_name=s["section_name"], research_objective=s["research_objective"]) for s in section_objs]
     reconstructed = [ReconstructedQuestion(**q) for q in questionnaire]
     result = {

@@ -796,19 +796,16 @@ function parseQuestionnaireFromRaw(rawSectionC) {
 }
 
 /**
- * If value is a percentage (e.g. "45%") and sample_size_n is set, compute count and show number first: No. of respondents * %.
- * Returns e.g. "225 (45%)" when n=500, so the numeric count is the main output; else returns value as-is.
+ * Value from report must be numeric only. Return integer string (count); strip any non-numeric/garbage.
+ * No percentages in output - backend sends counts only. Blank -> "0".
  */
-function formatOptionValueWithCount(val, sampleSizeN) {
-    if (val == null || val === '') return val;
+function formatOptionValueNumericOnly(val) {
+    if (val == null || val === '') return '0';
     var s = String(val).trim();
-    var pctMatch = s.match(/^(\d+(?:\.\d+)?)\s*%$/);
-    if (pctMatch && sampleSizeN > 0) {
-        var pct = parseFloat(pctMatch[1]);
-        var count = Math.round(sampleSizeN * pct / 100);
-        return count + ' (' + s + ')';
-    }
-    return s;
+    var numMatch = s.match(/^\s*(\d+)\s*$/);
+    if (numMatch) return numMatch[1];
+    var anyNum = s.match(/(\d+)/);
+    return anyNum ? anyNum[1] : '0';
 }
 
 /**
@@ -878,8 +875,8 @@ function renderMarketResearchOutput(data, objectivesEl, questionnaireEl) {
             questionnaireHtml += '<ul class="mre-q-options-list">';
             opts.forEach(function(opt, j) {
                 const val = vals[j];
-                if (hasValues && val !== undefined && val !== '') {
-                    const displayVal = formatOptionValueWithCount(val, n);
+                const displayVal = hasValues ? formatOptionValueNumericOnly(val) : '';
+                if (displayVal !== '') {
                     questionnaireHtml += '<li><span class="mre-q-opt-text">' + escapeHtml(opt) + '</span> <span class="mre-q-opt-value">' + escapeHtml(displayVal) + '</span></li>';
                 } else {
                     questionnaireHtml += '<li>' + escapeHtml(opt) + '</li>';
@@ -988,15 +985,13 @@ function downloadMarketResearchPdf() {
                 });
                 const opts = Array.isArray(q.answer_options) ? q.answer_options : [];
                 const vals = Array.isArray(q.option_values) ? q.option_values : [];
-                const n = q.sample_size_n;
                 const hasV = vals.length > 0;
                 if (opts.length > 0) {
                     y += 2;
                     opts.forEach((opt, j) => {
                         const optStr = (opt || '').trim();
-                        const rawVal = (hasV && vals[j] != null && vals[j] !== '') ? String(vals[j]).trim() : '';
-                        const valStr = formatOptionValueWithCount(rawVal, n);
-                        const lineStr = valStr ? '• ' + optStr + ' — ' + valStr : '• ' + optStr;
+                        const valStr = hasV ? formatOptionValueNumericOnly(vals[j]) : '0';
+                        const lineStr = '• ' + optStr + ' — ' + valStr;
                         const optLines = doc.splitTextToSize(lineStr, maxWOpt);
                         optLines.forEach(line => {
                             newPageIfNeeded(1);
@@ -1036,14 +1031,12 @@ function downloadMarketResearchCsv() {
         const desc = (q.survey_question || '').trim().replace(/^["']+|["']+$/g, '');
         const opts = Array.isArray(q.answer_options) ? q.answer_options : [];
         const vals = Array.isArray(q.option_values) ? q.option_values : [];
-        const n = q.sample_size_n;
         if (opts.length === 0) {
             rows.push(hasAnyValues ? [qNo, desc, '', ''] : [qNo, desc, '']);
         } else {
             opts.forEach((opt, j) => {
                 const optVal = (opt || '').trim().replace(/^["']+|["']+$/g, '');
-                const rawReportVal = (vals[j] != null && vals[j] !== '') ? String(vals[j]).trim() : '';
-                const reportVal = formatOptionValueWithCount(rawReportVal, n).replace(/^["']+|["']+$/g, '');
+                const reportVal = formatOptionValueNumericOnly(vals[j]).replace(/^["']+|["']+$/g, '');
                 const rowQNo = j === 0 ? qNo : '';
                 const rowDesc = j === 0 ? desc : '';
                 rows.push(hasAnyValues ? [rowQNo, rowDesc, optVal, reportVal] : [rowQNo, rowDesc, optVal]);
