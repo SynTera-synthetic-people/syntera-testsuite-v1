@@ -16,6 +16,7 @@ if os.path.isfile(_env_file):
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from config.parameter import load_ssm_parameters
 from fastapi.responses import FileResponse
 import logging
 from contextlib import asynccontextmanager
@@ -26,6 +27,7 @@ from database.connection import init_db
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+parameter = load_ssm_parameters()
 settings = Settings()
 
 
