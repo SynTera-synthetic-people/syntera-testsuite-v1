@@ -21,7 +21,7 @@ import logging
 from contextlib import asynccontextmanager
 
 from config.settings import Settings
-from backend.routers import surveys, validation, reports, auth, market_research, industry_surveys
+from backend.routers import surveys, validation, reports, auth, market_research, industry_surveys, simulation
 from database.connection import init_db
 
 logging.basicConfig(level=logging.INFO)
@@ -49,10 +49,13 @@ STATIC_DIR = os.path.join(os.path.dirname(__file__), "..", "app", "static")
 INDEX_HTML = os.path.join(os.path.dirname(__file__), "..", "app", "index.html")
 # Brand assets from frontend/Brand Assets
 BRAND_DIR = os.path.join(os.path.dirname(__file__), "..", "frontend", "Brand Assets", "Brand Assets")
+OMI_DIR = os.path.join(os.path.dirname(__file__), "..", "frontend", "Omi Character Animations")
 
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 if os.path.isdir(BRAND_DIR):
     app.mount("/brand", StaticFiles(directory=BRAND_DIR), name="brand")
+if os.path.isdir(OMI_DIR):
+    app.mount("/omi", StaticFiles(directory=OMI_DIR), name="omi")
 
 app.add_middleware(
     CORSMiddleware,
@@ -68,6 +71,7 @@ app.include_router(validation.router, prefix="/api/validation", tags=["validatio
 app.include_router(reports.router, prefix="/api/reports", tags=["reports"])
 app.include_router(market_research.router, prefix="/api/market-research", tags=["market-research"])
 app.include_router(industry_surveys.router, prefix="/api/industry-surveys", tags=["industry-surveys"])
+app.include_router(simulation.router, prefix="/api/simulation", tags=["simulation"])
 
 
 @app.get("/health")

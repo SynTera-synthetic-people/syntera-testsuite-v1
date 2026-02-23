@@ -1,7 +1,7 @@
 """Market Research Reverse Engineering - Infer research design from report content."""
 from fastapi import APIRouter, HTTPException, UploadFile, File, Form
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Any, Optional
 import base64
 import hashlib
 import logging
@@ -26,6 +26,7 @@ if os.path.isfile(_env_path):
         pass
 
 from config.settings import Settings
+from backend.utils.llm_gateway import LlmGateway
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -42,6 +43,7 @@ REVERSE_ENGINEER_CACHE_MAX = 50
 _upload_chunks_store: dict[str, dict] = {}
 UPLOAD_CHUNKS_TTL_SEC = 3600
 UPLOAD_CHUNKS_MAX_SESSIONS = 100
+_llm_gateway = LlmGateway(_settings)
 
 
 def _parse_env_file(path: str) -> tuple[Optional[str], Optional[str]]:
@@ -133,6 +135,26 @@ For EVERY question (one block each; be exhaustive):
 - Expected Output Pattern: (e.g. Bar chart)
 
 Rules: Plain text only. Report Output must be integers only (counts). No % symbols, no words. Sum of all option counts = n. No blank values. List every question."""
+
+# JSON output schema for cost optimization: predictable structure, server-side validation, cheap repair on failure
+REVERSE_ENGINEER_JSON_SYSTEM = """You are a Market Research Methodologist. Reverse-engineer the research design from the report.
+
+Output a single JSON object with exactly these keys (no markdown, no code fence):
+- "overall_objectives": array of strings (research objectives)
+- "overall_sample_size_n": integer or null (total respondents if stated in report)
+- "section_objectives": array of { "section_name": string, "research_objective": string }
+- "reconstructed_questionnaire": array of objects, each with:
+  "report_reference": string,
+  "research_intent": string,
+  "survey_question": string,
+  "question_type": string (e.g. Single choice),
+  "answer_options": array of strings,
+  "option_values": array of strings (counts only, e.g. "225", "150"; no %, no blanks; sum = sample_size_n),
+  "sample_size_n": integer or null,
+  "target_segment": string,
+  "expected_output_pattern": string
+
+List EVERY survey question. option_values must be counts only; sum equals sample_size_n. Output valid JSON only."""
 
 
 class ReverseEngineerRequest(BaseModel):
@@ -245,31 +267,134 @@ def _truncate_report(report_text: str) -> tuple[str, bool]:
     return truncated + suffix, True
 
 
+def _get_primary_models() -> tuple[str, str]:
+    """Return (openai_model, anthropic_model) based on TIER. Basic tier uses cheaper models."""
+    tier = (getattr(_settings, "TIER", "pro") or os.getenv("TIER", "pro")).lower()
+    if tier == "basic":
+        return (
+            getattr(_settings, "OPENAI_MODEL_BASIC", None) or os.getenv("OPENAI_MODEL_BASIC", "gpt-4o-mini"),
+            getattr(_settings, "ANTHROPIC_MODEL_BASIC", None) or os.getenv("ANTHROPIC_MODEL_BASIC", "claude-3-5-haiku-20241022"),
+        )
+    return (
+        _settings.OPENAI_MODEL or os.getenv("OPENAI_MODEL", "gpt-4o"),
+        _settings.ANTHROPIC_MODEL or os.getenv("ANTHROPIC_MODEL", "claude-sonnet-4-20250514"),
+    )
+
+
+def _parse_json_output(raw: str) -> tuple[list[str], Optional[int], list[dict], list[dict]]:
+    """Parse LLM JSON string into (overall_objectives, overall_n, section_objectives, questionnaire). Raises on invalid."""
+    import json
+    s = (raw or "").strip()
+    # Strip markdown code fence if present
+    if s.startswith("```"):
+        lines = s.split("\n")
+        if lines[0].startswith("```"):
+            lines = lines[1:]
+        if lines and lines[-1].strip() == "```":
+            lines = lines[:-1]
+        s = "\n".join(lines)
+    data = json.loads(s)
+    overall = list(data.get("overall_objectives") or [])
+    if not isinstance(overall, list):
+        overall = [str(overall)] if overall else []
+    overall = [str(x).strip() for x in overall if x is not None]
+    overall_n = data.get("overall_sample_size_n")
+    if overall_n is not None and not isinstance(overall_n, int):
+        try:
+            overall_n = int(overall_n)
+        except (TypeError, ValueError):
+            overall_n = None
+    sections = []
+    for sec in data.get("section_objectives") or []:
+        if isinstance(sec, dict) and sec.get("section_name") is not None:
+            sections.append({
+                "section_name": _strip_markdown_bold(str(sec.get("section_name", "")).strip()),
+                "research_objective": _strip_markdown_bold(str(sec.get("research_objective", "")).strip()),
+            })
+    questions = []
+    for q in data.get("reconstructed_questionnaire") or []:
+        if not isinstance(q, dict):
+            continue
+        questions.append({
+            "report_reference": _strip_markdown_bold(str(q.get("report_reference", "") or "")),
+            "research_intent": _strip_markdown_bold(str(q.get("research_intent", "") or "")),
+            "survey_question": _strip_markdown_bold(str(q.get("survey_question", "") or "")),
+            "question_type": _strip_markdown_bold(str(q.get("question_type", "") or "")),
+            "answer_options": [str(o).strip() for o in (q.get("answer_options") or []) if o is not None],
+            "option_values": [str(v).strip() for v in (q.get("option_values") or []) if v is not None],
+            "sample_size_n": _int_or_none(q.get("sample_size_n")),
+            "target_segment": _strip_markdown_bold(str(q.get("target_segment", "") or "")),
+            "expected_output_pattern": _strip_markdown_bold(str(q.get("expected_output_pattern", "") or "")),
+        })
+    return overall, overall_n, sections, questions
+
+
+def _repair_json(raw: str, openai_key: Optional[str] = None, anthropic_key: Optional[str] = None) -> str:
+    """Use a small/cheap model to fix invalid JSON. Returns repaired string or re-raises."""
+    repair_prompt = """Fix the following so it is valid JSON. Preserve all content; only fix syntax (missing commas, quotes, brackets). Output nothing but the JSON object, no markdown.
+
+Invalid JSON:
+"""
+    payload = (raw or "")[:15000]
+    system_prompt = "Fix invalid JSON syntax only; keep original meaning and fields."
+    user_prompt = repair_prompt + payload
+    repair_openai = getattr(_settings, "REPAIR_MODEL_OPENAI", None) or os.getenv("REPAIR_MODEL_OPENAI", "gpt-4o-mini")
+    repair_anthropic = getattr(_settings, "REPAIR_MODEL_ANTHROPIC", None) or os.getenv("REPAIR_MODEL_ANTHROPIC", "claude-3-5-haiku-20241022")
+    if openai_key and (openai_key or "").strip().startswith("sk-"):
+        try:
+            out = _llm_gateway.complete(
+                provider="openai",
+                model=repair_openai,
+                system_prompt=system_prompt,
+                user_prompt=user_prompt,
+                api_key=openai_key,
+                max_tokens=4096,
+                temperature=0,
+                response_format_json=False,
+            )
+            if out:
+                return out
+        except Exception as e:
+            logger.warning("JSON repair (OpenAI) failed: %s", e)
+    if anthropic_key and (anthropic_key or "").strip().startswith("sk-ant-"):
+        try:
+            out = _llm_gateway.complete(
+                provider="anthropic",
+                model=repair_anthropic,
+                system_prompt=system_prompt,
+                user_prompt=user_prompt,
+                api_key=anthropic_key,
+                max_tokens=4096,
+                temperature=0,
+                response_format_json=False,
+            )
+            if out:
+                return out
+        except Exception as e:
+            logger.warning("JSON repair (Anthropic) failed: %s", e)
+    raise ValueError("JSON repair failed or no API key available.")
+
+
 def _call_openai(report_text: str, api_key: Optional[str] = None) -> str:
     """Call OpenAI API with the reverse-engineering prompt. Returns raw markdown."""
     api_key = (api_key or "").strip() or _get_openai_key()
     if not api_key or not api_key.startswith("sk-"):
         raise ValueError("OPENAI_API_KEY not set.")
     report_to_send, _ = _truncate_report(report_text)
+    system_prompt = REVERSE_ENGINEER_SYSTEM_PROMPT
+    user_prompt = f"Input Report:\n\n{report_to_send}"
+    model, _ = _get_primary_models()
     try:
-        from openai import OpenAI
-        client = OpenAI(api_key=api_key)
-        model = _settings.OPENAI_MODEL or os.getenv("OPENAI_MODEL", "gpt-4o")
-        response = client.chat.completions.create(
+        return _llm_gateway.complete(
+            provider="openai",
             model=model,
-            messages=[
-                {"role": "system", "content": REVERSE_ENGINEER_SYSTEM_PROMPT},
-                {"role": "user", "content": f"Input Report:\n\n{report_to_send}"}
-            ],
-            temperature=0.3,
+            system_prompt=system_prompt,
+            user_prompt=user_prompt,
+            api_key=api_key,
             max_tokens=8192,
+            temperature=0.3,
+            response_format_json=False,
         )
-        content = response.choices[0].message.content if response.choices else None
-        if isinstance(content, list):
-            content = " ".join(
-                (p.get("text") if isinstance(p, dict) else str(p) for p in content if p)
-            )
-        return (content or "").strip()
     except Exception as e:
         err_str = str(e).lower()
         if "429" in err_str or "rate_limit" in err_str or "tokens per min" in err_str:
@@ -287,25 +412,20 @@ def _call_anthropic(report_text: str, api_key: Optional[str] = None) -> str:
     if not api_key or not api_key.startswith("sk-ant-"):
         raise ValueError("ANTHROPIC_API_KEY not set.")
     report_to_send, _ = _truncate_report(report_text)
+    system_prompt = REVERSE_ENGINEER_SYSTEM_PROMPT
+    user_prompt = f"Input Report:\n\n{report_to_send}"
+    _, model = _get_primary_models()
     try:
-        import anthropic
-        client = anthropic.Anthropic(api_key=api_key)
-        model = _settings.ANTHROPIC_MODEL or os.getenv("ANTHROPIC_MODEL", "claude-sonnet-4-20250514")
-        response = client.messages.create(
+        return _llm_gateway.complete(
+            provider="anthropic",
             model=model,
+            system_prompt=system_prompt,
+            user_prompt=user_prompt,
+            api_key=api_key,
             max_tokens=8192,
-            system=REVERSE_ENGINEER_SYSTEM_PROMPT,
-            messages=[{"role": "user", "content": f"Input Report:\n\n{report_to_send}"}],
+            temperature=0.3,
+            response_format_json=False,
         )
-        if response.content:
-            parts = []
-            for block in response.content:
-                text = getattr(block, "text", None) or (block.get("text") if isinstance(block, dict) else None)
-                if text:
-                    parts.append(str(text).strip())
-            if parts:
-                return "\n\n".join(parts)
-        return ""
     except Exception as e:
         err_str = str(e).lower()
         if "429" in err_str or "rate_limit" in err_str or "overloaded" in err_str:
@@ -315,6 +435,75 @@ def _call_anthropic(report_text: str, api_key: Optional[str] = None) -> str:
             )
         logger.exception("Anthropic (Claude) call failed")
         raise HTTPException(status_code=502, detail=f"LLM processing failed: {str(e)}")
+
+
+def _call_openai_json(report_text: str, api_key: Optional[str] = None) -> str:
+    """Call OpenAI requesting JSON output (cost optimization: strict schema, then repair if needed)."""
+    api_key = (api_key or "").strip() or _get_openai_key()
+    if not api_key or not api_key.startswith("sk-"):
+        raise ValueError("OPENAI_API_KEY not set.")
+    report_to_send, _ = _truncate_report(report_text)
+    system_prompt = REVERSE_ENGINEER_JSON_SYSTEM
+    user_prompt = f"Input Report:\n\n{report_to_send}"
+    model, _ = _get_primary_models()
+    try:
+        return _llm_gateway.complete(
+            provider="openai",
+            model=model,
+            system_prompt=system_prompt,
+            user_prompt=user_prompt,
+            api_key=api_key,
+            max_tokens=8192,
+            temperature=0.2,
+            response_format_json=True,
+        )
+    except Exception as e:
+        err_str = str(e).lower()
+        if "429" in err_str or "rate_limit" in err_str:
+            raise HTTPException(status_code=429, detail="Report too long or rate limited. Shorten or try again later.")
+        logger.exception("OpenAI JSON call failed")
+        raise HTTPException(status_code=502, detail=f"LLM processing failed: {str(e)}")
+
+
+def _call_anthropic_json(report_text: str, api_key: Optional[str] = None) -> str:
+    """Call Anthropic requesting JSON output (same schema as OpenAI JSON path)."""
+    api_key = (api_key or "").strip() or _get_anthropic_key()
+    if not api_key or not api_key.startswith("sk-ant-"):
+        raise ValueError("ANTHROPIC_API_KEY not set.")
+    report_to_send, _ = _truncate_report(report_text)
+    system_prompt = REVERSE_ENGINEER_JSON_SYSTEM + "\n\nOutput only valid JSON, no markdown."
+    user_prompt = f"Input Report:\n\n{report_to_send}"
+    _, model = _get_primary_models()
+    try:
+        return _llm_gateway.complete(
+            provider="anthropic",
+            model=model,
+            system_prompt=system_prompt,
+            user_prompt=user_prompt,
+            api_key=api_key,
+            max_tokens=8192,
+            temperature=0.2,
+            response_format_json=False,
+        )
+    except Exception as e:
+        err_str = str(e).lower()
+        if "429" in err_str or "rate_limit" in err_str or "overloaded" in err_str:
+            raise HTTPException(status_code=429, detail="Report too long or rate limited. Shorten or try again later.")
+        logger.exception("Anthropic JSON call failed")
+        raise HTTPException(status_code=502, detail=f"LLM processing failed: {str(e)}")
+
+
+def _int_or_none(v: Any) -> Optional[int]:
+    """Coerce value to int or None."""
+    if v is None:
+        return None
+    if isinstance(v, int):
+        return v
+    if isinstance(v, float):
+        return int(v)
+    if isinstance(v, str) and v.strip().isdigit():
+        return int(v.strip())
+    return None
 
 
 def _strip_markdown_bold(s: str) -> str:
@@ -439,6 +628,38 @@ def _extract_overall_sample_size(report_text: str) -> Optional[int]:
     return None
 
 
+def _split_list_items(text: str) -> list[str]:
+    """
+    Split list-style text into items by line bullets/newlines while preserving hyphens inside words.
+    Examples preserved as single item: "Sugar-free", "Low-fat", "Ready-to-eat".
+    """
+    if not text:
+        return []
+    raw = (text or "").strip()
+    if not raw:
+        return []
+
+    lines = [ln.strip() for ln in raw.splitlines() if ln.strip()]
+    items: list[str] = []
+    bullet_re = re.compile(r"^\s*(?:[-*•]\s+|\d+[\.\)]\s+)")
+
+    for ln in lines:
+        if ln in {"-", "*", "•"}:
+            continue
+        cleaned = bullet_re.sub("", ln).strip()
+        if cleaned and cleaned not in {"-", "*", "•"}:
+            items.append(cleaned)
+
+    # Fallback for single-line compact format like: "- A - B - C"
+    if len(items) <= 1 and " - " in raw and "\n" not in raw:
+        compact = [p.strip() for p in re.split(r"\s+-\s+", raw) if p.strip()]
+        compact = [bullet_re.sub("", p).strip() for p in compact if p.strip()]
+        if len(compact) > len(items):
+            items = compact
+
+    return items
+
+
 def _parse_structured_output(raw: str) -> tuple[list[str], Optional[int], list[dict], list[dict]]:
     """Parse raw markdown into overall_objectives, overall_sample_size_n, section_objectives, reconstructed_questionnaire."""
     overall = []
@@ -501,11 +722,11 @@ def _parse_structured_output(raw: str) -> tuple[list[str], Optional[int], list[d
                 if m:
                     val = m.group(1).strip()
                     if key == "answer_options":
-                        opts = [_strip_markdown_bold(o.strip()) for o in re.split(r"[\n-]", val) if o.strip() and o.strip() != "Option"]
+                        opts = [_strip_markdown_bold(o.strip()) for o in _split_list_items(val) if o.strip() and o.strip() != "Option"]
                         q[key] = [o for o in opts if o]
                     elif key == "option_values":
                         # Parse lines: extract only numeric values (number or number%); reject text/garbage
-                        lines = [ln.strip() for ln in re.split(r"[\n-]", val) if ln.strip()]
+                        lines = [ln.strip() for ln in _split_list_items(val) if ln.strip()]
                         values = []
                         for ln in lines:
                             num, is_pct = _extract_numeric_from_value(ln)
@@ -604,31 +825,68 @@ def _run_reverse_engineer(
         "No API key. Set OPENAI_API_KEY or ANTHROPIC_API_KEY in your .env file (see .env.example) "
         "and restart the server to get AI-powered questionnaire reconstruction from your report."
     )
+    use_json = getattr(_settings, "USE_JSON_OUTPUT", False) or (os.getenv("USE_JSON_OUTPUT", "false").lower() in ("1", "true", "yes"))
     openai_first = getattr(_settings, "OPENAI_FIRST", True) or (os.getenv("OPENAI_FIRST", "true").lower() in ("1", "true", "yes"))
-    providers = [
-        ("OpenAI", _call_openai, openai_key),
-        ("Anthropic", _call_anthropic, anthropic_key),
-    ] if openai_first else [
-        ("Anthropic", _call_anthropic, anthropic_key),
-        ("OpenAI", _call_openai, openai_key),
-    ]
-    for name, call_llm, key in providers:
-        try:
-            raw_md = call_llm(text, api_key=key)
-            if raw_md and len(raw_md.strip()) > 0:
-                try:
-                    overall, overall_n, section_objs, questionnaire = _parse_structured_output(raw_md)
-                except Exception as parse_err:
-                    logger.warning("Parse of %s output failed, using fallback structure: %s", name, parse_err)
-                    h_overall, h_sections, h_questions, _ = _heuristic_reverse_engineer(text)
-                    overall, overall_n, section_objs, questionnaire = [], None, h_sections, h_questions
-                ai_used = True
-                break
-        except ValueError as e:
-            logger.debug("No %s key or key invalid: %s", name, e)
-            continue
-        except HTTPException:
-            raise
+    if use_json:
+        json_providers = [
+            ("OpenAI", _call_openai_json, openai_key),
+            ("Anthropic", _call_anthropic_json, anthropic_key),
+        ] if openai_first else [
+            ("Anthropic", _call_anthropic_json, anthropic_key),
+            ("OpenAI", _call_openai_json, openai_key),
+        ]
+        for name, call_llm, key in json_providers:
+            try:
+                raw_md = call_llm(text, api_key=key)
+                if raw_md and len(raw_md.strip()) > 0:
+                    try:
+                        overall, overall_n, section_objs, questionnaire = _parse_json_output(raw_md)
+                        ai_used = True
+                        break
+                    except Exception as json_err:
+                        logger.debug("JSON parse failed, trying repair: %s", json_err)
+                        try:
+                            repaired = _repair_json(raw_md, openai_key=openai_key, anthropic_key=anthropic_key)
+                            overall, overall_n, section_objs, questionnaire = _parse_json_output(repaired)
+                            ai_used = True
+                            break
+                        except Exception:
+                            pass
+                        try:
+                            overall, overall_n, section_objs, questionnaire = _parse_structured_output(raw_md)
+                            ai_used = True
+                            break
+                        except Exception:
+                            logger.warning("JSON and markdown parse failed for %s, trying next provider", name)
+            except ValueError:
+                continue
+            except HTTPException:
+                raise
+    if not ai_used:
+        providers = [
+            ("OpenAI", _call_openai, openai_key),
+            ("Anthropic", _call_anthropic, anthropic_key),
+        ] if openai_first else [
+            ("Anthropic", _call_anthropic, anthropic_key),
+            ("OpenAI", _call_openai, openai_key),
+        ]
+        for name, call_llm, key in providers:
+            try:
+                raw_md = call_llm(text, api_key=key)
+                if raw_md and len(raw_md.strip()) > 0:
+                    try:
+                        overall, overall_n, section_objs, questionnaire = _parse_structured_output(raw_md)
+                    except Exception as parse_err:
+                        logger.warning("Parse of %s output failed, using fallback structure: %s", name, parse_err)
+                        h_overall, h_sections, h_questions, _ = _heuristic_reverse_engineer(text)
+                        overall, overall_n, section_objs, questionnaire = [], None, h_sections, h_questions
+                    ai_used = True
+                    break
+            except ValueError as e:
+                logger.debug("No %s key or key invalid: %s", name, e)
+                continue
+            except HTTPException:
+                raise
     if not ai_used:
         logger.info(
             "Market Research: no API key used (both providers raised ValueError). openai_key_provided=%s anthropic_key_provided=%s",
@@ -782,13 +1040,18 @@ def _run_reverse_engineer_maybe_chunked(
 
 @router.get("/ai-status")
 async def ai_status():
-    """Return whether OpenAI or Anthropic API keys are configured; provider order and cache size."""
+    """Return provider config + runtime optimization status (cache, budget, throttling)."""
     openai_first = getattr(_settings, "OPENAI_FIRST", True) or (os.getenv("OPENAI_FIRST", "true").lower() in ("1", "true", "yes"))
     return {
         "openai_configured": _get_openai_key() is not None,
         "anthropic_configured": _get_anthropic_key() is not None,
         "openai_first": openai_first,
         "cache_size": len(_reverse_engineer_cache),
+        "deterministic_cache_enabled": True,
+        "near_duplicate_cache": bool(getattr(_settings, "LLM_ALLOW_NEAR_DUPLICATE_CACHE", True)),
+        "daily_budget_tokens_max": int(getattr(_settings, "LLM_DAILY_TOKEN_BUDGET", 50_000_000)),
+        "daily_budget_tokens_used": _llm_gateway.budget.used_tokens,
+        "max_concurrent_heavy_calls": int(getattr(_settings, "LLM_MAX_CONCURRENT_HEAVY_CALLS", 3)),
         "env_paths_checked": _env_paths,
         "env_file_exists": any(os.path.isfile(p) for p in _env_paths),
     }

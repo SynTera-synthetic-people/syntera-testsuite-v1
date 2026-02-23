@@ -1,4 +1,150 @@
+// Omi narrator integration
+const OMI_BASE = '/omi/';
+const OMI_STATES = {
+    first: {
+        webm: 'First Appearance_Original.webm',
+        mp4: 'First Appearance_Lite.mp4',
+        loop: false,
+        message: 'Hi, I am Omi. I will guide your journey.',
+    },
+    idle: {
+        webm: 'Idle State Motion_Original.webm',
+        mp4: 'Idle State Motion_Lite.mp4',
+        loop: true,
+        message: 'I am here whenever you need help.',
+    },
+    greet: {
+        webm: 'Omi Greeting_Original.webm',
+        mp4: 'Omi Greeting_Lite.mp4',
+        loop: false,
+        message: 'Nice! Let us explore this section together.',
+    },
+    task: {
+        webm: 'Omi Task execution motion_Original.webm',
+        mp4: 'Omi Task execution motion_Lite.mp4',
+        loop: true,
+        message: 'Working on it. Hold tight.',
+    },
+    input: {
+        webm: 'Omi Inputs recording motion_Original.webm',
+        mp4: 'Omi Inputs recording motion_Lite.mp4',
+        loop: true,
+        message: 'Great input. Capturing details now.',
+    },
+    celebrate: {
+        webm: 'Omi Micro-Celebration_Original.webm',
+        mp4: 'Omi Micro-Celebration_Lite.mp4',
+        loop: false,
+        message: 'Awesome! That worked perfectly.',
+    },
+    caution: {
+        webm: 'Omi Caution State_Original.webm',
+        mp4: 'Omi Caution State_Lite.mp4',
+        loop: false,
+        message: 'Hmm, let us fix this together.',
+    },
+};
+
+let omiCurrentState = 'idle';
+let omiHideTimer = null;
+
+function omiAsset(fileName) {
+    return OMI_BASE + encodeURIComponent(fileName);
+}
+
+function omiSetVideoSource(video, cfg) {
+    const webmSrc = cfg.webm ? omiAsset(cfg.webm) : null;
+    const mp4Src = cfg.mp4 ? omiAsset(cfg.mp4) : null;
+    const desired = webmSrc || mp4Src;
+    if (!desired) return;
+    if (video.dataset.currentSrc === desired) return;
+
+    let fallbackTried = false;
+    video.onerror = function () {
+        if (!fallbackTried && mp4Src && video.getAttribute('src') !== mp4Src) {
+            fallbackTried = true;
+            video.setAttribute('src', mp4Src);
+            video.load();
+            const playPromise = video.play();
+            if (playPromise && typeof playPromise.catch === 'function') playPromise.catch(() => {});
+            return;
+        }
+        const narrator = document.getElementById('omi-narrator');
+        if (narrator) narrator.style.display = 'none';
+    };
+
+    video.setAttribute('src', desired);
+    video.dataset.currentSrc = desired;
+    video.load();
+}
+
+function omiSpeak(text, duration = 2600) {
+    const bubble = document.getElementById('omi-bubble');
+    if (!bubble || !text) return;
+    bubble.textContent = text;
+    bubble.classList.add('show');
+    if (omiHideTimer) clearTimeout(omiHideTimer);
+    omiHideTimer = setTimeout(() => bubble.classList.remove('show'), duration);
+}
+
+function omiPlay(state, customMessage = null) {
+    const video = document.getElementById('omi-video');
+    const narrator = document.getElementById('omi-narrator');
+    if (!video || !narrator) return;
+    const cfg = OMI_STATES[state] || OMI_STATES.idle;
+    omiCurrentState = state in OMI_STATES ? state : 'idle';
+    video.loop = !!cfg.loop;
+    omiSetVideoSource(video, cfg);
+    const playPromise = video.play();
+    if (playPromise && typeof playPromise.catch === 'function') {
+        playPromise.catch(() => {});
+    }
+    omiSpeak(customMessage || cfg.message);
+}
+
+function omiStateForSection(id) {
+    const map = {
+        home: ['greet', 'Welcome! Start with Validation Runs or Industry Surveys.'],
+        reports: ['idle', 'Your dashboard gives a quick health check of validations.'],
+        surveys: ['input', 'Create and manage survey experiments from here.'],
+        validation: ['task', 'Upload synthetic and real files to run comparisons.'],
+        results: ['idle', 'Review scores, tiers, and recommendations here.'],
+        'industry-surveys': ['greet', 'Browse industry references and S3 files quickly.'],
+        'market-research': ['task', 'Paste or upload a report and I will help reconstruct the questionnaire.'],
+        dashboard: ['idle', 'Track metrics and trends in one place.'],
+    };
+    return map[id] || ['idle', null];
+}
+
+function initOmiNarrator() {
+    const narrator = document.getElementById('omi-narrator');
+    const video = document.getElementById('omi-video');
+    const muteBtn = document.getElementById('omi-mute');
+    const toggleBtn = document.getElementById('omi-toggle');
+    if (!narrator || !video || !muteBtn || !toggleBtn) return;
+
+    video.muted = true;
+    muteBtn.addEventListener('click', () => {
+        video.muted = !video.muted;
+        muteBtn.textContent = video.muted ? '🔇' : '🔊';
+    });
+
+    toggleBtn.addEventListener('click', () => {
+        narrator.classList.toggle('collapsed');
+        toggleBtn.textContent = narrator.classList.contains('collapsed') ? '+' : '–';
+        toggleBtn.title = narrator.classList.contains('collapsed') ? 'Show Omi' : 'Hide Omi';
+    });
+
+    video.addEventListener('ended', () => {
+        if (omiCurrentState !== 'idle' && !video.loop) {
+            omiPlay('idle');
+        }
+    });
+    omiPlay('first');
+}
+
 function showSection(id) {
+    closeMobileMenu();
     // Check if user is authenticated before showing protected sections
     // Home and Industry Surveys are accessible without login
     if (currentUserRole === null && id !== 'industry-surveys' && id !== 'home') {
@@ -51,6 +197,9 @@ function showSection(id) {
     const subtitleEl = document.getElementById('section-subtitle');
     if (titleEl) titleEl.textContent = titleMap[id] || 'Home';
     if (subtitleEl) subtitleEl.textContent = subtitleMap[id] || '';
+
+    const [omiState, omiMessage] = omiStateForSection(id);
+    omiPlay(omiState, omiMessage);
 
     if(id==='surveys') loadSurveys();
     else if(id==='dashboard' || id==='reports') {
@@ -140,6 +289,7 @@ async function runValidation() {
     }
 
     try {
+        omiPlay('task', 'Running statistical validation now.');
         const res = await fetch(`/api/validation/attach-and-compare/${surveyId}`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
@@ -152,12 +302,14 @@ async function runValidation() {
         
         // Store results and navigate to results page
         storeResultsAndNavigate(data, surveyId);
+        omiPlay('celebrate', 'Validation complete! Let us review the results.');
         
         // refresh dashboard stats
         await loadDashboard();
         await loadSurveys();
     } catch (e) {
         console.error(e);
+        omiPlay('caution', 'Validation hit an issue. I can help you retry.');
         showErrorDisplay(
             'Validation Failed',
             'Unable to complete validation. Please check your inputs and try again.',
@@ -611,6 +763,7 @@ async function loadSamplePdfText() {
     statusEl.style.display = 'block';
     statusEl.textContent = 'Loading sample PDF...';
     statusEl.className = 'market-research-status loading';
+    omiPlay('input', 'Loading sample report so we can reverse-engineer it.');
     try {
         const opts = { method: 'GET' };
         const token = localStorage.getItem('authToken');
@@ -624,9 +777,11 @@ async function loadSamplePdfText() {
         textEl.value = data.report_text || '';
         statusEl.textContent = 'Sample PDF loaded. You can now click Reverse-Engineer.';
         statusEl.className = 'market-research-status success';
+        omiPlay('celebrate', 'Sample loaded. Ready when you are.');
     } catch (err) {
         statusEl.textContent = err.message || 'Failed to load sample PDF';
         statusEl.className = 'market-research-status error';
+        omiPlay('caution', 'Could not load sample PDF. Please try again.');
         showNotification(err.message || 'Sample PDF not found. Place sample_market_research_report.pdf in project root.', 'warning');
     }
 }
@@ -671,6 +826,7 @@ async function runMarketResearchReverseEngineer() {
     statusEl.style.display = 'block';
     statusEl.className = 'market-research-status loading';
     outputPanel.style.display = 'none';
+    omiPlay('task', 'Reverse-engineering report. This can take a moment.');
 
     const token = localStorage.getItem('authToken');
     const authHeader = token ? { 'Authorization': 'Bearer ' + token } : {};
@@ -698,9 +854,11 @@ async function runMarketResearchReverseEngineer() {
                 if (data.ai_used === false && data.message) {
                     statusEl.innerHTML = '<strong>Placeholder only.</strong> ' + escapeHtml(data.message);
                     statusEl.className = 'market-research-status error';
+                    omiPlay('caution', 'No AI key configured. Showing heuristic placeholder.');
                 } else {
                     statusEl.textContent = 'Done.';
                     statusEl.className = 'market-research-status success';
+                    omiPlay('celebrate', 'Reconstruction ready. Check objectives and questionnaire.');
                 }
                 return;
             }
@@ -745,9 +903,11 @@ async function runMarketResearchReverseEngineer() {
             if (data.ai_used === false && data.message) {
                 statusEl.innerHTML = '<strong>Placeholder only.</strong> ' + escapeHtml(data.message);
                 statusEl.className = 'market-research-status error';
+                omiPlay('caution', 'AI unavailable. Showing heuristic reconstruction.');
             } else {
                 statusEl.textContent = 'Done.';
                 statusEl.className = 'market-research-status success';
+                omiPlay('celebrate', 'Reconstruction complete.');
             }
             return;
         }
@@ -777,9 +937,11 @@ async function runMarketResearchReverseEngineer() {
             if (data.ai_used === false && data.message) {
                 statusEl.innerHTML = '<strong>Placeholder only.</strong> ' + escapeHtml(data.message);
                 statusEl.className = 'market-research-status error';
+                omiPlay('caution', 'AI unavailable. Showing heuristic reconstruction.');
             } else {
                 statusEl.textContent = 'Done.';
                 statusEl.className = 'market-research-status success';
+                omiPlay('celebrate', 'Reconstruction complete.');
             }
             return;
         }
@@ -818,14 +980,17 @@ async function runMarketResearchReverseEngineer() {
         if (data.ai_used === false && data.message) {
             statusEl.innerHTML = '<strong>Placeholder only.</strong> ' + escapeHtml(data.message);
             statusEl.className = 'market-research-status error';
+            omiPlay('caution', 'AI unavailable. Showing heuristic reconstruction.');
         } else {
             statusEl.textContent = 'Done.';
             statusEl.className = 'market-research-status success';
+            omiPlay('celebrate', 'Reconstruction complete.');
         }
     } catch (err) {
         statusEl.textContent = err.message || 'Request failed.';
         statusEl.className = 'market-research-status error';
         console.error('Market research reverse engineer error:', err);
+        omiPlay('caution', 'Reverse engineering failed. Please adjust input and retry.');
     }
 }
 
@@ -1826,6 +1991,7 @@ function showCombinedDashboardReports() {
 
 // Initialize navigation on page load
 document.addEventListener('DOMContentLoaded', async () => {
+    initOmiNarrator();
     // First, set up basic UI state
     updateNavigationForRole();
     updateUserDisplay();
@@ -2316,10 +2482,26 @@ function switchTab(tab) {
 // Toggle sidebar collapse
 function toggleSidebar() {
     const appShell = document.querySelector('.app-shell');
-    if (appShell) {
+    if (!appShell) return;
+    const isMobile = window.matchMedia('(max-width: 768px)').matches;
+    if (isMobile) {
+        appShell.classList.toggle('mobile-menu-open');
+        const overlay = document.getElementById('sidebar-overlay');
+        if (overlay) overlay.setAttribute('aria-hidden', appShell.classList.contains('mobile-menu-open') ? 'false' : 'true');
+        document.body.style.overflow = appShell.classList.contains('mobile-menu-open') ? 'hidden' : '';
+    } else {
         appShell.classList.toggle('sidebar-collapsed');
-        // Save state to localStorage
         localStorage.setItem('sidebarCollapsed', appShell.classList.contains('sidebar-collapsed'));
+    }
+}
+
+function closeMobileMenu() {
+    const appShell = document.querySelector('.app-shell');
+    if (appShell && appShell.classList.contains('mobile-menu-open')) {
+        appShell.classList.remove('mobile-menu-open');
+        const overlay = document.getElementById('sidebar-overlay');
+        if (overlay) overlay.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
     }
 }
 
@@ -2370,6 +2552,7 @@ async function compareFiles() {
     }
     
     try {
+        omiPlay('task', 'Comparing files now. I will guide you to the results.');
         const formData = new FormData();
         formData.append('synthetic_file', syntheticFile);
         formData.append('real_file', realFile);
@@ -2404,6 +2587,7 @@ async function compareFiles() {
         // Store results and navigate to results page
         storeResultsAndNavigate(data, data.survey_id);
         showNotification('Files compared successfully! Viewing results...', 'success', 3000);
+        omiPlay('celebrate', 'Comparison complete! Opening results.');
         
         // Refresh dashboard and surveys
         await loadDashboard();
@@ -2413,6 +2597,7 @@ async function compareFiles() {
     } catch (e) {
         console.error('Error in compareFiles:', e);
         console.error('Error stack:', e.stack);
+        omiPlay('caution', 'Comparison failed. Check inputs and try again.');
         showErrorDisplay(
             'File Comparison Failed',
             'Unable to compare files. Please check file formats and try again.',
@@ -2435,6 +2620,9 @@ if (typeof window !== 'undefined') {
 
 // Sophisticated Notification System with Animations
 function showNotification(message, type = 'error', duration = 5000) {
+    if (type === 'success') omiPlay('celebrate', message);
+    else if (type === 'warning' || type === 'error') omiPlay('caution', message);
+    else omiPlay('idle', message);
     // Remove existing notifications
     const existingNotifications = document.querySelectorAll('.notification-toast');
     existingNotifications.forEach(n => n.remove());

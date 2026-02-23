@@ -1,0 +1,87 @@
+{
+  "daily_token_cap": 50000000,
+  "jobs": [
+    {
+      "job_id": "snacking-habits-urban-genz",
+      "request": {
+        "section_id": "sec-snacking-habits",
+        "section_name": "Snacking Habits",
+        "objective": "Understand weekly snacking frequency and health preference trade-offs",
+        "model": "gpt-4o-mini",
+        "respondent_count": 300,
+        "deterministic_seed": 42,
+        "use_llm_archetypes": true,
+        "llm_max_tokens": 2500,
+        "segment": {
+          "segment_id": "urban-genz",
+          "segment_name": "Urban Gen Z",
+          "traits": [
+            "weekly treat buyer",
+            "health-conscious buyer",
+            "price-sensitive buyer"
+          ],
+          "archetype_count": 3,
+          "variation_strength": 0.3
+        },
+        "questions": [
+          {
+            "question_id": "q1",
+            "question_text": "How often do you buy packaged snacks?",
+            "question_type": "single_choice",
+            "options": ["Daily", "Weekly", "Monthly", "Rarely"]
+          },
+          {
+            "question_id": "q2",
+            "question_text": "What matters most when choosing snacks?",
+            "question_type": "single_choice",
+            "options": ["Taste", "Price", "Health", "Brand"]
+          },
+          {
+            "question_id": "q3",
+            "question_text": "Rate how healthy your snack choices are",
+            "question_type": "likert",
+            "options": ["1", "2", "3", "4", "5"]
+          }
+        ]
+      }
+    },
+    {
+      "job_id": "beverage-habits-working-professionals",
+      "request": {
+        "section_id": "sec-beverage-habits",
+        "section_name": "Beverage Habits",
+        "objective": "Understand weekday beverage choices and convenience drivers",
+        "model": "claude-3-5-haiku-20241022",
+        "respondent_count": 250,
+        "deterministic_seed": 99,
+        "use_llm_archetypes": true,
+        "llm_max_tokens": 2500,
+        "segment": {
+          "segment_id": "working-professionals",
+          "segment_name": "Working Professionals",
+          "traits": [
+            "convenience-first",
+            "routine-driven",
+            "premium-seeking"
+          ],
+          "archetype_count": 3,
+          "variation_strength": 0.25
+        },
+        "questions": [
+          {
+            "question_id": "q1",
+            "question_text": "Which beverage do you consume most on weekdays?",
+            "question_type": "single_choice",
+            "options": ["Tea", "Coffee", "Juice", "Soft drinks", "Water"]
+          },
+          {
+            "question_id": "q2",
+            "question_text": "Where do you usually buy beverages?",
+            "question_type": "single_choice",
+            "options": ["Office pantry", "Online", "Supermarket", "Local store", "Cafes"]
+          }
+        ]
+      }
+    }
+  ]
+}

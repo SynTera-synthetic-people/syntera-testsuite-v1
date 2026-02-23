@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#030712">
     <title>SynTera Test Suite</title>
     <link rel="icon" type="image/svg+xml" href="/brand/Icon.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -54,9 +55,11 @@
                     <li><button onclick="showSection('market-research')" id="nav-market-research" class="nav-item">Market Research Reverse Eng.</button></li>
                 </ul>
             </aside>
+        <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeMobileMenu()" aria-hidden="true"></div>
         <main class="main">
             <header class="top-bar">
-                <div>
+                <button type="button" class="mobile-menu-btn" onclick="toggleSidebar()" aria-label="Open menu">☰</button>
+                <div class="top-bar-content">
                     <h2 id="section-title">Home</h2>
                     <p class="subtitle" id="section-subtitle">Welcome to SynTera Test Suite - Statistical Validation Framework</p>
                 </div>
@@ -427,6 +430,16 @@
                 </div>
             </section>
         </main>
+    </div>
+    <div id="omi-narrator" class="omi-narrator" aria-live="polite">
+        <div class="omi-bubble" id="omi-bubble">Hi, I am Omi. I will guide you through your test-suite journey.</div>
+        <div class="omi-character-shell">
+            <video id="omi-video" class="omi-video" autoplay muted playsinline loop preload="auto" poster="/omi/OMI_Dark.png"></video>
+            <div class="omi-controls">
+                <button type="button" id="omi-toggle" class="omi-btn" title="Hide Omi">–</button>
+                <button type="button" id="omi-mute" class="omi-btn" title="Toggle sound">🔇</button>
+            </div>
+        </div>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="/static/js/app.js"></script>
