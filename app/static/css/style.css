@@ -1699,6 +1699,13 @@ input[type="checkbox"] {
     gap: 8px;
 }
 
+.test-results-grid .test-result-item--extra {
+    display: none;
+}
+.test-results-grid.is-expanded .test-result-item--extra {
+    display: flex;
+}
+
 .test-result-item {
     display: flex;
     align-items: center;
@@ -1732,9 +1739,15 @@ input[type="checkbox"] {
 }
 
 .test-result-item.more-tests {
-    background: transparent;
-    font-style: italic;
-    color: #9ca3af;
+    background: rgba(99, 102, 241, 0.12);
+    font-style: normal;
+    color: #a5b4fc;
+    cursor: pointer;
+    border: 1px dashed rgba(148, 163, 184, 0.4);
+}
+.test-result-item.more-tests:hover {
+    background: rgba(99, 102, 241, 0.2);
+    color: #c7d2fe;
 }
 
 .test-summary-stats {

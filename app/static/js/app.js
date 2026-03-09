@@ -1372,6 +1372,14 @@ function escapeHtml(s) {
 let currentReportsPage = 1;
 const reportsPerPage = 3; // 3 reports per page, rest in pagination
 
+function toggleReportCardChecks(btn) {
+    const grid = btn.closest('.synthetic-test-results')?.querySelector('.test-results-grid');
+    if (!grid) return;
+    const count = btn.dataset.moreCount || '0';
+    grid.classList.toggle('is-expanded');
+    btn.textContent = grid.classList.contains('is-expanded') ? 'Show less' : `+ ${count} more checks`;
+}
+
 async function loadReports(page = 1) {
     console.log('loadReports() called, page:', page);
     currentReportsPage = page;
@@ -1444,8 +1452,6 @@ async function loadReports(page = 1) {
             const report = s.test_suite_report || {};
             const tests = report.tests || [];
             
-            const totalTests = tests.filter(t => !t.error).length;
-            
             // Get file info - use survey title as primary label, avoid raw file paths in UI
             const fileInfo = s.synthetic_personas || {};
             const sourceFile = typeof fileInfo === 'object' && fileInfo.source_file ? fileInfo.source_file : '';
@@ -1454,14 +1460,14 @@ async function loadReports(page = 1) {
                 : (s.title || 'Uploaded file');
             const questionCount = s.test_suite_report?.question_comparisons?.length || fileInfo.question_data?.length || 0;
             
-            // Get top 5 test results with accuracies (plain English names via formatTestName)
-            const topTests = tests
+            // All test results; first 5 shown, rest expandable on click
+            const allTests = tests
                 .filter(t => t.match_score !== undefined && !t.error)
-                .slice(0, 5)
                 .map(t => ({
                     name: formatTestName(t.test),
                     accuracy: (t.match_score * 100).toFixed(1)
                 }));
+            const totalTests = tests.filter(t => !t.error).length;
             
             return `
                 <div class="report-card-2x2">
@@ -1502,23 +1508,15 @@ async function loadReports(page = 1) {
                         </div>
                         <div class="synthetic-test-results">
                             <div class="test-results-grid">
-                                ${topTests.map(test => `
-                                        <div class="test-result-item">
+                                ${allTests.map((test, idx) => `
+                                        <div class="test-result-item ${idx >= 5 ? 'test-result-item--extra' : ''}">
                                             <span class="test-result-name">${test.name}</span>
                                             <span class="test-result-accuracy" style="color: ${tierColor};">${test.accuracy}%</span>
                                         </div>
                                     `).join('')}
-                                ${totalTests > 5 ? `
-                                <div class="test-result-item more-tests">
-                                    <span class="test-result-name">+ ${totalTests - 5} more checks</span>
-                                </div>
+                                ${allTests.length > 5 ? `
+                                <div class="test-result-item more-tests" data-more-count="${allTests.length - 5}" onclick="toggleReportCardChecks(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleReportCardChecks(this)}" role="button" tabindex="0">+ ${allTests.length - 5} more checks</div>
                                 ` : ''}
-                            </div>
-                            <div class="test-summary-stats">
-                                <div class="summary-stat">
-                                    <span class="summary-label">Checks run</span>
-                                    <span class="summary-value">${totalTests}</span>
-                                </div>
                             </div>
                         </div>
                         <div class="report-card-actions-2x2">
