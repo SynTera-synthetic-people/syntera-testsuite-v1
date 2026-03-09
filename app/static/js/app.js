@@ -1,5 +1,6 @@
 // Omi narrator integration
 const OMI_BASE = '/omi/';
+const TIER_COLORS = { TIER_1: '#10b981', TIER_2: '#f59e0b', TIER_3: '#ef4444', TIER_4: '#7c3aed' };
 const OMI_STATES = {
     first: {
         webm: 'First Appearance_Original.webm',
@@ -108,7 +109,7 @@ function omiStateForSection(id) {
         reports: ['idle', 'Your dashboard gives a quick health check of validations.'],
         surveys: ['input', 'Create and manage survey experiments from here.'],
         validation: ['task', 'Upload synthetic and real files to run comparisons.'],
-        results: ['idle', 'Review scores, tiers, and recommendations here.'],
+        results: ['idle', 'Review scores and recommendations here.'],
         'industry-surveys': ['greet', 'Browse industry references and S3 files quickly.'],
         'market-research': ['task', 'Paste or upload a report and I will help reconstruct the questionnaire.'],
         dashboard: ['idle', 'Track metrics and trends in one place.'],
@@ -146,10 +147,10 @@ function initOmiNarrator() {
 function showSection(id) {
     closeMobileMenu();
     // Check if user is authenticated before showing protected sections
-    // Home and Industry Surveys are accessible without login
-    if (currentUserRole === null && id !== 'industry-surveys' && id !== 'home') {
+    // Without login: allow Dashboard & Reports and Results (View Details from dashboard)
+    if (currentUserRole === null && id !== 'reports' && id !== 'results') {
         showNotification('Please log in to access this page', 'warning');
-        id = 'home'; // Redirect to Home
+        id = 'reports';
     }
     
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
@@ -225,7 +226,7 @@ async function loadSurveys() {
         const surveys = await r.json();
         document.getElementById('surveys-list').innerHTML = surveys.map(s =>
             `<div class="survey-card">
-                <h3>${s.title}</h3>
+                <h3>${formatSurveyTitle(s.title)}</h3>
                 <p>Accuracy: ${s.accuracy_score ?? 'N/A'}</p>
                 <small>ID: ${s.id}</small>
             </div>`
@@ -243,7 +244,7 @@ async function loadDashboard() {
         const validatedSurveys = surveys.filter(s => s.accuracy_score !== null && s.accuracy_score !== undefined);
         document.getElementById('validated-surveys').textContent = validatedSurveys.length;
         
-        // Calculate average accuracy
+        // Average alignment score
         if (validatedSurveys.length > 0) {
             const totalAccuracy = validatedSurveys.reduce((sum, s) => {
                 const acc = parseFloat(s.accuracy_score) || 0;
@@ -254,11 +255,47 @@ async function loadDashboard() {
         } else {
             document.getElementById('avg-accuracy').textContent = '0%';
         }
+
+        // Avg variance range & avg stability from report question comparisons (plain English values)
+        const avgVarianceEl = document.getElementById('avg-variance-range');
+        const avgStabilityEl = document.getElementById('avg-stability-indicator');
+        if (avgVarianceEl && avgStabilityEl) {
+            const reportsWithQc = validatedSurveys.filter(s => {
+                const report = s.test_suite_report;
+                return report && Array.isArray(report.question_comparisons) && report.question_comparisons.length > 0;
+            });
+            if (reportsWithQc.length > 0) {
+                let sumVarianceRange = 0;
+                let sumStability = 0;
+                let count = 0;
+                reportsWithQc.forEach(s => {
+                    const scores = (s.test_suite_report.question_comparisons || [])
+                        .map(q => (q.match_score != null ? parseFloat(q.match_score) : null))
+                        .filter(v => typeof v === 'number' && !isNaN(v));
+                    if (scores.length > 0) {
+                        const minS = Math.min(...scores);
+                        const maxS = Math.max(...scores);
+                        sumVarianceRange += (maxS - minS) * 100;
+                        sumStability += minS * 100;
+                        count += 1;
+                    }
+                });
+                avgVarianceEl.textContent = count > 0 ? (sumVarianceRange / count).toFixed(1) + '%' : '—';
+                avgStabilityEl.textContent = count > 0 ? (sumStability / count).toFixed(1) + '%' : '—';
+            } else {
+                avgVarianceEl.textContent = '—';
+                avgStabilityEl.textContent = '—';
+            }
+        }
     } catch(e) { 
         console.error('Error loading dashboard:', e);
         document.getElementById('total-surveys').textContent = '0';
         document.getElementById('validated-surveys').textContent = '0';
         document.getElementById('avg-accuracy').textContent = '0%';
+        const avgVarianceEl = document.getElementById('avg-variance-range');
+        const avgStabilityEl = document.getElementById('avg-stability-indicator');
+        if (avgVarianceEl) avgVarianceEl.textContent = '—';
+        if (avgStabilityEl) avgStabilityEl.textContent = '—';
     }
 }
 
@@ -662,13 +699,7 @@ async function loadIndustrySurveys() {
     ];
     
     surveysList.innerHTML = industrySurveys.map(survey => {
-        const tierColors = {
-            'TIER_1': '#10b981',
-            'TIER_2': '#f59e0b',
-            'TIER_3': '#ef4444',
-            'TIER_4': '#7c3aed'
-        };
-        const tierColor = tierColors[survey.tier] || '#6b7280';
+        const tierColor = TIER_COLORS[survey.tier] || '#6b7280';
         
         return `
             <div class="industry-survey-card" style="border-left-color: ${survey.color};">
@@ -1339,7 +1370,7 @@ function escapeHtml(s) {
 
 // Pagination state
 let currentReportsPage = 1;
-const reportsPerPage = 4; // 2x2 grid = 4 items
+const reportsPerPage = 3; // 3 reports per page, rest in pagination
 
 async function loadReports(page = 1) {
     console.log('loadReports() called, page:', page);
@@ -1406,44 +1437,30 @@ async function loadReports(page = 1) {
         reportsList.innerHTML = paginatedSurveys.map(s => {
             const tier = s.confidence_tier || 'N/A';
             const accuracy = s.accuracy_score ? (s.accuracy_score * 100).toFixed(1) : 'N/A';
-            const tierColors = {
-                'TIER_1': '#10b981',
-                'TIER_2': '#f59e0b',
-                'TIER_3': '#ef4444',
-                'TIER_4': '#7c3aed'
-            };
-            const tierColor = tierColors[tier] || '#6b7280';
+            const tierColor = TIER_COLORS[tier] || '#6b7280';
             const validatedDate = s.validated_at ? new Date(s.validated_at).toLocaleDateString() : 'N/A';
             
             // Extract test accuracies from test_suite_report
             const report = s.test_suite_report || {};
             const tests = report.tests || [];
-            const testSummary = report.test_summary || {};
             
-            // Count tests by tier and calculate average accuracy
-            const testAccuracies = tests
-                .filter(t => t.match_score !== undefined && !t.error)
-                .map(t => (t.match_score * 100).toFixed(1));
-            
-            const tier1Tests = tests.filter(t => t.tier === 'TIER_1' && !t.error).length;
-            const tier2Tests = tests.filter(t => t.tier === 'TIER_2' && !t.error).length;
-            const tier3Tests = tests.filter(t => t.tier === 'TIER_3' && !t.error).length;
-            const tier4Tests = tests.filter(t => t.tier === 'TIER_4' && !t.error).length;
             const totalTests = tests.filter(t => !t.error).length;
             
-            // Get file info for seed characteristics
+            // Get file info - use survey title as primary label, avoid raw file paths in UI
             const fileInfo = s.synthetic_personas || {};
-            const sourceFile = typeof fileInfo === 'object' && fileInfo.source_file ? fileInfo.source_file : 'N/A';
+            const sourceFile = typeof fileInfo === 'object' && fileInfo.source_file ? fileInfo.source_file : '';
+            const dataSourceLabel = sourceFile && sourceFile !== 'N/A' && sourceFile.length > 3
+                ? (sourceFile.length > 30 ? 'Uploaded file' : sourceFile)
+                : (s.title || 'Uploaded file');
             const questionCount = s.test_suite_report?.question_comparisons?.length || fileInfo.question_data?.length || 0;
             
-            // Get top 5 test results with accuracies
+            // Get top 5 test results with accuracies (plain English names via formatTestName)
             const topTests = tests
                 .filter(t => t.match_score !== undefined && !t.error)
                 .slice(0, 5)
                 .map(t => ({
                     name: formatTestName(t.test),
-                    accuracy: (t.match_score * 100).toFixed(1),
-                    tier: t.tier
+                    accuracy: (t.match_score * 100).toFixed(1)
                 }));
             
             return `
@@ -1451,29 +1468,28 @@ async function loadReports(page = 1) {
                     <!-- Top Half: Seed Characteristics -->
                     <div class="report-card-seed-section">
                         <div class="seed-section-header">
-                            <h3 class="seed-section-title">${s.title || 'Untitled Survey'}</h3>
-                            <span class="tier-badge" style="background: ${tierColor}">${tier}</span>
+                            <h3 class="seed-section-title"><strong class="seed-label-bold">Study Name:</strong> <span class="seed-value-normal">${formatSurveyName(s.title || 'Validation run')}</span></h3>
                         </div>
                         <div class="seed-characteristics">
                             <div class="seed-char-item">
-                                <span class="seed-char-label">Survey ID</span>
+                                <span class="seed-char-label">Run ID</span>
                                 <span class="seed-char-value">${s.id.substring(0, 8)}...</span>
                             </div>
                             <div class="seed-char-item">
-                                <span class="seed-char-label">Source File</span>
-                                <span class="seed-char-value" title="${sourceFile}">${sourceFile.length > 25 ? sourceFile.substring(0, 25) + '...' : sourceFile}</span>
+                                <span class="seed-char-label">Data source</span>
+                                <span class="seed-char-value" title="${sourceFile || dataSourceLabel}">${dataSourceLabel.length > 28 ? dataSourceLabel.substring(0, 28) + '…' : dataSourceLabel}</span>
                             </div>
                             <div class="seed-char-item">
                                 <span class="seed-char-label">Questions</span>
                                 <span class="seed-char-value">${questionCount}</span>
                             </div>
                             <div class="seed-char-item">
-                                <span class="seed-char-label">Validated</span>
+                                <span class="seed-char-label">Last validated</span>
                                 <span class="seed-char-value">${validatedDate}</span>
                             </div>
                             <div class="seed-char-item">
-                                <span class="seed-char-label">Status</span>
-                                <span class="seed-char-value">${s.validation_status || 'VALIDATED'}</span>
+                                <span class="seed-char-label">Result</span>
+                                <span class="seed-char-value">${s.validation_status === 'VALIDATED' ? 'Validated' : (s.validation_status || 'Validated')}</span>
                             </div>
                         </div>
                     </div>
@@ -1481,47 +1497,27 @@ async function loadReports(page = 1) {
                     <!-- Bottom Half: Synthetic People Results -->
                     <div class="report-card-synthetic-section">
                         <div class="synthetic-section-header">
-                            <h4 class="synthetic-section-title">Synthetic People Results</h4>
+                            <h4 class="synthetic-section-title">Synthetic people alignment</h4>
                             <span class="overall-accuracy-badge" style="color: ${tierColor}; border-color: ${tierColor};">${accuracy}%</span>
                         </div>
                         <div class="synthetic-test-results">
                             <div class="test-results-grid">
-                                ${topTests.map(test => {
-                                    const testTierColor = tierColors[test.tier] || '#6b7280';
-                                    return `
+                                ${topTests.map(test => `
                                         <div class="test-result-item">
                                             <span class="test-result-name">${test.name}</span>
-                                            <span class="test-result-accuracy" style="color: ${testTierColor};">${test.accuracy}%</span>
-                                            <span class="test-result-badge" style="background: ${testTierColor}20; color: ${testTierColor};">${test.tier}</span>
+                                            <span class="test-result-accuracy" style="color: ${tierColor};">${test.accuracy}%</span>
                                         </div>
-                                    `;
-                                }).join('')}
+                                    `).join('')}
                                 ${totalTests > 5 ? `
                                 <div class="test-result-item more-tests">
-                                    <span class="test-result-name">+ ${totalTests - 5} more tests</span>
+                                    <span class="test-result-name">+ ${totalTests - 5} more checks</span>
                                 </div>
                                 ` : ''}
                             </div>
                             <div class="test-summary-stats">
                                 <div class="summary-stat">
-                                    <span class="summary-label">Total Tests</span>
+                                    <span class="summary-label">Checks run</span>
                                     <span class="summary-value">${totalTests}</span>
-                                </div>
-                                <div class="summary-stat">
-                                    <span class="summary-label">Tier 1</span>
-                                    <span class="summary-value" style="color: #10b981;">${tier1Tests}</span>
-                                </div>
-                                <div class="summary-stat">
-                                    <span class="summary-label">Tier 2</span>
-                                    <span class="summary-value" style="color: #f59e0b;">${tier2Tests}</span>
-                                </div>
-                                <div class="summary-stat">
-                                    <span class="summary-label">Tier 3</span>
-                                    <span class="summary-value" style="color: #ef4444;">${tier3Tests}</span>
-                                </div>
-                                <div class="summary-stat">
-                                    <span class="summary-label">Tier 4</span>
-                                    <span class="summary-value" style="color: #7c3aed;">${tier4Tests}</span>
                                 </div>
                             </div>
                         </div>
@@ -1635,13 +1631,15 @@ async function loadResultsPage() {
     
     const stored = sessionStorage.getItem('lastValidationResults');
     if (!stored) {
-        // Show empty state
+        // Show empty state (button: Dashboard when not logged in, Validation Runs when logged in)
+        const goToSection = currentUserRole ? 'validation' : 'reports';
+        const goToLabel = currentUserRole ? 'Go to Validation Runs' : 'Go to Dashboard';
         resultsContent.innerHTML = `
             <div class="empty-results-state">
                 <div class="empty-icon">📊</div>
                 <h3>No Results Yet</h3>
                 <p>Run a validation from the Validation Runs page to see results here.</p>
-                <button onclick="showSection('validation')" class="btn-primary">Go to Validation Runs</button>
+                <button id="results-empty-action-btn" onclick="showSection('${goToSection}')" class="btn-primary">${goToLabel}</button>
             </div>
         `;
         return;
@@ -1652,24 +1650,16 @@ async function loadResultsPage() {
         const data = parsed.data || parsed;
         const surveyId = parsed.surveyId || parsed.survey_id || data.survey_id;
         
-        console.log('Loading results for surveyId:', surveyId);
-        console.log('Data structure:', Object.keys(data));
-        
-        // If we have surveyId, try to fetch full results with question comparisons
         if (surveyId) {
             try {
                 const res = await fetch(`/api/validation/results/${surveyId}`);
                 if (res.ok) {
                     const fullData = await res.json();
-                    console.log('Fetched full results:', Object.keys(fullData));
                     displaySemilatticeStyleResults(fullData, surveyId, resultsContent);
                     return;
-                } else {
-                    const errorText = await res.text();
-                    console.warn('Failed to fetch full results:', res.status, errorText);
                 }
             } catch (e) {
-                console.warn('Could not fetch full results, using stored data:', e);
+                // Use stored data on fetch failure
             }
         }
         // Fallback to stored data - ensure it has the right structure
@@ -1689,13 +1679,9 @@ async function loadResultsPage() {
         try {
             displaySemilatticeStyleResults(displayData, surveyId, resultsContent);
         } catch (e) {
-            console.error('Semilattice style display failed, using fallback:', e);
-            // Fallback to old display function
             displayValidationResults(displayData, surveyId, resultsContent);
         }
     } catch (e) {
-        console.error('Error loading results:', e);
-        console.error('Stored data:', stored);
         resultsContent.innerHTML = `
             <div class="empty-results-state error-state-enhanced">
                 <div class="error-icon-animated">
@@ -1710,7 +1696,7 @@ async function loadResultsPage() {
                 <div class="error-details-enhanced">
                     <code>${e.message}</code>
                 </div>
-                <button onclick="showSection('validation')" class="btn-primary error-action-button">Go to Validation Runs</button>
+                <button onclick="showSection('${currentUserRole ? 'validation' : 'reports'}')" class="btn-primary error-action-button">${currentUserRole ? 'Go to Validation Runs' : 'Go to Dashboard'}</button>
             </div>
         `;
     }
@@ -1733,6 +1719,32 @@ function formatTestName(testName) {
         'cramer_von_mises': '📊 Distribution Equality'
     };
     return names[testName] || testName.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+}
+
+// Derive a short "Study Name" from file-comparison titles; no file names or "vs" shown.
+function formatSurveyTitle(rawTitle) {
+    if (!rawTitle) return '';
+    let title = String(rawTitle).trim();
+    const prefix = 'File Comparison:';
+    if (title.startsWith(prefix)) {
+        const rest = title.slice(prefix.length).trim();
+        const firstPart = rest.split(/\s+vs\s+/i)[0] || rest;
+        let name = firstPart
+            .replace(/\.[^.\s]+$/, '')  // strip extension
+            .replace(/_AI_Summary$|_Human_Summary$|_AI$|_Human$|_Synthetic$|_Real$/i, '')
+            .replace(/[_-]+/g, ' ')
+            .trim();
+        if (!name) name = 'Validation run';
+        return `Study Name: ${name}`;
+    }
+    return title.replace(/\.[^.\s]+$/, '').replace(/[_-]+/g, ' ').trim() || 'Study';
+}
+
+// Return only the display name (value part) for "Study Name: value" so the label can be bold and value normal weight.
+function formatSurveyName(rawTitle) {
+    const full = formatSurveyTitle(rawTitle);
+    if (full.startsWith('Study Name: ')) return full.slice(12);
+    return full;
 }
 
 // Generate sparkline SVG chart (Excel-style mini chart)
@@ -1819,18 +1831,15 @@ async function fetchUserPrivileges() {
                 updateUserDisplay();
                 return data;
             } else {
-                // Not authenticated - show only Industry Surveys
                 currentUserRole = null;
                 return { authenticated: false, role: null, is_super_user: false };
             }
         } else {
-            // If auth endpoint fails, show only Industry Surveys
             currentUserRole = null;
             return { authenticated: false, role: null, is_super_user: false };
         }
     } catch (error) {
         console.error('Error fetching user privileges:', error);
-        // On error, show only Industry Surveys
         currentUserRole = null;
         return { authenticated: false, role: null, is_super_user: false };
     } finally {
@@ -1882,8 +1891,8 @@ function logout() {
     currentUserRole = null; // No role after logout - show Home
     updateNavigationForRole();
     updateUserDisplay();
-    // Navigate to Home page after logout
-    showSection('home');
+    // Navigate to Dashboard & Reports after logout
+    showCombinedDashboardReports();
     showNotification('Logged out successfully', 'info');
 }
 
@@ -1900,6 +1909,81 @@ async function handleLogin() {
     const result = await login(username, password);
     if (result) {
         updateUserDisplay();
+    }
+}
+
+// New User registration modal
+function openRegisterModal() {
+    const modal = document.getElementById('register-modal');
+    if (modal) {
+        modal.style.display = 'flex';
+        modal.setAttribute('aria-hidden', 'false');
+        document.getElementById('register-username')?.focus();
+        document.getElementById('register-error').style.display = 'none';
+    }
+}
+
+function closeRegisterModal() {
+    const modal = document.getElementById('register-modal');
+    if (modal) {
+        modal.style.display = 'none';
+        modal.setAttribute('aria-hidden', 'true');
+        document.getElementById('register-form')?.reset();
+        document.getElementById('register-error').style.display = 'none';
+    }
+}
+
+async function register(username, email, password) {
+    const body = { username, password };
+    if (email && email.trim()) body.email = email.trim();
+    const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+    });
+    if (!response.ok) {
+        const data = await response.json().catch(() => ({ detail: 'Registration failed' }));
+        throw new Error(data.detail || 'Registration failed');
+    }
+    return response.json();
+}
+
+async function handleRegister(event) {
+    event.preventDefault();
+    const username = document.getElementById('register-username')?.value?.trim();
+    const email = document.getElementById('register-email')?.value?.trim();
+    const password = document.getElementById('register-password')?.value;
+    const confirmPassword = document.getElementById('register-password-confirm')?.value;
+    const errEl = document.getElementById('register-error');
+
+    if (!username || username.length < 2) {
+        errEl.textContent = 'Username must be at least 2 characters.';
+        errEl.style.display = 'block';
+        return;
+    }
+    if (password.length < 6) {
+        errEl.textContent = 'Password must be at least 6 characters.';
+        errEl.style.display = 'block';
+        return;
+    }
+    if (password !== confirmPassword) {
+        errEl.textContent = 'Passwords do not match.';
+        errEl.style.display = 'block';
+        return;
+    }
+
+    errEl.style.display = 'none';
+    try {
+        await register(username, email || null, password);
+        closeRegisterModal();
+        const loggedIn = await login(username, password);
+        if (loggedIn) {
+            updateUserDisplay();
+            showNotification('Account created. You are now logged in.', 'success');
+        }
+    } catch (e) {
+        errEl.textContent = e.message || 'Registration failed.';
+        errEl.style.display = 'block';
     }
 }
 
@@ -1938,12 +2022,37 @@ function updateUserDisplay() {
         if (userInfoDisplay) userInfoDisplay.style.display = 'none';
         if (loginFormDisplay) loginFormDisplay.style.display = 'block';
     }
+
+    // Dashboard: show Start New Validation / View All Experiments only when logged in
+    const dashboardActions = document.getElementById('dashboard-actions');
+    if (dashboardActions) dashboardActions.style.display = (authToken && currentUserRole) ? '' : 'none';
+
+    // Results header button: "Dashboard" when not logged in, "Run New Validation" when logged in
+    const resultsHeaderBtn = document.getElementById('results-header-action-btn');
+    if (resultsHeaderBtn) {
+        if (authToken && currentUserRole) {
+            resultsHeaderBtn.textContent = '← Run New Validation';
+            resultsHeaderBtn.onclick = () => showSection('validation');
+        } else {
+            resultsHeaderBtn.textContent = '← Dashboard';
+            resultsHeaderBtn.onclick = () => showSection('reports');
+        }
+    }
+
+    // Results empty state button (when visible)
+    const resultsEmptyBtn = document.getElementById('results-empty-action-btn');
+    if (resultsEmptyBtn) {
+        if (authToken && currentUserRole) {
+            resultsEmptyBtn.textContent = 'Go to Validation Runs';
+            resultsEmptyBtn.onclick = () => showSection('validation');
+        } else {
+            resultsEmptyBtn.textContent = 'Go to Dashboard';
+            resultsEmptyBtn.onclick = () => showSection('reports');
+        }
+    }
 }
 
 function updateNavigationForRole() {
-    const sections = ['home', 'dashboard', 'surveys', 'validation', 'results', 'industry-surveys', 'market-research', 'reports'];
-    
-    // Get navigation items
     const navHome = document.getElementById('nav-home');
     const navDashboardReports = document.getElementById('nav-dashboard-reports');
     const navSurveys = document.getElementById('nav-surveys');
@@ -1953,20 +2062,20 @@ function updateNavigationForRole() {
     const navMarketResearch = document.getElementById('nav-market-research');
     
     if (currentUserRole === null) {
-        // Not logged in: Show Home and Industry Surveys
-        if (navHome) navHome.style.display = '';
-        if (navDashboardReports) navDashboardReports.style.display = 'none';
-        if (navSurveys) navSurveys.style.display = 'none';
-        if (navValidation) navValidation.style.display = 'none';
-        if (navResults) navResults.style.display = 'none';
-        if (navIndustrySurveys) navIndustrySurveys.style.display = '';
-        if (navMarketResearch) navMarketResearch.style.display = 'none';
-    } else if (currentUserRole === 'user') {
-        // User: Show Home, Dashboard+Reports (combined), Test Results, Industry Surveys, Market Research
-        if (navHome) navHome.style.display = '';
+        // Not logged in: show only Dashboard & Reports
+        if (navHome) navHome.style.display = 'none';
         if (navDashboardReports) navDashboardReports.style.display = '';
         if (navSurveys) navSurveys.style.display = 'none';
         if (navValidation) navValidation.style.display = 'none';
+        if (navResults) navResults.style.display = 'none';
+        if (navIndustrySurveys) navIndustrySurveys.style.display = 'none';
+        if (navMarketResearch) navMarketResearch.style.display = 'none';
+    } else if (currentUserRole === 'user') {
+        // User: show all except maybe admin-only in the future
+        if (navHome) navHome.style.display = '';
+        if (navDashboardReports) navDashboardReports.style.display = '';
+        if (navSurveys) navSurveys.style.display = '';
+        if (navValidation) navValidation.style.display = '';
         if (navResults) navResults.style.display = '';
         if (navIndustrySurveys) navIndustrySurveys.style.display = '';
         if (navMarketResearch) navMarketResearch.style.display = '';
@@ -1995,6 +2104,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     // First, set up basic UI state
     updateNavigationForRole();
     updateUserDisplay();
+
+    // Allow pressing Enter in password field to trigger login
+    const passwordInput = document.getElementById('login-password');
+    if (passwordInput) {
+        passwordInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                handleLogin();
+            }
+        });
+    }
     
     try {
         // Fetch user privileges from backend
@@ -2002,17 +2121,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         // Load default page based on authentication status
         if (authData && authData.authenticated) {
-            // If logged in, load reports as default
             showSection('reports');
+            loadDashboard();
             loadReports(1);
         } else {
-            // If not logged in, show Home page
-            showSection('home');
+            // If not logged in, default to Dashboard & Reports
+            showSection('reports');
+            loadDashboard();
+            loadReports(1);
         }
     } catch (error) {
         console.error('Error during initialization:', error);
-        // Fallback: show Home if anything fails
-        showSection('home');
+        // Fallback: show Dashboard & Reports if anything fails
+        showSection('reports');
     }
     
     // Restore sidebar state - collapse by default
@@ -2044,6 +2165,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('market-research-load-sample')?.addEventListener('click', loadSamplePdfText);
     document.getElementById('market-research-download-pdf')?.addEventListener('click', downloadMarketResearchPdf);
     document.getElementById('market-research-download-csv')?.addEventListener('click', downloadMarketResearchCsv);
+
+    // Close register modal on overlay click or Escape
+    document.getElementById('register-modal')?.addEventListener('click', (e) => {
+        if (e.target.id === 'register-modal') closeRegisterModal();
+    });
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            const modal = document.getElementById('register-modal');
+            if (modal && modal.style.display === 'flex') closeRegisterModal();
+        }
+    });
 });
 
 // Display results in Semilattice.ai style
@@ -2054,46 +2186,28 @@ function displaySemilatticeStyleResults(data, surveyId, targetDiv) {
     }
     
     try {
-        // Handle different data structures
         const survey = data.survey || {};
         const fileInfo = data.file_info || {};
         let questionComparisons = data.question_comparisons || [];
-        
-        // Debug logging
-        console.log('displaySemilatticeStyleResults - Data keys:', Object.keys(data));
-        console.log('displaySemilatticeStyleResults - questionComparisons:', questionComparisons);
-        console.log('displaySemilatticeStyleResults - questionComparisons type:', typeof questionComparisons);
-        console.log('displaySemilatticeStyleResults - questionComparisons length:', Array.isArray(questionComparisons) ? questionComparisons.length : 'not an array');
-        
-        // Also check results.question_comparisons (nested structure)
         if (!questionComparisons || questionComparisons.length === 0) {
             const results = data.results || {};
             questionComparisons = results.question_comparisons || data.question_comparisons || [];
-            console.log('Checking nested results.question_comparisons:', questionComparisons);
         }
         
         const tier = data.overall_tier || data.tier || 'N/A';
         const accuracyValue = data.overall_accuracy || data.accuracy || 0;
         const accuracy = (typeof accuracyValue === 'number' ? accuracyValue * 100 : parseFloat(accuracyValue) * 100 || 0).toFixed(1);
+        const tierColor = TIER_COLORS[tier] || '#6b7280';
     
-    const tierColors = {
-        'TIER_1': '#10b981',
-        'TIER_2': '#f59e0b',
-        'TIER_3': '#ef4444',
-        'TIER_4': '#7c3aed'
-    };
-    const tierColor = tierColors[tier] || '#6b7280';
-    
-    // Format dates
     const createdDate = survey.created_at ? new Date(survey.created_at).toLocaleString() : 'N/A';
     const validatedDate = survey.validated_at ? new Date(survey.validated_at).toLocaleString() : 'N/A';
     
-    // Model details section (like Semilattice)
+    // Model details section – compact; no synthetic/real file names
     const modelDetailsHtml = `
-        <div class="model-details-card">
+        <div class="model-details-card model-details-compact">
             <div class="model-details-header">
                 <div>
-                    <h3>${survey.title || 'Survey Comparison'}</h3>
+                    <h3><strong class="seed-label-bold">Study Name:</strong> <span class="seed-value-normal">${formatSurveyName(survey.title || 'Survey Comparison')}</span></h3>
                     <p class="model-description">${survey.description || 'Comparison between synthetic and real survey responses'}</p>
                 </div>
                 <div class="model-id-section">
@@ -2125,22 +2239,6 @@ function displaySemilatticeStyleResults(data, surveyId, targetDiv) {
                     <div class="model-detail-label">Overall File Accuracy</div>
                     <div class="model-detail-value" style="color: ${tierColor}">${accuracy}%</div>
                 </div>
-                <div class="model-detail-item">
-                    <div class="model-detail-label">Status</div>
-                    <div class="model-detail-value">
-                        <span class="status-badge" style="background: ${tierColor}">${tier}</span>
-                    </div>
-                </div>
-                ${fileInfo.synthetic_file ? `
-                <div class="model-detail-item full-width">
-                    <div class="model-detail-label">Synthetic File</div>
-                    <div class="model-detail-value file-name" title="${fileInfo.synthetic_file}">${fileInfo.synthetic_file}</div>
-                </div>
-                <div class="model-detail-item full-width">
-                    <div class="model-detail-label">Real File</div>
-                    <div class="model-detail-value file-name" title="${fileInfo.real_file}">${fileInfo.real_file}</div>
-                </div>
-                ` : ''}
             </div>
         </div>
     `;
@@ -2253,23 +2351,7 @@ function displaySemilatticeStyleResults(data, surveyId, targetDiv) {
         </div>
     `;
     
-    // Calculate tier stats
-    const tier1Count = questionComparisons.length > 0 ? questionComparisons.filter(q => q.tier === 'TIER_1').length : (data.tests ? data.tests.filter(t => t.tier === 'TIER_1').length : 0);
-    const tier2Count = questionComparisons.length > 0 ? questionComparisons.filter(q => q.tier === 'TIER_2').length : 0;
-    const tier3Count = questionComparisons.length > 0 ? questionComparisons.filter(q => q.tier === 'TIER_3').length : 0;
-    const tier4Count = questionComparisons.length > 0 ? questionComparisons.filter(q => q.tier === 'TIER_4').length : (data.tests ? data.tests.filter(t => t.tier === 'TIER_4').length : 0);
-    const totalQuestions = questionComparisons.length > 0 ? questionComparisons.length : (fileInfo.synthetic_question_count || fileInfo.real_question_count || 0);
-    const tier1Percent = totalQuestions > 0 ? (tier1Count / totalQuestions * 100).toFixed(0) : 0;
-    const tier2Percent = totalQuestions > 0 ? (tier2Count / totalQuestions * 100).toFixed(0) : 0;
-    const tier3Percent = totalQuestions > 0 ? (tier3Count / totalQuestions * 100).toFixed(0) : 0;
-    const tier4Percent = totalQuestions > 0 ? (tier4Count / totalQuestions * 100).toFixed(0) : 0;
-    
-    // Get tier emoji and description
-    const tierEmoji = tier === 'TIER_1' ? '🎯' : tier === 'TIER_2' ? '✨' : tier === 'TIER_3' ? '📊' : '⚠️';
-    const tierDesc = tier === 'TIER_1' ? 'Excellent Match' : tier === 'TIER_2' ? 'Good Match' : tier === 'TIER_3' ? 'Needs Improvement' : 'Needs Significant Improvement';
-    
-    
-    // Question-by-question table with option-level comparison and sparklines
+    // Question-by-question table with option-level comparison (no sparklines)
     let questionsTableHtml = '';
     if (questionComparisons.length > 0) {
         questionsTableHtml = `
@@ -2280,71 +2362,86 @@ function displaySemilatticeStyleResults(data, surveyId, targetDiv) {
                             <tr>
                                 <th>Question</th>
                                 <th>Options Comparison</th>
-                                <th>Sparkline</th>
-                                <th>Status</th>
                                 <th>Type</th>
                                 <th>Match Score</th>
                             </tr>
                         </thead>
                         <tbody>
                             ${questionComparisons.map((q, idx) => {
-                                const qTierColor = tierColors[q.tier] || '#6b7280';
+                                const qTierColor = TIER_COLORS[q.tier] || '#6b7280';
                                 const matchPercent = (q.match_score * 100).toFixed(1);
                                 const optionComparisons = q.option_comparisons || [];
                                 
-                                // Build option-level comparison display
+                                // Bar chart: Y = options, X = count; Humans = green, Synthetic = red; count beside each bar
+                                const HUMAN_COLOR = '#22c55e';
+                                const SYNTHETIC_COLOR = '#ef4444';
                                 let optionsHtml = '';
                                 if (optionComparisons.length > 0) {
-                                    optionsHtml = optionComparisons.map(opt => {
-                                        const synCount = opt.synthetic_count || 0;
-                                        const realCount = opt.real_count || 0;
-                                        const maxCount = Math.max(synCount, realCount, 1);
-                                        const synPercent = (synCount / maxCount) * 100;
-                                        const realPercent = (realCount / maxCount) * 100;
-                                        
-                                        return `
-                                            <div class="option-comparison-item">
-                                                <div class="option-label">${opt.option}</div>
-                                                <div class="option-bars">
-                                                    <div class="option-bar synthetic" style="width: ${synPercent}%; background: ${qTierColor}; opacity: 0.7;" title="Synthetic: ${synCount}"></div>
-                                                    <div class="option-bar real" style="width: ${realPercent}%; background: ${qTierColor};" title="Real: ${realCount}"></div>
-                                                </div>
-                                                <div class="option-values">
-                                                    <span class="option-value-syn">S: ${synCount.toFixed(0)}</span>
-                                                    <span class="option-value-real">R: ${realCount.toFixed(0)}</span>
-                                                </div>
+                                    const maxCount = Math.max(1, ...optionComparisons.flatMap(opt => [opt.real_count || 0, opt.synthetic_count || 0]));
+                                    optionsHtml = `
+                                        <div class="q-bar-chart" role="img" aria-label="Humans vs Synthetic comparison">
+                                            <div class="q-bar-chart-legend">
+                                                <span class="q-bar-legend-item" style="background:${HUMAN_COLOR}"></span> Humans
+                                                <span class="q-bar-legend-item" style="background:${SYNTHETIC_COLOR}"></span> Synthetic
                                             </div>
-                                        `;
-                                    }).join('');
+                                            <div class="q-bar-chart-y-axis-label">Option</div>
+                                            <div class="q-bar-chart-bars">
+                                                ${optionComparisons.map(opt => {
+                                                    const synCount = opt.synthetic_count || 0;
+                                                    const realCount = opt.real_count || 0;
+                                                    const realPct = Math.round((realCount / maxCount) * 100);
+                                                    const synPct = Math.round((synCount / maxCount) * 100);
+                                                    const realDisplay = Math.round(realCount);
+                                                    const synDisplay = Math.round(synCount);
+                                                    return `
+                                                        <div class="q-bar-row">
+                                                            <div class="q-bar-y-label" title="${opt.option}">${opt.option}</div>
+                                                            <div class="q-bar-group">
+                                                                <div class="q-bar-slot">
+                                                                    <div class="q-bar q-bar-human" style="width:${realPct}%; background:${HUMAN_COLOR};" title="Humans: ${realDisplay}"></div>
+                                                                    <span class="q-bar-count-inline human">${realDisplay}</span>
+                                                                </div>
+                                                                <div class="q-bar-slot">
+                                                                    <div class="q-bar q-bar-synthetic" style="width:${synPct}%; background:${SYNTHETIC_COLOR};" title="Synthetic: ${synDisplay}"></div>
+                                                                    <span class="q-bar-count-inline synthetic">${synDisplay}</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    `;
+                                                }).join('')}
+                                            </div>
+                                        </div>
+                                    `;
                                 } else {
-                                    // Fallback to totals if no option data
                                     const synTotal = q.synthetic_total || 0;
                                     const realTotal = q.real_total || 0;
+                                    const maxCount = Math.max(realTotal, synTotal, 1);
+                                    const realPct = Math.round((realTotal / maxCount) * 100);
+                                    const synPct = Math.round((synTotal / maxCount) * 100);
+                                    const realDisplay = Math.round(realTotal);
+                                    const synDisplay = Math.round(synTotal);
                                     optionsHtml = `
-                                        <div class="option-comparison-item">
-                                            <div class="option-label">Total</div>
-                                            <div class="option-bars">
-                                                <div class="option-bar synthetic" style="width: 50%; background: ${qTierColor}; opacity: 0.7;" title="Synthetic: ${synTotal}"></div>
-                                                <div class="option-bar real" style="width: 50%; background: ${qTierColor};" title="Real: ${realTotal}"></div>
+                                        <div class="q-bar-chart">
+                                            <div class="q-bar-chart-legend">
+                                                <span class="q-bar-legend-item" style="background:${HUMAN_COLOR}"></span> Humans
+                                                <span class="q-bar-legend-item" style="background:${SYNTHETIC_COLOR}"></span> Synthetic
                                             </div>
-                                            <div class="option-values">
-                                                <span class="option-value-syn">S: ${synTotal.toFixed(0)}</span>
-                                                <span class="option-value-real">R: ${realTotal.toFixed(0)}</span>
+                                            <div class="q-bar-row">
+                                                <div class="q-bar-y-label">Total</div>
+                                                <div class="q-bar-group">
+                                                    <div class="q-bar-slot">
+                                                        <div class="q-bar q-bar-human" style="width:${realPct}%; background:${HUMAN_COLOR};" title="Humans: ${realDisplay}"></div>
+                                                        <span class="q-bar-count-inline human">${realDisplay}</span>
+                                                    </div>
+                                                    <div class="q-bar-slot">
+                                                        <div class="q-bar q-bar-synthetic" style="width:${synPct}%; background:${SYNTHETIC_COLOR};" title="Synthetic: ${synDisplay}"></div>
+                                                        <span class="q-bar-count-inline synthetic">${synDisplay}</span>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     `;
                                 }
-                                
-                                // Generate sparkline data
-                                const sparklineData = optionComparisons.length > 0 
-                                    ? optionComparisons.map(opt => ({
-                                        syn: opt.synthetic_count || 0,
-                                        real: opt.real_count || 0
-                                    }))
-                                    : [{ syn: q.synthetic_total || 0, real: q.real_total || 0 }];
-                                
-                                const sparklineId = `sparkline-${idx}`;
-                                const sparklineSvg = generateSparkline(sparklineData, sparklineId, qTierColor);
                                 
                                 return `
                                     <tr>
@@ -2357,14 +2454,8 @@ function displaySemilatticeStyleResults(data, surveyId, targetDiv) {
                                                 ${optionsHtml}
                                             </div>
                                         </td>
-                                        <td class="sparkline-cell">
-                                            ${sparklineSvg}
-                                        </td>
-                                        <td class="status-cell">
-                                            <span class="status-badge-small" style="background: ${qTierColor}">${q.status || 'Compared'}</span>
-                                        </td>
                                         <td class="type-cell">${q.type || 'Single-Choice'}</td>
-                                        <td class="match-score-cell" style="color: ${qTierColor}">${matchPercent}%</td>
+                                        <td class="match-score-cell" style="color: ${qTierColor}; font-weight: 600;">${matchPercent}%</td>
                                     </tr>
                                 `;
                             }).join('')}
@@ -2391,11 +2482,11 @@ function displaySemilatticeStyleResults(data, surveyId, targetDiv) {
                 <div class="test-results-grid">
                     ${data.tests ? data.tests.map(test => {
                         const testTier = test.tier || 'N/A';
-                        const testColor = tierColors[testTier] || '#6b7280';
+                        const testTierColor = TIER_COLORS[testTier] || '#6b7280';
                         return `
-                            <div class="test-result-card" style="border-left-color: ${testColor}">
+                            <div class="test-result-card" style="border-left-color: ${testTierColor}">
                                 <div class="test-result-name">${formatTestName(test.test)}</div>
-                                <div class="test-result-status" style="color: ${testColor}">${testTier}</div>
+                                <div class="test-result-status" style="color: ${testTierColor}">${testTier}</div>
                             </div>
                         `;
                     }).join('') : '<p>No test results available</p>'}
@@ -2407,10 +2498,11 @@ function displaySemilatticeStyleResults(data, surveyId, targetDiv) {
         targetDiv.innerHTML = `
             ${modelDetailsHtml}
             ${tabsHtml}
-            ${methodologyHtml}
             ${questionsTableHtml}
             ${questionComparisons.length === 0 ? summaryHtml : ''}
+            ${methodologyHtml}
             <div class="results-actions">
+                ${currentUserRole ? `<button onclick="showSection('validation')" class="btn-primary">Run New Validation</button>` : `<button onclick="showSection('reports')" class="btn-primary">← Dashboard</button>`}
                 <button onclick="downloadReport('${surveyId || ''}', 'html')" class="btn-download">📄 Download HTML Report</button>
                 <button onclick="downloadReport('${surveyId || ''}', 'json')" class="btn-download">📋 Download JSON</button>
             </div>
@@ -2433,7 +2525,7 @@ function displaySemilatticeStyleResults(data, surveyId, targetDiv) {
                 <div class="error-details-enhanced">
                     <code>${error.message}</code>
                 </div>
-                <button onclick="showSection('validation')" class="btn-primary error-action-button">Go to Validation Runs</button>
+                <button onclick="showSection('${currentUserRole ? 'validation' : 'reports'}')" class="btn-primary error-action-button">${currentUserRole ? 'Go to Validation Runs' : 'Go to Dashboard'}</button>
             </div>
         `;
     }
@@ -2761,14 +2853,7 @@ function displayValidationResults(data, surveyId, resultsDiv = null) {
     
     const tier = data.overall_tier || 'N/A';
     const accuracy = (data.overall_accuracy * 100).toFixed(1);
-    
-    const tierColors = {
-        'TIER_1': '#10b981',
-        'TIER_2': '#f59e0b',
-        'TIER_3': '#ef4444',
-        'TIER_4': '#7c3aed'
-    };
-    const tierColor = tierColors[tier] || '#6b7280';
+    const tierColor = TIER_COLORS[tier] || '#6b7280';
     
     // Build simplified test list (no complex categorization)
     let testsHtml = '';
@@ -2781,7 +2866,7 @@ function displayValidationResults(data, surveyId, resultsDiv = null) {
         
         validTests.forEach(test => {
             const testTier = test.tier || 'N/A';
-            const testTierColor = tierColors[testTier] || '#6b7280';
+            const testTierColor = TIER_COLORS[testTier] || '#6b7280';
             const metrics = formatTestMetrics(test);
             
             const tierEmoji = testTier === 'TIER_1' ? '✅' : testTier === 'TIER_2' ? '⚠️' : testTier === 'TIER_3' ? '❌' : '🔴';

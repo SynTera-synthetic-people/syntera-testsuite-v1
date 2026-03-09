@@ -17,7 +17,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from config.parameter import load_ssm_parameters
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, RedirectResponse
 import logging
 from contextlib import asynccontextmanager
 
@@ -85,6 +85,19 @@ async def health_check():
 async def index():
     """Serve the main HTML dashboard."""
     return FileResponse(INDEX_HTML)
+
+
+@app.get("/studio")
+@app.get("/test-studio")
+async def explore_test_studio():
+    """Redirect from synthetic-people.ai 'Explore Test Studio' to Dashboard & Reports."""
+    return RedirectResponse(url="/#reports", status_code=302)
+
+
+@app.get("/explore")
+async def explore():
+    """Alternate entry for Explore Test Studio (e.g. /explore)."""
+    return RedirectResponse(url="/#reports", status_code=302)
 
 
 if __name__ == "__main__":

@@ -13,76 +13,110 @@
 </head>
 <body>
     <div id="app" class="app-shell">
-            <aside class="sidebar" style="position: relative;">
-                <button class="sidebar-toggle" onclick="toggleSidebar()" title="Toggle sidebar">☰</button>
-                <div class="brand">
-                    <img src="/brand/Icon.svg" alt="" class="brand-logo-icon" />
-                    <div>
-                        <h1>SynTera</h1>
-                        <p>Synthetic People Test Suite</p>
+        <main class="main">
+            <header class="top-bar">
+                <div class="top-bar-row">
+                    <div class="brand">
+                        <img src="/brand/Icon.svg" alt="" class="brand-logo-icon" />
+                        <div>
+                            <h1>SynTera</h1>
+                            <p>Synthetic People Test Suite</p>
+                        </div>
                     </div>
-                </div>
-                <div class="user-auth-section" style="margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(55, 65, 81, 0.5);">
-                    <div id="user-info-display" style="display: none;">
-                        <div style="font-size: 0.75rem; color: #9ca3af; margin-bottom: 4px;">Logged in as</div>
-                        <div id="username-display" style="font-size: 0.85rem; color: #e5e7eb; font-weight: 600; margin-bottom: 8px;"></div>
-                        <div id="user-role-display" style="font-size: 0.7rem; color: #6b7280; margin-bottom: 8px;"></div>
-                        <button onclick="logout()" class="btn-logout" style="width: 100%; padding: 6px; font-size: 0.75rem; background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.4); color: #fca5a5; border-radius: 6px; cursor: pointer;">Logout</button>
+                    <div class="top-bar-content">
+                        <div class="home-hero header-hero">
+                            <div class="hero-content">
+                                <img src="/brand/Logo%20on%20Black.svg" alt="SynTera" class="hero-brand-logo" />
+                                <div class="hero-text-block">
+                                    <h1 class="hero-title">SynTera Test Suite</h1>
+                                    <p class="hero-subtitle">Compare real human survey output with synthetic people and persona survey output</p>
+                                    <div class="hero-badges">
+                                        <span class="badge">97.8% Accuracy</span>
+                                        <span class="badge">8 Statistical Tests</span>
+                                        <span class="badge">Production Ready</span>
+                                    </div>
+                                </div>
+                            </div>
+                            </div>
                     </div>
-                    <div id="login-form-display" style="display: none;">
-                        <label class="field-label" style="font-size: 0.75rem;">
-                            Username
-                            <input type="text" id="login-username" placeholder="user or super" style="margin-top: 4px; width: 100%;" />
-                        </label>
-                        <label class="field-label" style="font-size: 0.75rem;">
-                            Password
-                            <input type="password" id="login-password" placeholder="password" style="margin-top: 4px; width: 100%;" />
-                        </label>
-                        <button onclick="handleLogin()" class="btn-primary" style="width: 100%; margin-top: 8px; padding: 8px; font-size: 0.8rem;">Login</button>
-                        <div style="font-size: 0.65rem; color: #6b7280; margin-top: 8px; text-align: center;">
-                            Default: user/user123 or super/super123
+                    <div class="top-bar-auth">
+                        <div id="user-info-display" class="user-auth-inline" style="display: none;">
+                            <div class="user-auth-text">
+                                <span id="username-display" class="user-name"></span>
+                                <span id="user-role-display" class="user-role"></span>
+                            </div>
+                            <button onclick="logout()" class="btn-secondary btn-compact">Logout</button>
+                        </div>
+                        <div id="login-form-display" style="display: none;">
+                            <input type="text" id="login-username" placeholder="user or super" class="auth-input" />
+                            <input type="password" id="login-password" placeholder="password" class="auth-input" />
+                            <button onclick="handleLogin()" class="btn-primary btn-compact">Login</button>
+                            <button type="button" onclick="openRegisterModal()" class="btn-secondary btn-compact">New User</button>
                         </div>
                     </div>
                 </div>
-                <p class="sidebar-label">Workspace</p>
-                <ul class="nav-list">
-                    <li><button onclick="showSection('home')" id="nav-home" class="nav-item active">🏠 Home</button></li>
-                    <li><button onclick="showSection('reports'); loadDashboard();" id="nav-dashboard-reports" class="nav-item">Dashboard & Reports</button></li>
-                    <li><button onclick="showSection('surveys')" id="nav-surveys" class="nav-item">Surveys</button></li>
-                    <li><button onclick="showSection('validation')" id="nav-validation" class="nav-item">Validation Runs</button></li>
-                    <li><button onclick="showSection('results')" id="nav-results" class="nav-item">Test Results</button></li>
-                    <li><button onclick="showSection('industry-surveys')" id="nav-industry-surveys" class="nav-item">Industry Surveys</button></li>
-                    <li><button onclick="showSection('market-research')" id="nav-market-research" class="nav-item">Market Research Reverse Eng.</button></li>
-                </ul>
-            </aside>
-        <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeMobileMenu()" aria-hidden="true"></div>
-        <main class="main">
-            <header class="top-bar">
-                <button type="button" class="mobile-menu-btn" onclick="toggleSidebar()" aria-label="Open menu">☰</button>
-                <div class="top-bar-content">
-                    <h2 id="section-title">Home</h2>
-                    <p class="subtitle" id="section-subtitle">Welcome to SynTera Test Suite - Statistical Validation Framework</p>
-                </div>
+                <nav class="top-nav-tabs" aria-label="Main navigation">
+                    <button onclick="showSection('home')" id="nav-home" class="nav-item">Home</button>
+                    <button onclick="showSection('reports'); loadDashboard();" id="nav-dashboard-reports" class="nav-item active">Dashboard &amp; Reports</button>
+                    <button onclick="showSection('surveys')" id="nav-surveys" class="nav-item">Surveys</button>
+                    <button onclick="showSection('validation')" id="nav-validation" class="nav-item">Validation Runs</button>
+                    <button onclick="showSection('results')" id="nav-results" class="nav-item">Test Results</button>
+                    <button onclick="showSection('industry-surveys')" id="nav-industry-surveys" class="nav-item">Industry Surveys</button>
+                    <button onclick="showSection('market-research')" id="nav-market-research" class="nav-item">Market Research Reverse Eng.</button>
+                </nav>
             </header>
+
+            <!-- New User registration modal -->
+            <div id="register-modal" class="modal-overlay" style="display: none;" aria-hidden="true">
+                <div class="modal-card modal-register">
+                    <div class="modal-header">
+                        <h2>Create account</h2>
+                        <button type="button" class="modal-close" onclick="closeRegisterModal()" aria-label="Close">&times;</button>
+                    </div>
+                    <form id="register-form" class="modal-body" onsubmit="handleRegister(event)">
+                        <label for="register-username">Username</label>
+                        <input type="text" id="register-username" class="auth-input" placeholder="Username" required minlength="2" autocomplete="username" />
+                        <label for="register-email">Email (optional)</label>
+                        <input type="email" id="register-email" class="auth-input" placeholder="you@example.com" autocomplete="email" />
+                        <label for="register-password">Password</label>
+                        <input type="password" id="register-password" class="auth-input" placeholder="Password" required minlength="6" autocomplete="new-password" />
+                        <label for="register-password-confirm">Confirm password</label>
+                        <input type="password" id="register-password-confirm" class="auth-input" placeholder="Confirm password" required minlength="6" autocomplete="new-password" />
+                        <p id="register-error" class="form-error" style="display: none;"></p>
+                        <div class="modal-actions">
+                            <button type="button" onclick="closeRegisterModal()" class="btn-secondary">Cancel</button>
+                            <button type="submit" class="btn-primary">Create account</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
             <section id="home" class="section active">
-                <div class="home-hero">
-                    <div class="hero-content">
-                        <img src="/brand/Logo%20on%20Black.svg" alt="SynTera" class="hero-brand-logo" />
-                        <h1 class="hero-title">SynTera Test Suite</h1>
-                        <p class="hero-subtitle">Advanced Statistical Validation Framework for Synthetic Data</p>
-                        <div class="hero-badges">
-                            <span class="badge">97.8% Accuracy</span>
-                            <span class="badge">8 Statistical Tests</span>
-                            <span class="badge">Production Ready</span>
+                <div class="home-section">
+                    <div class="stats-showcase">
+                        <div class="stat-showcase-item">
+                            <div class="stat-value">8</div>
+                            <div class="stat-label">Statistical Tests</div>
+                        </div>
+                        <div class="stat-showcase-item">
+                            <div class="stat-value">97.8%</div>
+                            <div class="stat-label">Average Accuracy</div>
+                        </div>
+                        <div class="stat-showcase-item">
+                            <div class="stat-value">6</div>
+                            <div class="stat-label">Industry Domains</div>
+                        </div>
+                        <div class="stat-showcase-item">
+                            <div class="stat-value">∞</div>
+                            <div class="stat-label">Unlimited Validations</div>
                         </div>
                     </div>
                 </div>
 
                 <div class="home-section">
                     <div class="section-card">
-                        <div class="card-icon">🎯</div>
-                        <h2>What is SynTera?</h2>
-                        <p>SynTera Test Suite is a comprehensive statistical validation framework designed to evaluate and compare synthetic survey data against real-world datasets. It provides rigorous statistical analysis to ensure synthetic data maintains the statistical properties and distributions of original data.</p>
+                        <h2>What is SynTera Test-Suite?</h2>
+                        <p>SynTera Test Suite is a statistical validation framework that compares real human survey results with synthetic people and persona survey output. It runs rigorous statistical tests to ensure synthetic human responses align with the patterns and distributions of real human responses.</p>
                         <div class="feature-grid">
                             <div class="feature-item">
                                 <span class="feature-icon">🔬</span>
@@ -111,7 +145,6 @@
 
                 <div class="home-section">
                     <div class="section-card">
-                        <div class="card-icon">🎯</div>
                         <h2>Purpose</h2>
                         <p>SynTera Test Suite serves as a critical validation tool for organizations working with synthetic data, ensuring data quality, statistical accuracy, and reliability before deployment in production environments.</p>
                         <div class="purpose-grid">
@@ -141,7 +174,6 @@
 
                 <div class="home-section">
                     <div class="section-card">
-                        <div class="card-icon">🚀</div>
                         <h2>How to Use</h2>
                         <p>Getting started with SynTera Test Suite is simple and straightforward. Follow these steps to begin validating your synthetic data:</p>
                         <div class="steps-container">
@@ -190,37 +222,30 @@
 
                 <div class="home-section">
                     <div class="section-card">
-                        <div class="card-icon">✨</div>
                         <h2>Key Benefits</h2>
                         <p>SynTera Test Suite provides numerous advantages for organizations working with synthetic data:</p>
                         <div class="benefits-grid">
                             <div class="benefit-card">
-                                <div class="benefit-icon">🎯</div>
                                 <h3>High Accuracy</h3>
                                 <p>Achieve 97.8% accuracy in statistical validation, ensuring reliable synthetic data generation</p>
                             </div>
                             <div class="benefit-card">
-                                <div class="benefit-icon">🔍</div>
                                 <h3>Comprehensive Testing</h3>
                                 <p>8 different statistical tests including Chi-square, Kolmogorov-Smirnov, Mann-Whitney U, and more</p>
                             </div>
                             <div class="benefit-card">
-                                <div class="benefit-icon">⚡</div>
                                 <h3>Real-time Analysis</h3>
                                 <p>Get instant results with question-by-question comparison and detailed statistical insights</p>
                             </div>
                             <div class="benefit-card">
-                                <div class="benefit-icon">📊</div>
                                 <h3>Visual Dashboards</h3>
                                 <p>Interactive dashboards with pagination, 2x2 grid layouts, and comprehensive reporting</p>
                             </div>
                             <div class="benefit-card">
-                                <div class="benefit-icon">🔐</div>
                                 <h3>Role-Based Access</h3>
                                 <p>Secure access control with User and Super User roles for different permission levels</p>
                             </div>
                             <div class="benefit-card">
-                                <div class="benefit-icon">🌐</div>
                                 <h3>Industry Standards</h3>
                                 <p>Access to industry survey references and validation reports across multiple domains</p>
                             </div>
@@ -228,49 +253,70 @@
                     </div>
                 </div>
 
-                <div class="home-section">
-                    <div class="stats-showcase">
-                        <div class="stat-showcase-item">
-                            <div class="stat-value">8</div>
-                            <div class="stat-label">Statistical Tests</div>
-                        </div>
-                        <div class="stat-showcase-item">
-                            <div class="stat-value">97.8%</div>
-                            <div class="stat-label">Average Accuracy</div>
-                        </div>
-                        <div class="stat-showcase-item">
-                            <div class="stat-value">6</div>
-                            <div class="stat-label">Industry Domains</div>
-                        </div>
-                        <div class="stat-showcase-item">
-                            <div class="stat-value">∞</div>
-                            <div class="stat-label">Unlimited Validations</div>
-                        </div>
-                    </div>
-                </div>
             </section>
             <section id="reports" class="section">
                 <div class="section-header-row">
                     <div>
-                        <h2>Dashboard & Reports</h2>
-                        <p class="subtitle">Metrics, statistics, and validation reports for all completed surveys.</p>
+                        <h2>Synthetic People Test Studio</h2>
+                        <p class="subtitle">Transparent, comparable, and verifiable validation of synthetic people against real human survey data.</p>
+                    </div>
+                    <div id="dashboard-actions" class="section-actions" style="display: none;">
+                        <button onclick="showSection('validation')" class="btn-secondary">Start New Validation</button>
+                        <button onclick="showSection('surveys')" class="btn-ghost">View All Experiments</button>
+                    </div>
+                </div>
+
+                <div class="reports-intro-grid">
+                    <div class="intro-card">
+                        <h3>1. Seed survey input</h3>
+                        <p>Upload a real survey or define a controlled question set as your ground truth.</p>
+                    </div>
+                    <div class="intro-card">
+                        <h3>2. Behavioral simulation</h3>
+                        <p>Run the same questions through the calibrated Synthetic People engine.</p>
+                    </div>
+                    <div class="intro-card">
+                        <h3>3. Comparative metrics</h3>
+                        <p>Compare real vs synthetic people on alignment, variance bands, and stability.</p>
                     </div>
                 </div>
                 
                 <!-- Dashboard Stats Section -->
-                <div id="dashboard-stats-container" style="margin-bottom: 32px;">
+                <div id="dashboard-stats-container" class="dashboard-key-metrics">
+                    <div class="section-subrow">
+                        <h3>Key metrics</h3>
+                        <p class="subtitle">High-level health of your synthetic people validation studio.</p>
+                    </div>
                     <div class="stats">
-                        <div class="stat-card"><h3>Total Surveys</h3><p id="total-surveys">0</p></div>
-                        <div class="stat-card"><h3>Validated</h3><p id="validated-surveys">0</p></div>
-                        <div class="stat-card"><h3>Avg Accuracy</h3><p id="avg-accuracy">0%</p></div>
+                        <div class="stat-card stat-card--tests">
+                            <h3>Tests conducted</h3>
+                            <p id="total-surveys">0</p>
+                        </div>
+                        <div class="stat-card stat-card--validated">
+                            <h3>Validated runs</h3>
+                            <p id="validated-surveys">0</p>
+                        </div>
+                        <div class="stat-card stat-card--accuracy">
+                            <h3>Avg alignment score</h3>
+                            <p id="avg-accuracy">0%</p>
+                        </div>
+                        <div class="stat-card stat-card--variance">
+                            <h3>Avg variance range</h3>
+                            <p id="avg-variance-range">—</p>
+                        </div>
+                        <div class="stat-card stat-card--stability">
+                            <h3>Avg stability indicator</h3>
+                            <p id="avg-stability-indicator">—</p>
+                        </div>
                     </div>
                 </div>
                 
                 <!-- Reports Section -->
                 <div class="reports-section-header">
-                    <h3>Validation Reports</h3>
+                    <h3>Test configurations &amp; reports</h3>
+                    <p class="subtitle">Each card represents one experiment: a real survey benchmarked against synthetic people.</p>
                 </div>
-                <div id="reports-list" class="reports-grid-2x2"></div>
+                <div id="reports-list" class="reports-grid reports-grid-three"></div>
                 <div id="reports-pagination" class="pagination-container"></div>
             </section>
             <section id="surveys" class="section">
@@ -355,14 +401,14 @@
                         <h2>Test Results</h2>
                         <p class="subtitle">Compare synthetic vs real survey responses question-by-question.</p>
                     </div>
-                    <button onclick="showSection('validation')" class="btn-primary">← Run New Validation</button>
+                    <button id="results-header-action-btn" onclick="showSection('reports')" class="btn-primary">← Dashboard</button>
                 </div>
                 <div id="results-content">
                     <div class="empty-results-state">
                         <div class="empty-icon">📊</div>
                         <h3>No Results Yet</h3>
                         <p>Run a validation from the Validation Runs page to see results here.</p>
-                        <button onclick="showSection('validation')" class="btn-primary">Go to Validation Runs</button>
+                        <button id="results-empty-action-btn" onclick="showSection('reports')" class="btn-primary">Go to Dashboard</button>
                     </div>
                 </div>
             </section>
