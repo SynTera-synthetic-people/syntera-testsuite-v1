@@ -1,6 +1,16 @@
 // Omi narrator integration
 const OMI_BASE = '/omi/';
 const TIER_COLORS = { TIER_1: '#10b981', TIER_2: '#f59e0b', TIER_3: '#ef4444', TIER_4: '#7c3aed' };
+
+function getTierForTest(test) {
+    if (test.tier && TIER_COLORS[test.tier]) return test.tier;
+    const score = test.match_score != null ? Number(test.match_score) : 0;
+    if (score > 0.85) return 'TIER_1';
+    if (score > 0.75) return 'TIER_2';
+    if (score > 0.50) return 'TIER_3';
+    return 'TIER_4';
+}
+
 const OMI_STATES = {
     first: {
         webm: 'First Appearance_Original.webm',
@@ -1460,12 +1470,13 @@ async function loadReports(page = 1) {
                 : (s.title || 'Uploaded file');
             const questionCount = s.test_suite_report?.question_comparisons?.length || fileInfo.question_data?.length || 0;
             
-            // All test results; first 5 shown, rest expandable on click
+            // All test results; first 5 shown, rest expandable on click (include tier for color coding)
             const allTests = tests
                 .filter(t => t.match_score !== undefined && !t.error)
                 .map(t => ({
                     name: formatTestName(t.test),
-                    accuracy: (t.match_score * 100).toFixed(1)
+                    accuracy: (t.match_score * 100).toFixed(1),
+                    tier: getTierForTest(t)
                 }));
             const totalTests = tests.filter(t => !t.error).length;
             
@@ -1511,7 +1522,7 @@ async function loadReports(page = 1) {
                                 ${allTests.map((test, idx) => `
                                         <div class="test-result-item ${idx >= 5 ? 'test-result-item--extra' : ''}">
                                             <span class="test-result-name">${test.name}</span>
-                                            <span class="test-result-accuracy" style="color: ${tierColor};">${test.accuracy}%</span>
+                                            <span class="test-result-accuracy">${test.accuracy}%</span>
                                         </div>
                                     `).join('')}
                                 ${allTests.length > 5 ? `
@@ -1523,6 +1534,7 @@ async function loadReports(page = 1) {
                             <button onclick="viewReport('${s.id}')" class="btn-view-details">View Details</button>
                             <button onclick="downloadReport('${s.id}', 'html')" class="btn-download-small">📄</button>
                             <button onclick="downloadReport('${s.id}', 'json')" class="btn-download-small">📋</button>
+                            ${currentUserRole === 'super' ? `<button onclick="deleteReport('${s.id}')" class="btn-download-small btn-delete-report">Delete</button>` : ''}
                         </div>
                     </div>
                 </div>
@@ -1576,6 +1588,31 @@ async function loadReports(page = 1) {
                 </div>
             `;
         }
+    }
+}
+
+async function deleteReport(surveyId) {
+    if (currentUserRole !== 'super') {
+        alert('Only super users can delete reports.');
+        return;
+    }
+
+    const confirmed = window.confirm('Delete this report permanently? This cannot be undone.');
+    if (!confirmed) return;
+
+    try {
+        const res = await fetch(`/api/surveys/${surveyId}`, {
+            method: 'DELETE'
+        });
+        if (!res.ok) {
+            throw new Error(`Failed to delete report (status ${res.status})`);
+        }
+        // Reload dashboard metrics and current page of reports after successful delete
+        await loadDashboard();
+        await loadReports(currentReportsPage || 1);
+    } catch (e) {
+        console.error('Error deleting report:', e);
+        alert('Could not delete report. Please try again.');
     }
 }
 
@@ -2478,13 +2515,14 @@ function displaySemilatticeStyleResults(data, surveyId, targetDiv) {
             <div class="summary-section">
                 <h4>Statistical Tests</h4>
                 <div class="test-results-grid">
-                    ${data.tests ? data.tests.map(test => {
-                        const testTier = test.tier || 'N/A';
+                    ${data.tests ? data.tests.filter(t => !t.error).map(test => {
+                        const testTier = getTierForTest(test);
                         const testTierColor = TIER_COLORS[testTier] || '#6b7280';
+                        const matchPct = test.match_score != null ? (test.match_score * 100).toFixed(1) : '—';
                         return `
                             <div class="test-result-card" style="border-left-color: ${testTierColor}">
                                 <div class="test-result-name">${formatTestName(test.test)}</div>
-                                <div class="test-result-status" style="color: ${testTierColor}">${testTier}</div>
+                                <div class="test-result-status" style="color: ${testTierColor}">${matchPct}%</div>
                             </div>
                         `;
                     }).join('') : '<p>No test results available</p>'}

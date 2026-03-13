@@ -1806,6 +1806,17 @@ input[type="checkbox"] {
     transform: translateY(-2px);
 }
 
+.btn-delete-report {
+    border-color: rgba(239, 68, 68, 0.8);
+    color: #fecaca;
+}
+
+.btn-delete-report:hover {
+    background: rgba(239, 68, 68, 0.15);
+    border-color: rgba(248, 113, 113, 1);
+    color: #fee2e2;
+}
+
 /* Report Cards */
 .report-card {
     background: radial-gradient(circle at top left, #020617 0, #020617 60%);

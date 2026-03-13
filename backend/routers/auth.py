@@ -18,14 +18,12 @@ router = APIRouter()
 security = HTTPBearer()
 settings = Settings()
 
-# For development: Create default users if they don't exist
-DEFAULT_USERS = [
-    {"username": "user", "password": "user123", "role": UserRole.USER},
-    {"username": "super", "password": "super123", "role": UserRole.SUPER_USER},
-]
+# For development: default users are disabled when using shared Postgres users table.
+DEFAULT_USERS = []
 
 
 class UserCreate(BaseModel):
+    # We treat "username" from the UI as the user's full name.
     username: str
     email: Optional[EmailStr] = None
     password: str
@@ -33,6 +31,7 @@ class UserCreate(BaseModel):
 
 
 class UserLogin(BaseModel):
+    # Frontend sends "username" but we authenticate using email.
     username: str
     password: str
 
@@ -114,13 +113,13 @@ async def get_current_user(
     try:
         token = credentials.credentials
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
-        username: str = payload.get("sub")
-        if username is None:
+        email: str = payload.get("sub")
+        if email is None:
             raise credentials_exception
     except JWTError:
         raise credentials_exception
     
-    user = db.query(User).filter(User.username == username).first()
+    user = db.query(User).filter(User.email == email).first()
     if user is None:
         raise credentials_exception
     
@@ -159,11 +158,7 @@ def require_privilege(required_role: UserRole):
 @router.post("/register", response_model=UserResponse)
 async def register(user_data: UserCreate, db: Session = Depends(get_db)):
     """Register a new user (admin only in production)"""
-    # Check if user already exists
-    existing_user = db.query(User).filter(User.username == user_data.username).first()
-    if existing_user:
-        raise HTTPException(status_code=400, detail="Username already registered")
-    
+    # Check if user already exists by email (shared users table is email-centric)
     if user_data.email:
         existing_email = db.query(User).filter(User.email == user_data.email).first()
         if existing_email:
@@ -172,10 +167,11 @@ async def register(user_data: UserCreate, db: Session = Depends(get_db)):
     # Create new user
     hashed_password = get_password_hash(user_data.password)
     new_user = User(
-        username=user_data.username,
+        full_name=user_data.username,
         email=user_data.email,
         hashed_password=hashed_password,
-        role=user_data.role
+        role=user_data.role.value,
+        is_active=True,
     )
     
     db.add(new_user)
@@ -187,8 +183,8 @@ async def register(user_data: UserCreate, db: Session = Depends(get_db)):
 
 @router.post("/login", response_model=TokenResponse)
 async def login(login_data: UserLogin, db: Session = Depends(get_db)):
-    """Login and get access token"""
-    user = db.query(User).filter(User.username == login_data.username).first()
+    """Login and get access token (username field treated as email)."""
+    user = db.query(User).filter(User.email == login_data.username).first()
     
     if not user or not verify_password(login_data.password, user.hashed_password):
         raise HTTPException(
@@ -201,16 +197,16 @@ async def login(login_data: UserLogin, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="Inactive user")
     
     # Create access token
-    access_token = create_access_token(data={"sub": user.username})
+    access_token = create_access_token(data={"sub": user.email})
     
     return {
         "access_token": access_token,
         "token_type": "bearer",
         "user": UserResponse(
             id=user.id,
-            username=user.username,
+            username=user.full_name or user.email,
             email=user.email,
-            role=user.role.value,
+            role=(user.role or UserRole.USER.value),
             is_active=user.is_active
         )
     }
@@ -221,9 +217,9 @@ async def get_current_user_info(current_user: User = Depends(get_current_user)):
     """Get current user information"""
     return UserResponse(
         id=current_user.id,
-        username=current_user.username,
+        username=current_user.full_name or current_user.email,
         email=current_user.email,
-        role=current_user.role.value,
+        role=(current_user.role or UserRole.USER.value),
         is_active=current_user.is_active
     )
 
@@ -240,23 +236,12 @@ async def check_privileges(current_user: Optional[User] = Depends(get_current_us
     
     return {
         "authenticated": True,
-        "role": current_user.role.value,
-        "is_super_user": current_user.role == UserRole.SUPER_USER,
-        "username": current_user.username
+        "role": (current_user.role or UserRole.USER.value),
+        "is_super_user": (current_user.role or UserRole.USER.value) == UserRole.SUPER_USER.value,
+        "username": current_user.full_name or current_user.email
     }
 
 
 def init_default_users(db: Session):
-    """Initialize default users for development"""
-    for user_data in DEFAULT_USERS:
-        existing = db.query(User).filter(User.username == user_data["username"]).first()
-        if not existing:
-            hashed_password = get_password_hash(user_data["password"])
-            new_user = User(
-                username=user_data["username"],
-                hashed_password=hashed_password,
-                role=user_data["role"]
-            )
-            db.add(new_user)
-            logger.info(f"Created default user: {user_data['username']}")
-    db.commit()
+    """Default user initialization is disabled when using shared users table."""
+    return

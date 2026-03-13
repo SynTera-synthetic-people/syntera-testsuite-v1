@@ -56,14 +56,6 @@ async def init_db():
         from database.base import Base
         Base.metadata.create_all(bind=engine)
         logger.info("Database initialized")
-        
-        # Initialize default users
-        from backend.routers.auth import init_default_users
-        db = SessionLocal()
-        try:
-            init_default_users(db)
-        finally:
-            db.close()
     except Exception as e:
         logger.error(f"Database init failed: {e}")
         raise

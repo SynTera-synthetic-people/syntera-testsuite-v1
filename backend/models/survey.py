@@ -5,7 +5,7 @@ from database.base import Base
 import uuid
 
 class Survey(Base):
-    __tablename__ = "surveys"
+    __tablename__ = "test_lab_surveys"
     id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
     title = Column(String(255), nullable=False, index=True)
     description = Column(Text)
@@ -24,7 +24,7 @@ class Survey(Base):
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
 class ValidationRun(Base):
-    __tablename__ = "validation_runs"
+    __tablename__ = "test_lab_validation_runs"
     id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
     survey_id = Column(String, nullable=False, index=True)
     overall_accuracy = Column(Float, nullable=False)
