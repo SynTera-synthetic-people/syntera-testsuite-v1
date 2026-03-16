@@ -10,7 +10,7 @@ class UserRole(str, enum.Enum):
 
 
 class User(Base):
-    __tablename__ = "users"
+    __tablename__ = "user"
 
     # Core identity fields (match shared table)
     id = Column(String, primary_key=True)
