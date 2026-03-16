@@ -40,12 +40,9 @@ class User(Base):
     account_tier = Column(String, nullable=True)
     organization_id = Column(String, nullable=True)
 
-    # Audit fields
-    created_at = Column(DateTime(timezone=False), nullable=False)
+    # Audit fields (match existing table columns)
+    created_at = Column(DateTime(timezone=False), nullable=True)
     last_activity_at = Column(DateTime(timezone=False), nullable=True)
-    is_deleted = Column(Boolean, default=False)
-    deleted_at = Column(DateTime(timezone=False), nullable=True)
-    deleted_by = Column(String, nullable=True)
 
     def has_privilege(self, required_role: UserRole) -> bool:
         """Check if user has required privilege level based on textual role."""

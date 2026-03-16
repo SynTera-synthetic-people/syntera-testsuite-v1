@@ -1534,7 +1534,7 @@ async function loadReports(page = 1) {
                             <button onclick="viewReport('${s.id}')" class="btn-view-details">View Details</button>
                             <button onclick="downloadReport('${s.id}', 'html')" class="btn-download-small">📄</button>
                             <button onclick="downloadReport('${s.id}', 'json')" class="btn-download-small">📋</button>
-                            ${currentUserRole === 'super' ? `<button onclick="deleteReport('${s.id}')" class="btn-download-small btn-delete-report">Delete</button>` : ''}
+                            ${authToken ? `<button onclick="deleteReport('${s.id}')" class="btn-download-small btn-delete-report">Delete</button>` : ''}
                         </div>
                     </div>
                 </div>
@@ -2027,14 +2027,12 @@ function updateUserDisplay() {
     const userInfoDisplay = document.getElementById('user-info-display');
     const loginFormDisplay = document.getElementById('login-form-display');
     const usernameDisplay = document.getElementById('username-display');
-    const userRoleDisplay = document.getElementById('user-role-display');
     
-    if (authToken && currentUserRole) {
+    if (authToken) {
         // Show user info, hide login form
         if (userInfoDisplay) userInfoDisplay.style.display = 'block';
         if (loginFormDisplay) loginFormDisplay.style.display = 'none';
         if (usernameDisplay) usernameDisplay.textContent = 'Loading...';
-        if (userRoleDisplay) userRoleDisplay.textContent = currentUserRole === 'super' ? 'Super User' : 'Regular User';
         
         // Fetch full user info
         fetch('/api/auth/me', {
@@ -2060,12 +2058,12 @@ function updateUserDisplay() {
 
     // Dashboard: show Start New Validation / View All Experiments only when logged in
     const dashboardActions = document.getElementById('dashboard-actions');
-    if (dashboardActions) dashboardActions.style.display = (authToken && currentUserRole) ? '' : 'none';
+    if (dashboardActions) dashboardActions.style.display = authToken ? '' : 'none';
 
     // Results header button: "Dashboard" when not logged in, "Run New Validation" when logged in
     const resultsHeaderBtn = document.getElementById('results-header-action-btn');
     if (resultsHeaderBtn) {
-        if (authToken && currentUserRole) {
+        if (authToken) {
             resultsHeaderBtn.textContent = '← Run New Validation';
             resultsHeaderBtn.onclick = () => showSection('validation');
         } else {
@@ -2077,7 +2075,7 @@ function updateUserDisplay() {
     // Results empty state button (when visible)
     const resultsEmptyBtn = document.getElementById('results-empty-action-btn');
     if (resultsEmptyBtn) {
-        if (authToken && currentUserRole) {
+        if (authToken) {
             resultsEmptyBtn.textContent = 'Go to Validation Runs';
             resultsEmptyBtn.onclick = () => showSection('validation');
         } else {

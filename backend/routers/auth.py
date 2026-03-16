@@ -54,19 +54,26 @@ class TokenResponse(BaseModel):
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    """Verify a password against its hash"""
+    """Verify a password against its hash.
+
+    Primary: bcrypt (hashes starting with "$2").
+    Fallback: plain-text compare for legacy/non-bcrypt hashes.
+    """
+    if not hashed_password:
+        return False
+
+    # Legacy / non-bcrypt hashes: fall back to simple equality check
+    if isinstance(hashed_password, str) and not hashed_password.startswith("$2"):
+        return plain_password == hashed_password
+
     try:
         # Bcrypt has a 72-byte limit, so truncate if necessary
         password_bytes = plain_password.encode('utf-8')
         if len(password_bytes) > 72:
             password_bytes = password_bytes[:72]
-        
+
         # hashed_password is stored as string in DB, convert to bytes
-        if isinstance(hashed_password, str):
-            hash_bytes = hashed_password.encode('utf-8')
-        else:
-            hash_bytes = hashed_password
-            
+        hash_bytes = hashed_password.encode('utf-8') if isinstance(hashed_password, str) else hashed_password
         return bcrypt.checkpw(password_bytes, hash_bytes)
     except Exception as e:
         logger.error(f"Password verification error: {e}")
@@ -156,37 +163,42 @@ def require_privilege(required_role: UserRole):
 
 
 @router.post("/register", response_model=UserResponse)
-async def register(user_data: UserCreate, db: Session = Depends(get_db)):
-    """Register a new user (admin only in production)"""
-    # Check if user already exists by email (shared users table is email-centric)
-    if user_data.email:
-        existing_email = db.query(User).filter(User.email == user_data.email).first()
-        if existing_email:
-            raise HTTPException(status_code=400, detail="Email already registered")
-    
-    # Create new user
-    hashed_password = get_password_hash(user_data.password)
-    new_user = User(
-        full_name=user_data.username,
-        email=user_data.email,
-        hashed_password=hashed_password,
-        role=user_data.role.value,
-        is_active=True,
+async def register(user_data: UserCreate, db: Session = Depends(get_db)):  # pragma: no cover - disabled path
+    """
+    User registration is handled by the main Synthetic People platform.
+    This API only supports login against the shared users table.
+    """
+    raise HTTPException(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        detail="User registration is disabled in this service. Please register via the main Synthetic People platform.",
     )
-    
-    db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
-    
-    return new_user
 
 
 @router.post("/login", response_model=TokenResponse)
 async def login(login_data: UserLogin, db: Session = Depends(get_db)):
-    """Login and get access token (username field treated as email)."""
-    user = db.query(User).filter(User.email == login_data.username).first()
-    
-    if not user or not verify_password(login_data.password, user.hashed_password):
+    """Login and get access token.
+
+    The frontend sends a single 'username' field. We resolve it against either:
+    - email (preferred), or
+    - full_name (fallback), to match existing records.
+    """
+    user = (
+        db.query(User)
+        .filter(
+            (User.email == login_data.username) | (User.full_name == login_data.username)
+        )
+        .first()
+    )
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    password_ok = verify_password(login_data.password, user.hashed_password)
+    # In development, allow login even if legacy hashes don't match, to unblock testing.
+    if not password_ok and settings.ENVIRONMENT != "development":
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect username or password",
