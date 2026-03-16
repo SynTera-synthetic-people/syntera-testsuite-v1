@@ -9,6 +9,7 @@ def load_ssm_parameters():
         "/test-suite/ANTHROPIC_API_KEY",
         "/test-suite/AWS_ACCESS_KEY_ID",
         "/test-suite/AWS_SECRET_ACCESS_KEY",
+        "/test-suite/DATABASE_URL",
     ]
 
     response = ssm.get_parameters(
