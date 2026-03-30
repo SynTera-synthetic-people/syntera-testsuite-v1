@@ -1,790 +1,469 @@
-/* ========== Design system: Enterprise Dark, AI-Driven, Premium ========== */
-:root {
-    --font-sans: 'Outfit', system-ui, -apple-system, sans-serif;
-    --font-serif: 'Playfair Display', Georgia, serif;
-    
-    --bg-base: #07090f;
-    --bg-surface: #12151e;
-    --bg-surface-elevated: #1a1e2b;
-    
-    --border-subtle: rgba(255, 255, 255, 0.08);
-    --border-highlight: rgba(255, 255, 255, 0.15);
-    
-    --text-main: #f1f5f9;
-    --text-muted: #94a3b8;
-    
-    --accent-blue: #1e70ff;
-    --accent-blue-glow: rgba(30, 112, 255, 0.3);
-    --accent-cyan: #00e5ff;
-    --accent-cyan-glow: rgba(0, 229, 255, 0.3);
-    --accent-green: #00e676;
-    --accent-purple: #9d4edd;
-    
-    --radius-sm: 8px;
-    --radius-md: 12px;
-    --radius-lg: 18px;
-    --radius-pill: 9999px;
-    
-    --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#030712">
+    <title>SynTera Test Suite</title>
+    <link rel="icon" type="image/svg+xml" href="/brand/Icon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div id="app" class="app-shell">
+        <main class="main">
+            <header class="top-bar">
+                <div class="top-bar-row">
+                    <div class="brand">
+                        <img src="/brand/Icon.svg" alt="" class="brand-logo-icon" />
+                        <div>
+                            <h1>SynTera</h1>
+                            <p>Synthetic People Test Suite</p>
+                        </div>
+                    </div>
+                    <div class="top-bar-content">
+                        <div class="home-hero header-hero">
+                            <div class="hero-content">
+                                <img src="/brand/Logo%20on%20Black.svg" alt="SynTera" class="hero-brand-logo" />
+                                <div class="hero-text-block">
+                                    <h1 class="hero-title">SynTera Test Suite</h1>
+                                    <p class="hero-subtitle">Compare real human survey output with synthetic people </p>
+                                    <div class="hero-badges">
+                                        <span class="badge">97.8% Accuracy</span>
+                                        <span class="badge">8 Statistical Tests</span>
+                                        <span class="badge">Production Ready</span>
+                                    </div>
+                                </div>
+                            </div>
+                            </div>
+                    </div>
+                    <div class="top-bar-auth">
+                        <div id="user-info-display" class="user-auth-inline" style="display: none;">
+                            <div class="user-auth-text">
+                                <span id="username-display" class="user-name"></span>
+                            </div>
+                            <button onclick="logout()" class="btn-secondary btn-compact">Logout</button>
+                        </div>
+                        <div id="login-form-display" style="display: none;">
+                            <input type="text" id="login-username" placeholder="Username" class="auth-input" />
+                            <input type="password" id="login-password" placeholder="Password" class="auth-input" />
+                            <button onclick="handleLogin()" class="btn-primary btn-compact">Login</button>
+                        </div>
+                    </div>
+                </div>
+                <nav class="top-nav-tabs" aria-label="Main navigation">
+                    <button onclick="showSection('home')" id="nav-home" class="nav-item">Home</button>
+                    <button onclick="showSection('reports'); loadDashboard();" id="nav-dashboard-reports" class="nav-item active">Dashboard &amp; Reports</button>
+                    <button onclick="showSection('surveys')" id="nav-surveys" class="nav-item">Surveys</button>
+                    <button onclick="showSection('validation')" id="nav-validation" class="nav-item">Validation Runs</button>
+                    <button onclick="showSection('results')" id="nav-results" class="nav-item">Test Results</button>
+                    <button onclick="showSection('industry-surveys')" id="nav-industry-surveys" class="nav-item">Industry Surveys</button>
+                    <button onclick="showSection('market-research')" id="nav-market-research" class="nav-item">Market Research Reverse Eng.</button>
+                </nav>
+            </header>
+
+            <!-- Registration is managed by the main Synthetic People platform; no New User modal here -->
+
+            <section id="home" class="section active">
+                <div class="home-section">
+                    <div class="stats-showcase">
+                        <div class="stat-showcase-item">
+                            <div class="stat-value">8</div>
+                            <div class="stat-label">Statistical Tests</div>
+                        </div>
+                        <div class="stat-showcase-item">
+                            <div class="stat-value">97.8%</div>
+                            <div class="stat-label">Average Accuracy</div>
+                        </div>
+                        <div class="stat-showcase-item">
+                            <div class="stat-value">6</div>
+                            <div class="stat-label">Industry Domains</div>
+                        </div>
+                        <div class="stat-showcase-item">
+                            <div class="stat-value">∞</div>
+                            <div class="stat-label">Unlimited Validations</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="home-section">
+                    <div class="section-card">
+                        <h2>What is SynTera Test-Suite?</h2>
+                        <p>SynTera Test Suite is a statistical validation framework that compares real human survey results with synthetic people and persona survey output. It runs rigorous statistical tests to ensure synthetic human responses align with the patterns and distributions of real human responses.</p>
+                        <div class="feature-grid">
+                            <div class="feature-item">
+                                <span class="feature-icon">🔬</span>
+                                <div>
+                                    <h4>Scientific Approach</h4>
+                                    <p>Based on proven statistical methodologies</p>
+                                </div>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-icon">⚡</span>
+                                <div>
+                                    <h4>Fast & Efficient</h4>
+                                    <p>Real-time validation and comparison</p>
+                                </div>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-icon">📈</span>
+                                <div>
+                                    <h4>Comprehensive Analysis</h4>
+                                    <p>Multiple statistical tests in one platform</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="home-section">
+                    <div class="section-card">
+                        <h2>Purpose</h2>
+                        <p>SynTera Test Suite serves as a critical validation tool for organizations working with synthetic data, ensuring data quality, statistical accuracy, and reliability before deployment in production environments.</p>
+                        <div class="purpose-grid">
+                            <div class="purpose-card">
+                                <div class="purpose-number">01</div>
+                                <h3>Data Quality Assurance</h3>
+                                <p>Validate that synthetic data maintains statistical properties of original datasets</p>
+                            </div>
+                            <div class="purpose-card">
+                                <div class="purpose-number">02</div>
+                                <h3>Risk Mitigation</h3>
+                                <p>Identify discrepancies before deploying synthetic data in production</p>
+                            </div>
+                            <div class="purpose-card">
+                                <div class="purpose-number">03</div>
+                                <h3>Compliance & Standards</h3>
+                                <p>Ensure synthetic data meets regulatory and industry standards</p>
+                            </div>
+                            <div class="purpose-card">
+                                <div class="purpose-number">04</div>
+                                <h3>Research & Development</h3>
+                                <p>Support research initiatives requiring validated synthetic datasets</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="home-section">
+                    <div class="section-card">
+                        <h2>How to Use</h2>
+                        <p>Getting started with SynTera Test Suite is simple and straightforward. Follow these steps to begin validating your synthetic data:</p>
+                        <div class="steps-container">
+                            <div class="step-item">
+                                <div class="step-number">1</div>
+                                <div class="step-content">
+                                    <h3>Upload Your Data</h3>
+                                    <p>Navigate to <strong>Validation Runs</strong> and upload your seed (real) and synthetic data files in CSV or Excel format</p>
+                                </div>
+                            </div>
+                            <div class="step-item">
+                                <div class="step-number">2</div>
+                                <div class="step-content">
+                                    <h3>Select Extraction Method</h3>
+                                    <p>Choose your preferred extraction method (JSON, CSV, or Excel) for data processing</p>
+                                </div>
+                            </div>
+                            <div class="step-item">
+                                <div class="step-number">3</div>
+                                <div class="step-content">
+                                    <h3>Run Comparison</h3>
+                                    <p>Click <strong>Compare Files</strong> to initiate statistical analysis across 8 different tests</p>
+                                </div>
+                            </div>
+                            <div class="step-item">
+                                <div class="step-number">4</div>
+                                <div class="step-content">
+                                    <h3>Review Results</h3>
+                                    <p>View detailed question-by-question comparisons and statistical methodology in <strong>Test Results</strong></p>
+                                </div>
+                            </div>
+                            <div class="step-item">
+                                <div class="step-number">5</div>
+                                <div class="step-content">
+                                    <h3>Access Reports</h3>
+                                    <p>Explore comprehensive reports in <strong>Dashboard & Reports</strong> with accuracy metrics and validation summaries</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="cta-buttons">
+                            <button onclick="showSection('validation')" class="cta-primary">Start Validation →</button>
+                            <button onclick="showSection('industry-surveys')" class="cta-secondary">Explore Industry Surveys →</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="home-section">
+                    <div class="section-card">
+                        <h2>Key Benefits</h2>
+                        <p>SynTera Test Suite provides numerous advantages for organizations working with synthetic data:</p>
+                        <div class="benefits-grid">
+                            <div class="benefit-card">
+                                <h3>High Accuracy</h3>
+                                <p>Achieve 97.8% accuracy in statistical validation, ensuring reliable synthetic data generation</p>
+                            </div>
+                            <div class="benefit-card">
+                                <h3>Comprehensive Testing</h3>
+                                <p>8 different statistical tests including Chi-square, Kolmogorov-Smirnov, Mann-Whitney U, and more</p>
+                            </div>
+                            <div class="benefit-card">
+                                <h3>Real-time Analysis</h3>
+                                <p>Get instant results with question-by-question comparison and detailed statistical insights</p>
+                            </div>
+                            <div class="benefit-card">
+                                <h3>Visual Dashboards</h3>
+                                <p>Interactive dashboards with pagination, 2x2 grid layouts, and comprehensive reporting</p>
+                            </div>
+                            <div class="benefit-card">
+                                <h3>Role-Based Access</h3>
+                                <p>Secure access control with User and Super User roles for different permission levels</p>
+                            </div>
+                            <div class="benefit-card">
+                                <h3>Industry Standards</h3>
+                                <p>Access to industry survey references and validation reports across multiple domains</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+            <section id="reports" class="section">
+                <div class="section-header-row">
+                    <div>
+                        <h2>Synthetic People Test Studio</h2>
+                        <p class="subtitle">Transparent, comparable, and verifiable validation of synthetic people against real human survey data.</p>
+                    </div>
+                    <div id="dashboard-actions" class="section-actions" style="display: none;">
+                        <button onclick="showSection('validation')" class="btn-secondary">Start New Validation</button>
+                        <button onclick="showSection('surveys')" class="btn-ghost">View All Experiments</button>
+                    </div>
+                </div>
+
+                <div class="reports-intro-grid">
+                    <div class="intro-card">
+                        <h3>1. Seed survey input</h3>
+                        <p>Upload a real survey or define a controlled question set as your ground truth.</p>
+                    </div>
+                    <div class="intro-card">
+                        <h3>2. Behavioral simulation</h3>
+                        <p>Run the same questions through the calibrated Synthetic People engine.</p>
+                    </div>
+                    <div class="intro-card">
+                        <h3>3. Comparative metrics</h3>
+                        <p>Compare real vs synthetic people on alignment, variance bands, and stability.</p>
+                    </div>
+                </div>
+                
+                <!-- Dashboard Stats Section -->
+                <div id="dashboard-stats-container" class="dashboard-key-metrics">
+                    <div class="section-subrow">
+                        <h3>Key metrics</h3>
+                        <p class="subtitle">High-level health of your synthetic people validation studio.</p>
+                    </div>
+                    <div class="stats">
+                        <div class="stat-card stat-card--tests">
+                            <h3>Tests conducted</h3>
+                            <p id="total-surveys">0</p>
+                        </div>
+                        <div class="stat-card stat-card--validated">
+                            <h3>Validated runs</h3>
+                            <p id="validated-surveys">0</p>
+                        </div>
+                        <div class="stat-card stat-card--accuracy">
+                            <h3>Avg alignment score</h3>
+                            <p id="avg-accuracy">0%</p>
+                        </div>
+                        <div class="stat-card stat-card--variance">
+                            <h3>Avg variance range</h3>
+                            <p id="avg-variance-range">—</p>
+                        </div>
+                        <div class="stat-card stat-card--stability">
+                            <h3>Avg stability indicator</h3>
+                            <p id="avg-stability-indicator">—</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Reports Section -->
+                <div class="reports-section-header">
+                    <h3>Test configurations &amp; reports</h3>
+                    <p class="subtitle">Each card represents one experiment: a real survey benchmarked against synthetic people.</p>
+                </div>
+                <div id="reports-list" class="reports-grid reports-grid-three"></div>
+                <div id="reports-pagination" class="pagination-container"></div>
+            </section>
+            <section id="surveys" class="section">
+                <div class="section-header-row">
+                    <div>
+                        <h2>Surveys</h2>
+                        <p class="subtitle">Each survey represents one experiment run.</p>
+                    </div>
+                    <button onclick="createNewSurvey()" class="btn-primary">New Survey Comparison</button>
+                </div>
+                <div id="surveys-list" class="cards-grid"></div>
+                <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid rgba(148, 163, 184, 0.2);">
+                    <button onclick="showSection('validation')" class="btn-primary">→ Go to Validation Runs</button>
+                </div>
+            </section>
+            <section id="validation" class="section">
+                <div class="section-header-row">
+                    <div>
+                        <h2>Validation Runs</h2>
+                        <p class="subtitle">Compare two questionnaires via file upload or manual data entry.</p>
+                    </div>
+                </div>
+                <div class="validation-tabs">
+                    <button class="tab-btn active" onclick="switchTab('files')" id="tab-files">📁 File Upload</button>
+                    <button class="tab-btn" onclick="switchTab('manual')" id="tab-manual">✏️ Manual Entry</button>
+                </div>
+                <div id="tab-content-files" class="tab-content active">
+                    <div class="two-column">
+                        <div class="panel">
+                            <h3>1. Upload questionnaire files</h3>
+                            <p class="help-text">Upload Excel (.xlsx, .xls) or CSV files containing survey responses.</p>
+                            <label class="field-label">Questionnaire 1 (Synthetic/File A)
+                                <input type="file" id="file-synthetic" accept=".xlsx,.xls,.csv" />
+                                <small class="file-info" id="file-synthetic-info">No file selected</small>
+                            </label>
+                            <label class="field-label">Questionnaire 2 (Real/File B)
+                                <input type="file" id="file-real" accept=".xlsx,.xls,.csv" />
+                                <small class="file-info" id="file-real-info">No file selected</small>
+                            </label>
+                            <label class="field-label">Survey ID (optional)
+                                <input id="file-survey-id" type="text" placeholder="Paste survey ID from Surveys panel (leave empty to create new)" />
+                            </label>
+                            <label class="field-label">Extraction Method
+                                <select id="extraction-method">
+                                    <option value="totals">Totals (sum per column)</option>
+                                    <option value="all">All responses (individual values)</option>
+                                </select>
+                            </label>
+                            <button class="btn-primary full-width" onclick="compareFiles()">Compare Files</button>
+                        </div>
+                        <div class="panel">
+                            <h3>2. Ready to compare</h3>
+                            <p class="help-text">Click "Compare Files" to run the validation. Results will appear on the Test Results page.</p>
+                        </div>
+                    </div>
+                </div>
+                <div id="tab-content-manual" class="tab-content">
+                    <div class="two-column">
+                        <div class="panel">
+                            <h3>1. Select survey &amp; data</h3>
+                            <label class="field-label">Survey ID
+                                <input id="validation-survey-id" type="text" placeholder="Paste survey ID from Surveys panel" />
+                            </label>
+                            <label class="field-label">Synthetic responses (JSON array)
+                                <textarea id="synthetic-input" rows="4" placeholder="[42, 33, 18, 7]"></textarea>
+                            </label>
+                            <label class="field-label">Real responses (JSON array)
+                                <textarea id="real-input" rows="4" placeholder="[40, 35, 20, 5]"></textarea>
+                            </label>
+                            <button class="btn-primary full-width" onclick="runValidation()">Run Validation</button>
+                        </div>
+                        <div class="panel">
+                            <h3>2. Ready to validate</h3>
+                            <p class="help-text">Click "Run Validation" to start. Results will appear on the Test Results page.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section id="results" class="section">
+                <div class="section-header-row">
+                    <div>
+                        <h2>Test Results</h2>
+                        <p class="subtitle">Compare synthetic vs real survey responses question-by-question.</p>
+                    </div>
+                    <button id="results-header-action-btn" onclick="showSection('reports')" class="btn-primary">← Dashboard</button>
+                </div>
+                <div id="results-content">
+                    <div class="empty-results-state">
+                        <div class="empty-icon">📊</div>
+                        <h3>No Results Yet</h3>
+                        <p>Run a validation from the Validation Runs page to see results here.</p>
+                        <button id="results-empty-action-btn" onclick="showSection('reports')" class="btn-primary">Go to Dashboard</button>
+                    </div>
+                </div>
+            </section>
+            <section id="industry-surveys" class="section">
+                <div class="section-header-row">
+                    <div>
+                        <h2>Industry Survey Reports</h2>
+                        <p class="subtitle">Industry-specific surveys and data from S3, plus reference surveys across domains.</p>
+                    </div>
+                </div>
+                <div id="industry-surveys-s3-container" class="industry-s3-section" style="margin-bottom: 28px;">
+                    <h3 class="industry-subsection-title">Industry data (S3)</h3>
+                    <p class="help-text" id="industry-s3-help">Loading…</p>
+                    <div class="industry-s3-filter-row" id="industry-s3-filter-row" style="display: none;">
+                        <label for="industry-s3-filter" class="industry-s3-filter-label">Industry type</label>
+                        <select id="industry-s3-filter" class="industry-s3-filter-select">
+                            <option value="">All industries</option>
+                        </select>
+                    </div>
+                    <div id="industry-surveys-s3-list" class="cards-grid"></div>
+                </div>
+                <h3 class="industry-subsection-title">Reference surveys</h3>
+                <div id="industry-surveys-list" class="cards-grid"></div>
+            </section>
+            <section id="market-research" class="section">
+                <div class="section-header-row">
+                    <div>
+                        <h2>Market Research Reverse Engineering</h2>
+                        <p class="subtitle">Upload a market research report to reverse-engineer the original research design and reconstructed questionnaire.</p>
+                    </div>
+                </div>
+                <div class="market-research-container">
+                    <div class="panel">
+                        <h3>Input Report</h3>
+                        <p class="help-text">Paste report text below or upload a .txt or .pdf file. Minimum 50 characters required.</p>
+                        <p class="help-text" style="margin-top:4px; color: #94a3b8; font-size: 0.85rem;">Only text is read from the report; charts and images are not.</p>
+                        <label class="field-label">
+                            Report text
+                            <textarea id="market-research-report-text" rows="10" placeholder="Paste executive summary, charts, findings, consumer quotes, key recommendations..."></textarea>
+                        </label>
+                        <div class="market-research-upload-row">
+                            <label class="field-label" style="flex:1;">
+                                Or upload file
+                                <input type="file" id="market-research-file" accept=".txt,.pdf" />
+                            </label>
+                            <button type="button" class="btn-secondary" id="market-research-load-sample" title="Load text from sample_market_research_report.pdf in project root">Load sample PDF</button>
+                            <button type="button" class="btn-primary" id="market-research-submit">Reverse-Engineer</button>
+                        </div>
+                        <div id="market-research-status" class="market-research-status" style="display:none;"></div>
+                    </div>
+                    <div class="panel" id="market-research-output-panel" style="display:none;">
+                        <div class="market-research-download-row">
+                            <button type="button" class="btn-primary" id="market-research-download-pdf">Download result (PDF)</button>
+                            <button type="button" class="btn-secondary" id="market-research-download-csv">Download questionnaire (CSV)</button>
+                        </div>
+                        <div id="market-research-section-objectives" class="market-research-section-panel">
+                            <h3>1. Research Objective</h3>
+                            <div id="market-research-output-objectives" class="market-research-output"></div>
+                        </div>
+                        <div id="market-research-section-questionnaire" class="market-research-section-panel">
+                            <h3>2. Questionnaire</h3>
+                            <div id="market-research-output-questionnaire" class="market-research-output market-research-questionnaire-list"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <div id="omi-narrator" class="omi-narrator" aria-live="polite">
+        <div class="omi-bubble" id="omi-bubble">Hi, I am Omi. I will guide you through your test-suite journey.</div>
+        <div class="omi-character-shell">
+            <video id="omi-video" class="omi-video" autoplay muted playsinline loop preload="auto" poster="/omi/OMI_Dark.png"></video>
+            <div class="omi-controls">
+                <button type="button" id="omi-toggle" class="omi-btn" title="Hide Omi">–</button>
+                <button type="button" id="omi-mute" class="omi-btn" title="Toggle sound">🔇</button>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
 
-* { margin: 0; padding: 0; box-sizing: border-box; }
-html { scroll-behavior: smooth; font-size: 16px; }
-
-body {
-    font-family: var(--font-sans);
-    background-color: var(--bg-base);
-    color: var(--text-main);
-    line-height: 1.5;
-    min-height: 100vh;
-    overflow-x: hidden;
-    /* Subtle radial glow background */
-    background-image: radial-gradient(circle at 50% 0%, rgba(30, 112, 255, 0.08), transparent 50%),
-                      radial-gradient(circle at 80% 80%, rgba(0, 229, 255, 0.05), transparent 40%);
-}
-
-.app-shell {
-    max-width: 1600px;
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-}
-
-.main {
-    padding: 24px 40px 60px;
-    display: flex;
-    flex-direction: column;
-    gap: 30px;
-}
-
-/* ========== Top Navigation & Branding ========== */
-.top-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: rgba(18, 21, 30, 0.6);
-    backdrop-filter: blur(12px);
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-pill);
-    padding: 12px 24px;
-    position: sticky;
-    top: 20px;
-    z-index: 100;
-}
-
-.brand {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-}
-
-.brand-logo-main {
-    height: 32px;
-    width: auto;
-    object-fit: contain;
-}
-
-.brand-divider {
-    width: 1px;
-    height: 30px;
-    background: var(--border-highlight);
-}
-
-.brand-text h1 {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: #fff;
-    letter-spacing: 0.5px;
-}
-
-.brand-text p {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-}
-
-.hero-badges {
-    display: flex;
-    gap: 10px;
-    margin-left: 12px;
-}
-
-.badge {
-    padding: 4px 12px;
-    border-radius: var(--radius-pill);
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-.badge-purple { background: rgba(157, 78, 221, 0.15); color: #c77dff; border: 1px solid rgba(157, 78, 221, 0.3); }
-.badge-cyan { background: rgba(0, 229, 255, 0.15); color: #84ffff; border: 1px solid rgba(0, 229, 255, 0.3); }
-.badge-green { background: rgba(0, 230, 118, 0.15); color: #69f0ae; border: 1px solid rgba(0, 230, 118, 0.3); }
-
-.top-bar-auth {
-    display: flex;
-    align-items: center;
-}
-
-.auth-group {
-    display: flex;
-    gap: 8px;
-}
-
-.auth-input {
-    background: var(--bg-surface-elevated);
-    border: 1px solid var(--border-subtle);
-    color: #fff;
-    padding: 8px 16px;
-    border-radius: var(--radius-pill);
-    font-size: 0.85rem;
-    font-family: inherit;
-    outline: none;
-    transition: var(--transition);
-}
-.auth-input:focus {
-    border-color: var(--accent-blue);
-    box-shadow: 0 0 10px var(--accent-blue-glow);
-}
-
-.btn-primary {
-    background: var(--accent-blue);
-    color: #fff;
-    border: none;
-    padding: 8px 20px;
-    border-radius: var(--radius-pill);
-    font-size: 0.85rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: var(--transition);
-    box-shadow: 0 4px 15px var(--accent-blue-glow);
-}
-.btn-primary:hover {
-    background: #3380ff;
-    transform: translateY(-1px);
-    box-shadow: 0 6px 20px var(--accent-blue-glow);
-}
-
-.btn-ghost {
-    background: transparent;
-    color: var(--text-muted);
-    border: 1px solid var(--border-subtle);
-    padding: 8px 20px;
-    border-radius: var(--radius-pill);
-    font-size: 0.85rem;
-    cursor: pointer;
-    transition: var(--transition);
-}
-.btn-ghost:hover {
-    background: rgba(255,255,255,0.05);
-    color: #fff;
-}
-
-.user-auth-inline {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-}
-.user-name { font-size: 0.9rem; font-weight: 500; }
-
-/* Navigation Pills */
-.top-nav-tabs {
-    display: flex;
-    gap: 12px;
-    justify-content: flex-start;
-    margin-top: -10px;
-    padding: 0 10px;
-}
-
-.nav-item {
-    background: transparent;
-    border: none;
-    color: var(--text-muted);
-    padding: 8px 16px;
-    border-radius: var(--radius-pill);
-    font-size: 0.9rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: var(--transition);
-}
-
-.nav-item:hover { color: #fff; background: rgba(255,255,255,0.03); }
-.nav-item.active {
-    background: rgba(30, 112, 255, 0.15);
-    color: #fff;
-    border: 1px solid rgba(30, 112, 255, 0.4);
-}
-
-/* Sections */
-.section { display: none; animation: fadeIn 0.4s ease forwards; }
-.section.active { display: block; }
-@keyframes fadeIn { from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
-
-/* ========== Hero Section ========== */
-.studio-hero {
-    text-align: center;
-    max-width: 800px;
-    margin: 40px auto 60px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.logo-mark img {
-    height: 40px;
-    margin-bottom: 20px;
-    opacity: 0.9;
-}
-
-.eyebrow {
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    font-weight: 600;
-    color: var(--text-muted);
-    margin-bottom: 16px;
-}
-
-.main-heading {
-    font-size: clamp(2.5rem, 4vw, 3.5rem);
-    font-weight: 600;
-    line-height: 1.1;
-    margin-bottom: 20px;
-    color: #fff;
-}
-
-.highlight-serif {
-    font-family: var(--font-serif);
-    font-style: italic;
-    font-weight: 600;
-}
-
-.description {
-    font-size: 1.05rem;
-    color: var(--text-muted);
-    line-height: 1.6;
-    margin-bottom: 30px;
-    max-width: 700px;
-}
-
-.btn-schedule {
-    background: var(--accent-blue);
-    color: #fff;
-    border: none;
-    padding: 12px 28px;
-    border-radius: var(--radius-sm);
-    font-size: 0.9rem;
-    font-weight: 600;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    transition: var(--transition);
-    box-shadow: 0 4px 15px var(--accent-blue-glow);
-}
-.btn-schedule:hover {
-    background: #3380ff;
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(30, 112, 255, 0.4);
-}
-
-/* ========== Key Metrics ========== */
-.metrics-wrapper {
-    background: var(--bg-surface);
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-lg);
-    padding: 40px;
-    position: relative;
-    margin-bottom: 60px;
-}
-
-.metrics-label-cap {
-    position: absolute;
-    top: -14px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: var(--bg-surface);
-    padding: 0 20px;
-    font-size: 1rem;
-    font-weight: 600;
-    color: #fff;
-}
-
-.glass-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 24px;
-}
-
-.stat-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    padding: 10px;
-    position: relative;
-}
-
-/* Metric Hover Tooltip logic */
-.stat-card[data-tooltip]:hover::after {
-    content: attr(data-tooltip);
-    position: absolute;
-    top: -40px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(30, 41, 59, 0.95);
-    color: #fff;
-    padding: 8px 12px;
-    border-radius: 6px;
-    font-size: 0.75rem;
-    white-space: nowrap;
-    z-index: 10;
-    border: 1px solid var(--border-subtle);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-}
-
-.info-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    border: 1px solid var(--text-muted);
-    font-size: 0.6rem;
-    color: var(--text-muted);
-    margin-left: 6px;
-    vertical-align: middle;
-    cursor: help;
-}
-
-.stat-card h3 {
-    font-size: 0.85rem;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 12px;
-    font-weight: 600;
-}
-
-.stat-card p {
-    font-size: 3.5rem;
-    font-weight: 700;
-    color: #fff;
-    line-height: 1;
-}
-
-/* ========== Report Cards Grid (Dynamically Generated by JS) ========== */
-.reports-section-header {
-    position: relative;
-    border-top: 1px solid var(--border-subtle);
-    margin: 0 0 40px 0;
-    text-align: center;
-}
-.reports-label-cap {
-    display: inline-block;
-    background: var(--bg-base);
-    padding: 0 20px;
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--accent-cyan);
-    transform: translateY(-50%);
-}
-
-.reports-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
-    gap: 24px;
-}
-
-/* Overriding the JS injected class to match mockup styling */
-.report-card-2x2 {
-    background: var(--bg-surface);
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-lg);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    transition: var(--transition);
-    min-height: 480px;
-}
-
-.report-card-2x2:hover {
-    border-color: rgba(30, 112, 255, 0.4);
-    box-shadow: 0 10px 40px rgba(0,0,0,0.3), 0 0 15px rgba(30, 112, 255, 0.1);
-    transform: translateY(-4px);
-}
-
-/* Seed characteristics section (Top half of card) */
-.report-card-seed-section {
-    padding: 24px;
-    border-bottom: 1px solid var(--border-subtle);
-}
-
-.seed-section-header { margin-bottom: 24px; }
-
-.seed-section-title {
-    font-size: 1.1rem;
-    color: #fff;
-    margin: 0;
-    line-height: 1.4;
-}
-
-.seed-label-bold { font-weight: 700; color: var(--text-muted); display: block; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 4px; }
-.seed-value-normal { font-weight: 600; font-size: 1.1rem; }
-
-.seed-characteristics {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px 24px;
-}
-
-.seed-char-item {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.seed-char-label {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    font-weight: 600;
-}
-
-.seed-char-value {
-    font-size: 0.9rem;
-    color: #fff;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-/* Synthetic Results section (Bottom half of card) */
-.report-card-synthetic-section {
-    padding: 24px;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    position: relative;
-}
-
-/* Custom CSS "Divider" injected to look like mockup */
-.report-card-synthetic-section::before {
-    content: 'Synthetic People Simulation Run';
-    display: block;
-    text-align: center;
-    font-size: 0.75rem;
-    color: var(--accent-cyan);
-    background: rgba(0, 229, 255, 0.1);
-    border: 1px solid rgba(0, 229, 255, 0.2);
-    border-radius: var(--radius-pill);
-    padding: 4px 16px;
-    width: max-content;
-    margin: -36px auto 20px auto; /* Pull it up onto the border line */
-    position: relative;
-    z-index: 2;
-}
-
-.synthetic-section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.synthetic-section-title {
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--text-muted);
-}
-
-.overall-accuracy-badge {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #fff !important; 
-    border: 1px solid var(--border-highlight) !important;
-    padding: 4px 12px;
-    border-radius: var(--radius-sm);
-    background: var(--bg-surface-elevated);
-}
-
-.synthetic-test-results { flex: 1; margin-bottom: 20px;}
-
-.test-results-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.test-result-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.03);
-}
-
-.test-result-name {
-    font-size: 0.85rem;
-    color: #fff;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.test-result-accuracy {
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: #fff;
-}
-
-.more-tests {
-    color: var(--accent-blue);
-    cursor: pointer;
-    font-size: 0.8rem;
-    justify-content: center;
-    border: none;
-}
-.more-tests:hover { color: #fff; }
-
-.report-card-actions-2x2 {
-    display: flex;
-    gap: 12px;
-    margin-top: auto;
-}
-
-.btn-view-details {
-    flex: 1;
-    background: var(--accent-blue);
-    color: #fff;
-    border: none;
-    padding: 10px;
-    border-radius: var(--radius-pill);
-    font-size: 0.9rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: var(--transition);
-}
-.btn-view-details:hover { background: #3380ff; }
-
-.btn-download-small {
-    background: var(--bg-surface-elevated);
-    border: 1px solid var(--border-subtle);
-    color: #fff;
-    width: 40px;
-    border-radius: var(--radius-pill);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: var(--transition);
-}
-.btn-download-small:hover { background: rgba(255,255,255,0.1); }
-
-/* Pagination */
-.pagination-container { margin-top: 40px; display: flex; justify-content: center; }
-.pagination { display: flex; gap: 8px; align-items: center; }
-.pagination-btn {
-    background: transparent;
-    border: 1px solid var(--border-subtle);
-    color: var(--text-muted);
-    padding: 6px 14px;
-    border-radius: var(--radius-sm);
-    font-size: 0.85rem;
-    cursor: pointer;
-}
-.pagination-btn.active {
-    background: var(--accent-blue);
-    color: #fff;
-    border-color: var(--accent-blue);
-}
-.pagination-btn:hover:not(.active):not(.disabled) { border-color: rgba(255,255,255,0.3); color: #fff; }
-
-/* ========== Test Results View (Second Screenshot) ========== */
-.result-header-layout {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 24px;
-}
-
-.result-title {
-    font-size: 2rem;
-    font-weight: 600;
-    color: #fff;
-    margin-bottom: 4px;
-}
-
-/* Restyling JS injected '.model-details-compact' */
-.model-details-card {
-    background: var(--bg-surface);
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-lg);
-    padding: 24px;
-    margin-bottom: 30px;
-}
-.model-details-compact .model-details-header h3 { font-size: 1.5rem; margin-bottom: 8px; }
-.model-details-compact .seed-label-bold { display: inline; color: var(--text-muted); font-size: 1rem; }
-.model-details-compact .seed-value-normal { color: #fff; font-weight: 600; }
-
-.model-details-grid {
-    display: flex;
-    gap: 40px;
-    margin-top: 20px;
-    border-top: 1px solid var(--border-subtle);
-    padding-top: 20px;
-}
-
-.model-detail-item { display: flex; flex-direction: column; gap: 4px; }
-.model-detail-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;}
-.model-detail-value { font-size: 1rem; color: #fff; font-weight: 500; }
-
-/* Questions Table Wrapper */
-.questions-table-container {
-    background: var(--bg-surface);
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-}
-
-.questions-table { width: 100%; border-collapse: collapse; }
-.questions-table th {
-    text-align: left;
-    padding: 16px 24px;
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    font-weight: 600;
-    border-bottom: 1px solid var(--border-subtle);
-    background: var(--bg-surface-elevated);
-}
-
-.questions-table td {
-    padding: 20px 24px;
-    border-bottom: 1px solid rgba(255,255,255,0.02);
-    vertical-align: top;
-}
-.questions-table tbody tr:hover { background: rgba(255,255,255,0.02); }
-
-.question-cell { width: 35%; }
-.question-number {
-    display: inline-block;
-    background: rgba(0, 229, 255, 0.1);
-    color: var(--accent-cyan);
-    width: 24px;
-    height: 24px;
-    text-align: center;
-    line-height: 24px;
-    border-radius: 50%;
-    font-size: 0.75rem;
-    font-weight: 700;
-    margin-right: 12px;
-}
-.question-text { font-size: 0.95rem; color: #fff; line-height: 1.4; display: inline; }
-
-.type-cell { color: var(--text-muted); font-size: 0.85rem; width: 15%; }
-.match-score-cell { font-weight: 600; width: 15%; text-align: right;}
-
-/* Q-Bar Chart Restyling (Green vs Red bars exactly like screenshot) */
-.answer-options-cell { width: 35%; }
-.q-bar-chart { width: 100%; font-size: 0.8rem; }
-.q-bar-chart-legend {
-    display: flex;
-    gap: 16px;
-    margin-bottom: 12px;
-    font-size: 0.75rem;
-    color: var(--text-muted);
-}
-.q-bar-legend-item { display: inline-block; width: 8px; height: 8px; border-radius: 2px; }
-
-.q-bar-row {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 12px;
-}
-.q-bar-y-label {
-    font-size: 0.8rem;
-    color: var(--text-muted);
-    margin-bottom: 4px;
-}
-.q-bar-group { display: flex; flex-direction: column; gap: 4px; }
-.q-bar-slot {
-    height: 12px;
-    background: rgba(255,255,255,0.05);
-    border-radius: 2px;
-    position: relative;
-    display: flex;
-    align-items: center;
-}
-.q-bar { height: 100%; border-radius: 2px; }
-.q-bar-human { background: var(--accent-green) !important; }
-.q-bar-synthetic { background: #ff3b30 !important; }
-
-.q-bar-count-inline {
-    position: absolute;
-    right: -30px;
-    font-size: 0.75rem;
-    font-weight: 600;
-}
-.q-bar-count-inline.human { color: var(--accent-green); }
-.q-bar-count-inline.synthetic { color: #ff3b30; }
-
-/* Tabs inside results (hide summary tab logic since mockup focuses on questions) */
-.results-tabs { display: none; }
-
-/* Miscellaneous UI Overrides to support other JS features */
-.glass-panel {
-    background: var(--bg-surface);
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-lg);
-    padding: 30px;
-}
-.two-column { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-.field-label { display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px;}
-.field-label input, .field-label textarea, .glass-select {
-    background: var(--bg-surface-elevated);
-    border: 1px solid var(--border-subtle);
-    padding: 12px;
-    border-radius: var(--radius-sm);
-    color: #fff;
-    font-family: inherit;
-    font-size: 0.9rem;
-    outline: none;
-    transition: var(--transition);
-}
-.field-label input:focus, .field-label textarea:focus, .glass-select:focus { border-color: var(--accent-blue); }
-.full-width { width: 100%; }
-.btn-back { background: transparent; border: 1px solid var(--border-subtle); }
-
-/* Omi Narrator Reset */
-.omi-narrator { position: fixed; right: 24px; bottom: 24px; z-index: 1000; }
-.omi-bubble { background: var(--bg-surface); border: 1px solid var(--border-subtle); color: #fff; padding: 12px; border-radius: var(--radius-md); font-size: 0.85rem; margin-bottom: 12px; }
-.omi-character-shell { width: 120px; height: 120px; position: relative; }
-.omi-video { width: 100%; height: 100%; object-fit: contain; }
-.omi-controls { position: absolute; top: -10px; right: -10px; display: flex; gap: 4px; }
-.omi-btn { background: var(--bg-surface); color: #fff; border: 1px solid var(--border-subtle); border-radius: 50%; width: 24px; height: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; }
-
-/* Responsive Adjustments */
-@media (max-width: 1200px) {
-    .glass-grid { grid-template-columns: repeat(2, 1fr); }
-    .reports-grid { grid-template-columns: repeat(2, 1fr); }
-}
-
-@media (max-width: 768px) {
-    .main { padding: 16px; }
-    .top-bar { flex-direction: column; gap: 16px; border-radius: var(--radius-lg); padding: 16px; }
-    .brand { flex-direction: column; text-align: center; }
-    .brand-divider { display: none; }
-    .top-nav-tabs { flex-wrap: wrap; justify-content: center; margin-top: 10px; }
-    
-    .glass-grid { grid-template-columns: 1fr; }
-    .reports-grid { grid-template-columns: 1fr; }
-    .two-column { grid-template-columns: 1fr; }
-    
-    .metrics-wrapper { padding: 30px 20px; }
-    .model-details-grid { flex-direction: column; gap: 16px; }
-    
-    .questions-table th, .questions-table td { padding: 12px; display: block; width: 100%; }
-    .questions-table tr { border-bottom: 2px solid var(--border-subtle); display: block; margin-bottom: 16px; }
-    .q-bar-count-inline { right: 10px; color: #fff !important; text-shadow: 0 0 4px #000; }
-}
