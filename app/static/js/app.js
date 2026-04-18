@@ -1,14 +1,19 @@
 // Omi narrator integration
 const OMI_BASE = '/omi/';
-const TIER_COLORS = { TIER_1: '#10b981', TIER_2: '#f59e0b', TIER_3: '#ef4444', TIER_4: '#7c3aed' };
+function matchScoreAccentColor(score01) {
+    if (score01 == null || typeof score01 !== 'number' || Number.isNaN(score01)) return '#6b7280';
+    const p = score01 * 100;
+    if (p >= 85) return '#10b981';
+    if (p >= 75) return '#f59e0b';
+    if (p >= 50) return '#ef4444';
+    return '#7c3aed';
+}
 
-function getTierForTest(test) {
-    if (test.tier && TIER_COLORS[test.tier]) return test.tier;
-    const score = test.match_score != null ? Number(test.match_score) : 0;
-    if (score > 0.85) return 'TIER_1';
-    if (score > 0.75) return 'TIER_2';
-    if (score > 0.50) return 'TIER_3';
-    return 'TIER_4';
+function normalizeAccuracy01(value) {
+    if (value == null || value === '') return null;
+    const n = typeof value === 'number' ? value : parseFloat(value);
+    if (Number.isNaN(n)) return null;
+    return n > 1 ? n / 100 : n;
 }
 
 const OMI_STATES = {
@@ -214,9 +219,7 @@ function showSection(id) {
 
     if(id==='surveys') loadSurveys();
     else if(id==='dashboard' || id==='reports') {
-        // Combined Dashboard & Reports - load both
-        loadDashboard();
-        loadReports(currentReportsPage);
+        Promise.all([loadDashboard(), loadReports(currentReportsPage)]).catch((err) => console.error(err));
     }
     else if(id==='industry-surveys') {
         loadIndustrySurveys();
@@ -224,16 +227,15 @@ function showSection(id) {
     else if(id==='results') {
         loadResultsPage();
     }
-    else if(id==='market-research') {
-        // Optional: reset output panel when entering
+    else if (id === 'market-research') {
+        loadLatestMarketResearchExtraction();
     }
     // Home section doesn't need any loading function
 }
 
 async function loadSurveys() {
     try {
-        const r = await fetch('/api/surveys/');
-        const surveys = await r.json();
+        const surveys = await fetchSurveysList();
         document.getElementById('surveys-list').innerHTML = surveys.map(s =>
             `<div class="survey-card">
                 <h3>${formatSurveyTitle(s.title)}</h3>
@@ -246,57 +248,41 @@ async function loadSurveys() {
 
 async function loadDashboard() {
     try {
-        const r = await fetch('/api/surveys/');
-        const surveys = await r.json();
-        const totalSurveys = surveys.length;
+        const [surveys, testLabResp] = await Promise.all([
+            fetchSurveysList(),
+            fetch('/api/validation/test-lab/metrics')
+        ]);
+        const totalSurveys = Array.isArray(surveys) ? surveys.length : 0;
         document.getElementById('total-surveys').textContent = totalSurveys;
-        
-        const validatedSurveys = surveys.filter(s => s.accuracy_score !== null && s.accuracy_score !== undefined);
-        document.getElementById('validated-surveys').textContent = validatedSurveys.length;
-        
-        // Average alignment score
-        if (validatedSurveys.length > 0) {
-            const totalAccuracy = validatedSurveys.reduce((sum, s) => {
-                const acc = parseFloat(s.accuracy_score) || 0;
-                return sum + acc;
-            }, 0);
-            const avgAccuracy = (totalAccuracy / validatedSurveys.length) * 100;
-            document.getElementById('avg-accuracy').textContent = avgAccuracy.toFixed(1) + '%';
-        } else {
-            document.getElementById('avg-accuracy').textContent = '0%';
+
+        if (testLabResp.ok) {
+            const metrics = await testLabResp.json();
+            document.getElementById('validated-surveys').textContent = metrics?.scenarios_covered?.count ?? 0;
+            document.getElementById('avg-accuracy').textContent = `${((metrics?.avg_similarity ?? 0) * 100).toFixed(1)}%`;
+            document.getElementById('avg-variance-range').textContent = `${((metrics?.avg_directional_alignment ?? 0) * 100).toFixed(1)}%`;
+            document.getElementById('avg-stability-indicator').textContent = metrics?.industries_covered?.count ?? 0;
+            lastScenarioMix = metrics?.scenarios_covered?.mix || {};
+            lastIndustryMix = metrics?.industries_covered?.mix || {};
+            const scenarioBtn = document.getElementById('scenario-mix-btn');
+            const industryBtn = document.getElementById('industry-mix-btn');
+            if (scenarioBtn) scenarioBtn.style.display = Object.keys(lastScenarioMix).length ? 'inline-flex' : 'none';
+            if (industryBtn) industryBtn.style.display = Object.keys(lastIndustryMix).length ? 'inline-flex' : 'none';
+            return;
         }
 
-        // Avg variance range & avg stability from report question comparisons (plain English values)
-        const avgVarianceEl = document.getElementById('avg-variance-range');
-        const avgStabilityEl = document.getElementById('avg-stability-indicator');
-        if (avgVarianceEl && avgStabilityEl) {
-            const reportsWithQc = validatedSurveys.filter(s => {
-                const report = s.test_suite_report;
-                return report && Array.isArray(report.question_comparisons) && report.question_comparisons.length > 0;
-            });
-            if (reportsWithQc.length > 0) {
-                let sumVarianceRange = 0;
-                let sumStability = 0;
-                let count = 0;
-                reportsWithQc.forEach(s => {
-                    const scores = (s.test_suite_report.question_comparisons || [])
-                        .map(q => (q.match_score != null ? parseFloat(q.match_score) : null))
-                        .filter(v => typeof v === 'number' && !isNaN(v));
-                    if (scores.length > 0) {
-                        const minS = Math.min(...scores);
-                        const maxS = Math.max(...scores);
-                        sumVarianceRange += (maxS - minS) * 100;
-                        sumStability += minS * 100;
-                        count += 1;
-                    }
-                });
-                avgVarianceEl.textContent = count > 0 ? (sumVarianceRange / count).toFixed(1) + '%' : '—';
-                avgStabilityEl.textContent = count > 0 ? (sumStability / count).toFixed(1) + '%' : '—';
-            } else {
-                avgVarianceEl.textContent = '—';
-                avgStabilityEl.textContent = '—';
-            }
-        }
+        // Fallback to survey-only metrics if test-lab endpoint is unavailable
+        const validatedSurveys = surveys.filter(s => s.accuracy_score !== null && s.accuracy_score !== undefined);
+        document.getElementById('validated-surveys').textContent = validatedSurveys.length;
+        const avgAccuracy = validatedSurveys.length > 0
+            ? ((validatedSurveys.reduce((sum, s) => sum + (parseFloat(s.accuracy_score) || 0), 0) / validatedSurveys.length) * 100)
+            : 0;
+        document.getElementById('avg-accuracy').textContent = avgAccuracy.toFixed(1) + '%';
+        document.getElementById('avg-variance-range').textContent = '—';
+        document.getElementById('avg-stability-indicator').textContent = '—';
+        const scenarioBtn = document.getElementById('scenario-mix-btn');
+        const industryBtn = document.getElementById('industry-mix-btn');
+        if (scenarioBtn) scenarioBtn.style.display = 'none';
+        if (industryBtn) industryBtn.style.display = 'none';
     } catch(e) { 
         console.error('Error loading dashboard:', e);
         document.getElementById('total-surveys').textContent = '0';
@@ -306,14 +292,21 @@ async function loadDashboard() {
         const avgStabilityEl = document.getElementById('avg-stability-indicator');
         if (avgVarianceEl) avgVarianceEl.textContent = '—';
         if (avgStabilityEl) avgStabilityEl.textContent = '—';
+        const scenarioBtn = document.getElementById('scenario-mix-btn');
+        const industryBtn = document.getElementById('industry-mix-btn');
+        if (scenarioBtn) scenarioBtn.style.display = 'none';
+        if (industryBtn) industryBtn.style.display = 'none';
     }
 }
 
 function createNewSurvey() {
     const title = prompt('Survey title:');
     if(!title) return;
-    fetch('/api/surveys/', {method:'POST', body: JSON.stringify({title}), 
-           headers:{'Content-Type':'application/json'}}).then(() => loadSurveys());
+    fetch('/api/surveys/', {method:'POST', body: JSON.stringify({title}),
+           headers:{'Content-Type':'application/json'}}).then(async () => {
+        invalidateSurveysCache();
+        await loadSurveys();
+    });
 }
 
 async function runValidation() {
@@ -351,9 +344,8 @@ async function runValidation() {
         storeResultsAndNavigate(data, surveyId);
         omiPlay('celebrate', 'Validation complete! Let us review the results.');
         
-        // refresh dashboard stats
-        await loadDashboard();
-        await loadSurveys();
+        invalidateSurveysCache();
+        await Promise.all([loadDashboard(), loadSurveys()]);
     } catch (e) {
         console.error(e);
         omiPlay('caution', 'Validation hit an issue. I can help you retry.');
@@ -372,7 +364,6 @@ function downloadReport(surveyId, format) {
 }
 
 async function loadIndustrySurveys() {
-    console.log('loadIndustrySurveys() called');
     const surveysList = document.getElementById('industry-surveys-list');
     const s3List = document.getElementById('industry-surveys-s3-list');
     const s3Help = document.getElementById('industry-s3-help');
@@ -548,7 +539,6 @@ async function loadIndustrySurveys() {
             surveyLink: 'https://example.com/surveys/banking-fintech',
             pdfLink: 'https://example.com/pdfs/banking-fintech-report.pdf',
             accuracy: 92.5,
-            tier: 'TIER_1',
             validatedDate: '2024-01-15',
             testCount: 12,
             pdfReferences: [
@@ -576,7 +566,6 @@ async function loadIndustrySurveys() {
             surveyLink: 'https://example.com/surveys/healthcare-patient',
             pdfLink: 'https://example.com/pdfs/healthcare-patient-report.pdf',
             accuracy: 88.3,
-            tier: 'TIER_1',
             validatedDate: '2024-01-18',
             testCount: 12,
             pdfReferences: [
@@ -604,7 +593,6 @@ async function loadIndustrySurveys() {
             surveyLink: 'https://example.com/surveys/retail-consumer',
             pdfLink: 'https://example.com/pdfs/retail-consumer-report.pdf',
             accuracy: 85.7,
-            tier: 'TIER_2',
             validatedDate: '2024-01-20',
             testCount: 12,
             pdfReferences: [
@@ -632,7 +620,6 @@ async function loadIndustrySurveys() {
             surveyLink: 'https://example.com/surveys/education-student',
             pdfLink: 'https://example.com/pdfs/education-student-report.pdf',
             accuracy: 90.2,
-            tier: 'TIER_1',
             validatedDate: '2024-01-22',
             testCount: 12,
             pdfReferences: [
@@ -660,7 +647,6 @@ async function loadIndustrySurveys() {
             surveyLink: 'https://example.com/surveys/technology-ai',
             pdfLink: 'https://example.com/pdfs/technology-ai-report.pdf',
             accuracy: 87.9,
-            tier: 'TIER_2',
             validatedDate: '2024-01-25',
             testCount: 12,
             pdfReferences: [
@@ -688,7 +674,6 @@ async function loadIndustrySurveys() {
             surveyLink: 'https://example.com/surveys/transportation-mobility',
             pdfLink: 'https://example.com/pdfs/transportation-mobility-report.pdf',
             accuracy: 83.4,
-            tier: 'TIER_2',
             validatedDate: '2024-01-28',
             testCount: 12,
             pdfReferences: [
@@ -709,8 +694,6 @@ async function loadIndustrySurveys() {
     ];
     
     surveysList.innerHTML = industrySurveys.map(survey => {
-        const tierColor = TIER_COLORS[survey.tier] || '#6b7280';
-        
         return `
             <div class="industry-survey-card" style="border-left-color: ${survey.color};">
                 <div class="industry-survey-header">
@@ -721,13 +704,12 @@ async function loadIndustrySurveys() {
                         <div class="industry-survey-domain" style="color: ${survey.color};">${survey.domain}</div>
                         <h3 class="industry-survey-title">${survey.title}</h3>
                     </div>
-                    <span class="tier-badge" style="background: ${tierColor}">${survey.tier}</span>
                 </div>
                 <p class="industry-survey-description">${survey.description}</p>
                 <div class="industry-survey-stats">
                     <div class="industry-stat">
                         <div class="industry-stat-label">Accuracy</div>
-                        <div class="industry-stat-value" style="color: ${tierColor};">${survey.accuracy}%</div>
+                        <div class="industry-stat-value" style="color: ${survey.color};">${survey.accuracy}%</div>
                     </div>
                     <div class="industry-stat">
                         <div class="industry-stat-label">Tests Run</div>
@@ -829,6 +811,46 @@ async function loadSamplePdfText() {
 
 let lastMarketResearchData = null;
 
+/** Load last persisted reverse-engineer result from API (same shape as POST response). */
+async function loadLatestMarketResearchExtraction() {
+    const outputPanel = document.getElementById('market-research-output-panel');
+    const objectivesEl = document.getElementById('market-research-output-objectives');
+    const questionnaireEl = document.getElementById('market-research-output-questionnaire');
+    const statusEl = document.getElementById('market-research-status');
+    if (!outputPanel || !objectivesEl || !questionnaireEl) return;
+
+    const token = localStorage.getItem('authToken');
+    const headers = token ? { Authorization: 'Bearer ' + token } : {};
+    try {
+        const res = await fetch('/api/market-research/latest-extraction', { headers });
+        if (!res.ok) return;
+        const body = await res.json();
+        if (!body.has_extraction || !body.data) return;
+
+        lastMarketResearchData = body.data;
+        renderMarketResearchOutput(body.data, objectivesEl, questionnaireEl);
+        outputPanel.style.display = 'block';
+        if (statusEl) {
+            statusEl.style.display = 'block';
+            statusEl.className = 'market-research-status success';
+            const when = body.data.persisted_at
+                ? new Date(body.data.persisted_at).toLocaleString()
+                : '';
+            statusEl.textContent = when
+                ? 'Loaded last saved extraction (' + when + '). Run Reverse-Engineer to process a new report.'
+                : 'Loaded last saved extraction. Run Reverse-Engineer to process a new report.';
+        }
+    } catch (e) {
+        console.warn('Could not load latest market research extraction', e);
+    }
+}
+
+function notifyMarketResearchSaved(data) {
+    if (data && data.extraction_id) {
+        showNotification('Report extraction saved to the database.', 'success', 4000);
+    }
+}
+
 // Chunk size for upload (stay under ~1MB to avoid 413). No limit on total file or text length.
 var MAX_UPLOAD_CHARS = 300000;
 var MAX_UPLOAD_FILE_BYTES = 900 * 1024;  // files larger than this are sent in chunked upload
@@ -892,6 +914,7 @@ async function runMarketResearchReverseEngineer() {
                 lastMarketResearchData = data;
                 renderMarketResearchOutput(data, objectivesEl, questionnaireEl);
                 outputPanel.style.display = 'block';
+                notifyMarketResearchSaved(data);
                 if (data.ai_used === false && data.message) {
                     statusEl.innerHTML = '<strong>Placeholder only.</strong> ' + escapeHtml(data.message);
                     statusEl.className = 'market-research-status error';
@@ -941,6 +964,7 @@ async function runMarketResearchReverseEngineer() {
             lastMarketResearchData = data;
             renderMarketResearchOutput(data, objectivesEl, questionnaireEl);
             outputPanel.style.display = 'block';
+            notifyMarketResearchSaved(data);
             if (data.ai_used === false && data.message) {
                 statusEl.innerHTML = '<strong>Placeholder only.</strong> ' + escapeHtml(data.message);
                 statusEl.className = 'market-research-status error';
@@ -975,6 +999,7 @@ async function runMarketResearchReverseEngineer() {
             lastMarketResearchData = data;
             renderMarketResearchOutput(data, objectivesEl, questionnaireEl);
             outputPanel.style.display = 'block';
+            notifyMarketResearchSaved(data);
             if (data.ai_used === false && data.message) {
                 statusEl.innerHTML = '<strong>Placeholder only.</strong> ' + escapeHtml(data.message);
                 statusEl.className = 'market-research-status error';
@@ -1018,6 +1043,7 @@ async function runMarketResearchReverseEngineer() {
         lastMarketResearchData = data;
         renderMarketResearchOutput(data, objectivesEl, questionnaireEl);
         outputPanel.style.display = 'block';
+        notifyMarketResearchSaved(data);
         if (data.ai_used === false && data.message) {
             statusEl.innerHTML = '<strong>Placeholder only.</strong> ' + escapeHtml(data.message);
             statusEl.className = 'market-research-status error';
@@ -1160,6 +1186,16 @@ function renderMarketResearchOutput(data, objectivesEl, questionnaireEl) {
     const hasRealOutput = sections.researchObjective.length > 0 || sections.questionnaire.length > 0;
 
     let objectivesHtml = '';
+    const ctxGeo = data.geography;
+    const ctxInd = data.industry;
+    const ctxScen = data.scenario;
+    if (ctxGeo || ctxInd || ctxScen) {
+        objectivesHtml += '<div class="mre-block mre-extracted-context"><h4>Geography, industry & scenario</h4><dl class="mre-context-dl">';
+        if (ctxGeo) objectivesHtml += '<dt>Geography</dt><dd>' + escapeHtml(String(ctxGeo)) + '</dd>';
+        if (ctxInd) objectivesHtml += '<dt>Industry</dt><dd>' + escapeHtml(String(ctxInd)) + '</dd>';
+        if (ctxScen) objectivesHtml += '<dt>Scenario</dt><dd>' + escapeHtml(String(ctxScen)) + '</dd>';
+        objectivesHtml += '</dl></div>';
+    }
     if (!aiUsed && message) {
         objectivesHtml += '<div class="mre-no-api-key-banner"><strong>No API key.</strong> ' + escapeHtml(message) + '</div>';
     }
@@ -1378,9 +1414,306 @@ function escapeHtml(s) {
     return div.innerHTML;
 }
 
+function formatStudyValidatedAt(d) {
+    if (d == null || d === '') return '—';
+    const dt = new Date(d);
+    if (Number.isNaN(dt.getTime())) return '—';
+    return dt.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+}
+
+function shortSurveyId(id) {
+    if (!id) return '—';
+    const s = String(id);
+    if (s.length <= 14) return s;
+    return s.slice(0, 8) + '…';
+}
+
 // Pagination state
 let currentReportsPage = 1;
-const reportsPerPage = 3; // 3 reports per page, rest in pagination
+const reportsPerPage = 1; // one study per page; use pagination for the rest
+const testLabProfileCache = new Map();
+let surveysListCache = null;
+let surveysFetchPromise = null;
+
+function invalidateSurveysCache() {
+    surveysListCache = null;
+    surveysFetchPromise = null;
+    testLabProfileCache.clear();
+}
+
+async function fetchSurveysList() {
+    if (surveysListCache !== null) return surveysListCache;
+    if (!surveysFetchPromise) {
+        surveysFetchPromise = fetch('/api/surveys/?summary=1')
+            .then(async (r) => {
+                if (!r.ok) throw new Error(`HTTP ${r.status}`);
+                const surveys = await r.json();
+                surveysListCache = Array.isArray(surveys) ? surveys : [];
+                return surveysListCache;
+            })
+            .finally(() => {
+                surveysFetchPromise = null;
+            });
+    }
+    return surveysFetchPromise;
+}
+
+let pendingLeadSurveyId = null;
+let lastScenarioMix = {};
+let lastIndustryMix = {};
+
+async function getTestLabProfile(surveyId) {
+    if (!surveyId) return null;
+    if (testLabProfileCache.has(surveyId)) return testLabProfileCache.get(surveyId);
+    try {
+        const res = await fetch(`/api/validation/test-lab/profile/${surveyId}`);
+        if (!res.ok) return null;
+        const profile = await res.json();
+        testLabProfileCache.set(surveyId, profile);
+        return profile;
+    } catch (e) {
+        return null;
+    }
+}
+
+async function fetchTestLabProfilesBatch(surveyIds) {
+    const ids = [...new Set((surveyIds || []).filter(Boolean))];
+    if (!ids.length) return new Map();
+    const missing = ids.filter((id) => !testLabProfileCache.has(id));
+    if (missing.length) {
+        const qs = encodeURIComponent(missing.join(','));
+        try {
+            const res = await fetch(`/api/validation/test-lab/profiles/batch?survey_ids=${qs}`);
+            if (res.ok) {
+                const batch = await res.json();
+                missing.forEach((id) => {
+                    testLabProfileCache.set(id, batch[id] != null ? batch[id] : null);
+                });
+            } else {
+                await Promise.all(missing.map((id) => getTestLabProfile(id)));
+            }
+        } catch {
+            await Promise.all(missing.map((id) => getTestLabProfile(id)));
+        }
+    }
+    return new Map(ids.map((id) => [id, testLabProfileCache.get(id) || {}]));
+}
+
+/** Fieldwork duration buckets (aligns with backend _estimate_human_time). */
+function estimateHumanTime(sampleSize) {
+    const n = parseInt(sampleSize, 10);
+    if (!n || n <= 0) return 'Unknown';
+    if (n <= 2000) return '1-2 weeks';
+    if (n <= 4000) return '2-3 weeks';
+    if (n <= 6000) return '3-4 weeks';
+    return '4-5 weeks';
+}
+
+const HUMAN_ECON_TOOLTIPS = {
+    cost: 'Estimated cost of conducting the human survey: conventional range is $5–$8 per response × sample size (e.g. 2,600 × $5 = $13,000 min and 2,600 × $8 = $20,800 max).',
+    time: 'Approximate time for respondents to complete fieldwork, bucketed by sample size (e.g. 1,000–2,000 → 1–2 weeks; 2,001–4,000 → 2–3 weeks; 4,001–6,000 → 3–4 weeks; 6,000+ → 4–5 weeks).',
+    effort: 'Estimated hours for data processing, analysis, and report preparation for a standard survey study (typically 80–120 hours).'
+};
+
+function formatCurrencyRange(minValue, maxValue) {
+    const min = Number(minValue);
+    const max = Number(maxValue);
+    if (!Number.isFinite(min) && !Number.isFinite(max)) return '—';
+    if (Number.isFinite(min) && Number.isFinite(max)) return `$${Math.round(min).toLocaleString()}-$${Math.round(max).toLocaleString()}`;
+    const fallback = Number.isFinite(min) ? min : max;
+    return `$${Math.round(fallback).toLocaleString()}`;
+}
+
+function surveyDisplayName(rawTitle) {
+    const t = String(rawTitle || '').trim();
+    if (t === 'File Comparison: Food_Delivery_Behavior_AI_Summary.csv vs Food_Delivery_Behavior_Human_Summary.csv') {
+        return 'Food Delivery Behavior in India';
+    }
+    const parsed = formatSurveyName(rawTitle);
+    return parsed || 'Food Delivery Behavior';
+}
+
+function targetAudienceWithAge(rawAudience) {
+    const t = String(rawAudience || '').trim();
+    if (!t) return 'Age group: 18-45 years';
+    return /age/i.test(t) ? t : `Age group: ${t}`;
+}
+
+function derivedIndustry(studyName, profileIndustry) {
+    const named = String(profileIndustry || '').trim();
+    const s = String(studyName || '').toLowerCase();
+    let inferred = 'General';
+    if (/food/i.test(s)) inferred = 'Food';
+    else if (/\bev\b|electric vehicle|e-vehicle|automotive/i.test(s)) inferred = 'Automotive';
+    if (!named || named.toLowerCase() === 'general') return inferred;
+    return named;
+}
+
+/** Fallback human cost range when economics not yet persisted ($5–$8 per response). */
+function estimatedCostFromRespondents(sampleSize) {
+    const n = Number(sampleSize || 0);
+    if (!n || n <= 0) return '—';
+    const min = Math.round(n * 5);
+    const max = Math.round(n * 8);
+    return `$${min.toLocaleString()}–$${max.toLocaleString()}`;
+}
+
+function computeDirectionalAlignment(questionComparisons) {
+    if (!Array.isArray(questionComparisons) || questionComparisons.length === 0) return null;
+    let aligned = 0;
+    let comparable = 0;
+    questionComparisons.forEach((q) => {
+        const options = Array.isArray(q?.option_comparisons) ? q.option_comparisons : [];
+        if (!options.length) return;
+        const synTop = options.reduce((a, b) => (Number(a.synthetic_count || 0) >= Number(b.synthetic_count || 0) ? a : b));
+        const realTop = options.reduce((a, b) => (Number(a.real_count || 0) >= Number(b.real_count || 0) ? a : b));
+        comparable += 1;
+        if (String(synTop.option) === String(realTop.option)) aligned += 1;
+    });
+    if (!comparable) return null;
+    return (aligned / comparable) * 100;
+}
+
+function formatHumanCostDisplay(econ) {
+    if (!econ || typeof econ !== 'object') return '—';
+    const min = econ.estimated_cost_min;
+    const max = econ.estimated_cost_max;
+    if (min != null && max != null) {
+        const a = Math.round(Number(min));
+        const b = Math.round(Number(max));
+        if (!Number.isFinite(a) || !Number.isFinite(b)) return '—';
+        if (a === 0 && b === 0) return '—';
+        if (a === b) return `$${a.toLocaleString()}`;
+        return `$${a.toLocaleString()}–$${b.toLocaleString()}`;
+    }
+    return '—';
+}
+
+/** Display stored 0–1 or 0–100 similarity-style values as a percent string. */
+function formatOutcomePercent(val) {
+    if (val == null || val === '') return '—';
+    const n = Number(val);
+    if (Number.isNaN(n)) return '—';
+    const pct = n <= 1 ? n * 100 : n;
+    return `${pct.toFixed(1)}%`;
+}
+
+function vlabelWithTip(text, tipText) {
+    return `<span class="vlabel">${escapeHtml(text)} <span class="metric-tip" title="${escapeHtml(tipText)}">i</span></span>`;
+}
+
+function renderVerdictBulletList(items) {
+    const arr = Array.isArray(items) ? items.filter((t) => t != null && String(t).trim() !== '') : [];
+    if (!arr.length) {
+        return '<p class="verdict-empty">No verdict bullets stored yet.</p>';
+    }
+    return `<ul class="verdict-list">${arr.map((t) => `<li>${escapeHtml(String(t))}</li>`).join('')}</ul>`;
+}
+
+function renderMixChart(mix) {
+    const entries = Object.entries(mix || {}).filter(([, v]) => Number(v) > 0);
+    if (entries.length === 0) return '<p class="help-text">No data available.</p>';
+    const total = entries.reduce((sum, [, v]) => sum + Number(v), 0);
+    const colors = ['#22c55e', '#3b82f6', '#f59e0b', '#ef4444', '#a855f7', '#14b8a6', '#f97316'];
+    let cumulative = 0;
+    const segments = entries.map(([, count], idx) => {
+        const value = Number(count);
+        const pct = (value / total) * 100;
+        const start = cumulative;
+        cumulative += pct;
+        return `${colors[idx % colors.length]} ${start.toFixed(2)}% ${cumulative.toFixed(2)}%`;
+    }).join(', ');
+    const legend = entries.map(([name, count], idx) => {
+        const pct = ((Number(count) / total) * 100).toFixed(1);
+        return `<div class="mix-legend-item"><span class="mix-dot" style="background:${colors[idx % colors.length]}"></span><span>${escapeHtml(name)}: ${count} (${pct}%)</span></div>`;
+    }).join('');
+    return `
+        <div class="mix-pie-wrap">
+            <div class="mix-pie" style="background: conic-gradient(${segments});"></div>
+            <div class="mix-total">Total: ${total}</div>
+        </div>
+        <div class="mix-legend">${legend}</div>
+    `;
+}
+
+function openMixPopup(kind) {
+    const modal = document.getElementById('mix-popup-modal');
+    const titleEl = document.getElementById('mix-popup-title');
+    const contentEl = document.getElementById('mix-popup-content');
+    if (!modal || !titleEl || !contentEl) return;
+    if (kind === 'scenarios') {
+        titleEl.textContent = 'Scenarios Mix';
+        contentEl.innerHTML = renderMixChart(lastScenarioMix);
+    } else {
+        titleEl.textContent = 'Industries Mix';
+        contentEl.innerHTML = renderMixChart(lastIndustryMix);
+    }
+    modal.style.display = 'flex';
+}
+
+function closeMixPopup() {
+    const modal = document.getElementById('mix-popup-modal');
+    if (modal) modal.style.display = 'none';
+}
+
+function openLeadCaptureModal(surveyId) {
+    pendingLeadSurveyId = surveyId;
+    const modal = document.getElementById('lead-capture-modal');
+    const errorEl = document.getElementById('lead-form-error');
+    if (errorEl) {
+        errorEl.style.display = 'none';
+        errorEl.textContent = '';
+    }
+    if (modal) modal.style.display = 'flex';
+}
+
+function closeLeadCaptureModal() {
+    pendingLeadSurveyId = null;
+    const modal = document.getElementById('lead-capture-modal');
+    if (modal) modal.style.display = 'none';
+}
+
+async function submitLeadCapture() {
+    if (!pendingLeadSurveyId) return;
+    const surveyId = pendingLeadSurveyId;
+    const nameEl = document.getElementById('lead-name');
+    const companyEl = document.getElementById('lead-company');
+    const emailEl = document.getElementById('lead-email');
+    const errorEl = document.getElementById('lead-form-error');
+    const payload = {
+        name: (nameEl?.value || '').trim(),
+        company_name: (companyEl?.value || '').trim(),
+        email: (emailEl?.value || '').trim(),
+        consent: true,
+        source: 'view_detailed_comparison',
+        metadata: { section: 'reports' }
+    };
+    if (!payload.name || !payload.company_name || !payload.email) {
+        if (errorEl) {
+            errorEl.textContent = 'All fields are required.';
+            errorEl.style.display = 'block';
+        }
+        return;
+    }
+    try {
+        const res = await fetch(`/api/validation/test-lab/lead-capture/${surveyId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        if (!res.ok) throw new Error('Could not capture details.');
+        closeLeadCaptureModal();
+        if (nameEl) nameEl.value = '';
+        if (companyEl) companyEl.value = '';
+        if (emailEl) emailEl.value = '';
+        await viewReport(surveyId);
+    } catch (e) {
+        if (errorEl) {
+            errorEl.textContent = e.message || 'Could not submit form.';
+            errorEl.style.display = 'block';
+        }
+    }
+}
 
 function toggleReportCardChecks(btn) {
     const grid = btn.closest('.synthetic-test-results')?.querySelector('.test-results-grid');
@@ -1391,7 +1724,6 @@ function toggleReportCardChecks(btn) {
 }
 
 async function loadReports(page = 1) {
-    console.log('loadReports() called, page:', page);
     currentReportsPage = page;
     const reportsList = document.getElementById('reports-list');
     const paginationContainer = document.getElementById('reports-pagination');
@@ -1405,13 +1737,7 @@ async function loadReports(page = 1) {
     reportsList.innerHTML = '<div class="empty-state"><p>Loading reports...</p></div>';
     
     try {
-        console.log('Fetching surveys from /api/surveys/');
-        const r = await fetch('/api/surveys/');
-        if (!r.ok) {
-            throw new Error(`HTTP error! status: ${r.status}`);
-        }
-        const surveys = await r.json();
-        console.log(`Received ${surveys.length} surveys`);
+        const surveys = await fetchSurveysList();
         
         // Filter to only show surveys with validation results
         const validatedSurveys = surveys.filter(s => {
@@ -1432,8 +1758,6 @@ async function loadReports(page = 1) {
             return timestampB - timestampA;
         });
         
-        console.log(`Found ${validatedSurveys.length} validated surveys out of ${surveys.length} total`);
-        
         if (validatedSurveys.length === 0) {
             reportsList.innerHTML = `
                 <div class="empty-state">
@@ -1451,93 +1775,169 @@ async function loadReports(page = 1) {
         const startIndex = (page - 1) * reportsPerPage;
         const endIndex = startIndex + reportsPerPage;
         const paginatedSurveys = validatedSurveys.slice(startIndex, endIndex);
+        const profileMap = await fetchTestLabProfilesBatch(paginatedSurveys.map((s) => s.id));
         
-        reportsList.innerHTML = paginatedSurveys.map(s => {
-            const tier = s.confidence_tier || 'N/A';
+        reportsList.innerHTML = paginatedSurveys.map((s, idx) => {
+            const studyIndex = startIndex + idx + 1;
+            const totalStudies = validatedSurveys.length;
+            const validatedLabel = formatStudyValidatedAt(s.validated_at || s.updated_at || s.created_at);
             const accuracy = s.accuracy_score ? (s.accuracy_score * 100).toFixed(1) : 'N/A';
-            const tierColor = TIER_COLORS[tier] || '#6b7280';
-            const validatedDate = s.validated_at ? new Date(s.validated_at).toLocaleDateString() : 'N/A';
+            const profile = profileMap.get(s.id) || {};
+            const humanStudy = profile.human_study || {};
+            const sampleSize = humanStudy.sample_size || 0;
+            const estimatedCost = estimatedCostFromRespondents(sampleSize);
+            const estimatedTime = humanStudy?.economics?.estimated_time_range || estimateHumanTime(sampleSize);
+            const estimatedEffort = humanStudy?.economics?.estimated_effort_hours || '80-120 hours';
+            const scenario = profile.scenario || '—';
+            const rawStudyName = humanStudy.survey_name || s.title || '';
+            const commonSurveyName = surveyDisplayName(rawStudyName);
+            const industry = derivedIndustry(commonSurveyName, profile.industry);
+            const profileGeo = profile.geography || humanStudy.geography || 'India';
             
             // Extract test accuracies from test_suite_report
             const report = s.test_suite_report || {};
             const tests = report.tests || [];
             
-            // Get file info - use survey title as primary label, avoid raw file paths in UI
+            // Get file info if present
             const fileInfo = s.synthetic_personas || {};
-            const sourceFile = typeof fileInfo === 'object' && fileInfo.source_file ? fileInfo.source_file : '';
-            const dataSourceLabel = sourceFile && sourceFile !== 'N/A' && sourceFile.length > 3
-                ? (sourceFile.length > 30 ? 'Uploaded file' : sourceFile)
-                : (s.title || 'Uploaded file');
-            const questionCount = s.test_suite_report?.question_comparisons?.length || fileInfo.question_data?.length || 0;
-            
-            // All test results; first 5 shown, rest expandable on click (include tier for color coding)
-            const allTests = tests
-                .filter(t => t.match_score !== undefined && !t.error)
-                .map(t => ({
-                    name: formatTestName(t.test),
-                    accuracy: (t.match_score * 100).toFixed(1),
-                    tier: getTierForTest(t)
-                }));
+            const questionComparisons = s.test_suite_report?.question_comparisons || [];
+            const slimQc = Number(fileInfo._question_data_count);
+            const questionCount = questionComparisons.length
+                || (Number.isFinite(slimQc) && slimQc > 0 ? slimQc : 0)
+                || (Array.isArray(fileInfo.question_data) ? fileInfo.question_data.length : 0)
+                || 0;
+            const syntheticStudy = profile.synthetic_study || {};
+            const commonTargetAudience = targetAudienceWithAge(humanStudy.target_audience);
+            const humanSampleSize = humanStudy.sample_size || questionCount || 0;
+            const humanQuestions = humanStudy.total_questions || questionCount || 0;
+            const smPersisted = s.study_metrics || {};
+            const pickMetric = (a, b, c) => {
+                const v = a != null ? a : (b != null ? b : c);
+                return v == null || v === '' ? '—' : escapeHtml(String(v));
+            };
+            const actionPoints = pickMetric(s.actions_data_points, smPersisted.actions_data_points, syntheticStudy.actions_data_points);
+            const neuroPoints = pickMetric(s.neuroscience_data_points, smPersisted.neuroscience_data_points, syntheticStudy.neuroscience_data_points);
+            const contextualPoints = pickMetric(s.contextual_layer_data_points, smPersisted.contextual_layer_data_points, syntheticStudy.contextual_layer_data_points);
+            const avgSimSource = s.avg_similarity != null ? s.avg_similarity : (smPersisted.avg_similarity != null ? smPersisted.avg_similarity : s.accuracy_score);
+            const avgSimilarityDisplay = avgSimSource != null && avgSimSource !== '' ? escapeHtml((Number(avgSimSource) * 100).toFixed(1)) : escapeHtml(accuracy);
+            const daStored = s.directional_alignment != null ? s.directional_alignment : smPersisted.directional_alignment;
+            const directionalAlignmentPct = daStored != null && daStored !== ''
+                ? (Number(daStored) <= 1 ? (Number(daStored) * 100).toFixed(1) : Number(daStored).toFixed(1))
+                : null;
+            const directionalDisplay = directionalAlignmentPct != null ? escapeHtml(directionalAlignmentPct) + '%' : (() => {
+                const live = computeDirectionalAlignment(questionComparisons);
+                return live == null ? '—' : escapeHtml(live.toFixed(1)) + '%';
+            })();
+            const checksSource = s.checks_passed != null ? s.checks_passed : smPersisted.checks_passed;
             const totalTests = tests.filter(t => !t.error).length;
-            
+            const checksDisplay = escapeHtml(String(checksSource != null ? checksSource : totalTests));
+            const spEconomics = syntheticStudy.economics || {};
+            const spCostLabel = spEconomics.cost_display != null && String(spEconomics.cost_display).trim() !== ''
+                ? escapeHtml(String(spEconomics.cost_display))
+                : '$999';
+            const spTime = spEconomics.time_display || '3-4 hrs';
+            const spEffort = spEconomics.effort_display || '1-2 hrs';
+
+            const verdict = profile.verdict || {};
+            const synStats = syntheticStudy.statistics && typeof syntheticStudy.statistics === 'object' ? syntheticStudy.statistics : {};
+            const simPersonas = syntheticStudy.sample_size != null ? syntheticStudy.sample_size : humanSampleSize;
+            const synThreadsDisp = syntheticStudy.contextual_conversation_threads != null
+                ? escapeHtml(String(syntheticStudy.contextual_conversation_threads))
+                : '—';
+            const synSourcesDisp = syntheticStudy.contextual_sources_inferred != null
+                ? escapeHtml(String(syntheticStudy.contextual_sources_inferred))
+                : '—';
+            const predAccRaw = s.avg_prediction_accuracy != null ? s.avg_prediction_accuracy : synStats.avg_prediction_accuracy;
+            const relStrRaw = s.avg_relationship_strength != null ? s.avg_relationship_strength : synStats.avg_relationship_strength;
+            const predDisp = escapeHtml(formatOutcomePercent(predAccRaw));
+            const relDisp = escapeHtml(formatOutcomePercent(relStrRaw));
+            const humanCostDisp = (() => {
+                const d = formatHumanCostDisplay(humanStudy.economics);
+                return d !== '—' ? d : estimatedCost;
+            })();
+
+            const verdictSource = verdict.source ? String(verdict.source) : '';
+            const verdictMetaLine = verdictSource === 'llm'
+                ? `<p class="verdict-meta">Source: LLM${verdict.llm_model ? ` (${escapeHtml(String(verdict.llm_model))})` : ''}${verdict.generated_at ? ` · ${escapeHtml(String(verdict.generated_at))}` : ''}</p>`
+                : '';
+            const verdictInsight = verdict.summary_statement
+                ? String(verdict.summary_statement)
+                : `Insight: Human and Synthetic People outputs show ${avgSimilarityDisplay}% overall similarity with ${directionalDisplay} directional alignment. Use "Where it differs" to review low-similarity questions and refine calibration.`;
+
             return `
-                <div class="report-card-2x2">
-                    <!-- Top Half: Seed Characteristics -->
-                    <div class="report-card-seed-section">
-                        <div class="seed-section-header">
-                            <h3 class="seed-section-title"><strong class="seed-label-bold">Study Name:</strong> <span class="seed-value-normal">${formatSurveyName(s.title || 'Validation run')}</span></h3>
-                        </div>
-                        <div class="seed-characteristics">
-                            <div class="seed-char-item">
-                                <span class="seed-char-label">Run ID</span>
-                                <span class="seed-char-value">${s.id.substring(0, 8)}...</span>
-                            </div>
-                            <div class="seed-char-item">
-                                <span class="seed-char-label">Data source</span>
-                                <span class="seed-char-value" title="${sourceFile || dataSourceLabel}">${dataSourceLabel.length > 28 ? dataSourceLabel.substring(0, 28) + '…' : dataSourceLabel}</span>
-                            </div>
-                            <div class="seed-char-item">
-                                <span class="seed-char-label">Questions</span>
-                                <span class="seed-char-value">${questionCount}</span>
-                            </div>
-                            <div class="seed-char-item">
-                                <span class="seed-char-label">Last validated</span>
-                                <span class="seed-char-value">${validatedDate}</span>
-                            </div>
-                            <div class="seed-char-item">
-                                <span class="seed-char-label">Result</span>
-                                <span class="seed-char-value">${s.validation_status === 'VALIDATED' ? 'Validated' : (s.validation_status || 'Validated')}</span>
-                            </div>
-                        </div>
+                <article class="report-card-2x2 verdict-screen-card" aria-label="Study ${studyIndex} of ${totalStudies}: ${escapeHtml(formatSurveyName(s.title || 'Validation run'))}">
+                    <div class="verdict-screen-meta">
+                        <span class="study-card-pill study-card-pill--industry">${escapeHtml(industry)}</span>
+                        <span class="study-card-topbar-meta">
+                            <span class="study-card-meta-item"><span class="study-card-meta-key">Validated</span> ${validatedLabel}</span>
+                            <span class="study-card-meta-item"><span class="study-card-meta-key">Study</span> ${studyIndex} / ${totalStudies}</span>
+                            <span class="study-card-meta-item study-card-meta-id" title="${escapeHtml(s.id)}"><span class="study-card-meta-key">ID</span> ${escapeHtml(shortSurveyId(s.id))}</span>
+                        </span>
                     </div>
-                    
-                    <!-- Bottom Half: Synthetic People Results -->
-                    <div class="report-card-synthetic-section">
-                        <div class="synthetic-section-header">
-                            <h4 class="synthetic-section-title">Synthetic people alignment</h4>
-                            <span class="overall-accuracy-badge" style="color: ${tierColor}; border-color: ${tierColor};">${accuracy}%</span>
-                        </div>
-                        <div class="synthetic-test-results">
-                            <div class="test-results-grid">
-                                ${allTests.map((test, idx) => `
-                                        <div class="test-result-item ${idx >= 5 ? 'test-result-item--extra' : ''}">
-                                            <span class="test-result-name">${test.name}</span>
-                                            <span class="test-result-accuracy">${test.accuracy}%</span>
-                                        </div>
-                                    `).join('')}
-                                ${allTests.length > 5 ? `
-                                <div class="test-result-item more-tests" data-more-count="${allTests.length - 5}" onclick="toggleReportCardChecks(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleReportCardChecks(this)}" role="button" tabindex="0">+ ${allTests.length - 5} more checks</div>
-                                ` : ''}
+                    <div class="verdict-split">
+                        <section class="verdict-panel verdict-panel-human" aria-label="Human study">
+                            <h3 class="verdict-panel-title">Human Study</h3>
+                            <div class="verdict-panel-body">
+                                <div class="vrow"><span class="vlabel">Survey title</span><strong class="vvalue">${escapeHtml(commonSurveyName)}</strong></div>
+                                <div class="vrow"><span class="vlabel">Industry</span><strong class="vvalue">${escapeHtml(industry)}</strong></div>
+                                <div class="vrow"><span class="vlabel">Scenario</span><strong class="vvalue">${escapeHtml(scenario)}</strong></div>
+                                <div class="vrow"><span class="vlabel">Target audience</span><strong class="vvalue">${escapeHtml(commonTargetAudience)}</strong></div>
+                                <div class="vrow"><span class="vlabel">Geography</span><strong class="vvalue">${escapeHtml(profileGeo)}</strong></div>
+                                <div class="vrow"><span class="vlabel">Sample size</span><strong class="vvalue">${escapeHtml(humanSampleSize)}</strong></div>
+                                <div class="vrow"><span class="vlabel">No. of questions</span><strong class="vvalue">${escapeHtml(humanQuestions)}</strong></div>
+                                <div class="verdict-subhead">Economics (human)</div>
+                                <div class="vrow">${vlabelWithTip('Est. cost', HUMAN_ECON_TOOLTIPS.cost)}<strong class="vvalue">${humanCostDisp}</strong></div>
+                                <div class="vrow">${vlabelWithTip('Est. time', HUMAN_ECON_TOOLTIPS.time)}<strong class="vvalue">${escapeHtml(estimatedTime)}</strong></div>
+                                <div class="vrow">${vlabelWithTip('Est. effort', HUMAN_ECON_TOOLTIPS.effort)}<strong class="vvalue">${escapeHtml(estimatedEffort)}</strong></div>
+                            </div>
+                        </section>
+                        <section class="verdict-panel verdict-panel-synthetic" aria-label="Synthetic-people simulation">
+                            <h3 class="verdict-panel-title">Synthetic-People simulation</h3>
+                            <div class="verdict-panel-body">
+                                <div class="vrow"><span class="vlabel">Simulation setup (personas)</span><strong class="vvalue">${escapeHtml(String(simPersonas))}</strong></div>
+                                <div class="vrow"><span class="vlabel">Behavior calibration (actions ingested)</span><strong class="vvalue">${actionPoints}</strong></div>
+                                <div class="vrow"><span class="vlabel">Neuroscience (signals)</span><strong class="vvalue">${neuroPoints}</strong></div>
+                                <div class="vrow"><span class="vlabel">Contextual — conversation threads</span><strong class="vvalue">${synThreadsDisp}</strong></div>
+                                <div class="vrow"><span class="vlabel">Contextual — sources inferred</span><strong class="vvalue">${synSourcesDisp}</strong></div>
+                                <div class="vrow vrow--hint"><span class="vlabel">Contextual layer (aggregate)</span><strong class="vvalue">${contextualPoints}</strong></div>
+                                <div class="verdict-subhead">Outcome matrix</div>
+                                <div class="vrow"><span class="vlabel">Avg. similarity</span><strong class="vvalue">${avgSimilarityDisplay}%</strong></div>
+                                <div class="vrow"><span class="vlabel">Avg. directional alignment</span><strong class="vvalue">${directionalDisplay}</strong></div>
+                                <div class="vrow"><span class="vlabel">Avg. prediction accuracy</span><strong class="vvalue">${predDisp}</strong></div>
+                                <div class="vrow"><span class="vlabel">Avg. relationship strength</span><strong class="vvalue">${relDisp}</strong></div>
+                                <div class="verdict-subhead">Economics (synthetic)</div>
+                                <div class="vrow"><span class="vlabel">Est. cost</span><strong class="vvalue">${spCostLabel}</strong></div>
+                                <div class="vrow"><span class="vlabel">Est. time</span><strong class="vvalue">${escapeHtml(spTime)}</strong></div>
+                                <div class="vrow"><span class="vlabel">Est. effort</span><strong class="vvalue">${escapeHtml(spEffort)}</strong></div>
+                            </div>
+                        </section>
+                    </div>
+                    <section class="verdict-bottom" aria-label="The verdict">
+                        <h3 class="verdict-bottom-title">The Verdict</h3>
+                        <p class="verdict-summary">${escapeHtml(verdictInsight)}</p>
+                        ${verdictMetaLine}
+                        <div class="verdict-bottom-columns">
+                            <div class="verdict-bottom-block">
+                                <h4 class="verdict-bottom-heading">What matches</h4>
+                                ${renderVerdictBulletList(verdict.what_matches)}
+                            </div>
+                            <div class="verdict-bottom-block">
+                                <h4 class="verdict-bottom-heading">Where it differs</h4>
+                                ${renderVerdictBulletList(verdict.where_it_differs)}
+                            </div>
+                            <div class="verdict-bottom-block verdict-bottom-block--full">
+                                <h4 class="verdict-bottom-heading">Why the difference</h4>
+                                ${renderVerdictBulletList(verdict.why_the_difference)}
                             </div>
                         </div>
-                        <div class="report-card-actions-2x2">
-                            <button onclick="viewReport('${s.id}')" class="btn-view-details">View Details</button>
-                            <button onclick="downloadReport('${s.id}', 'html')" class="btn-download-small">📄</button>
-                            <button onclick="downloadReport('${s.id}', 'json')" class="btn-download-small">📋</button>
-                            ${authToken ? `<button onclick="deleteReport('${s.id}')" class="btn-download-small btn-delete-report">Delete</button>` : ''}
-                        </div>
+                    </section>
+                    <div class="report-card-actions-2x2">
+                        <button onclick="openLeadCaptureModal('${s.id}')" class="btn-view-details">View detailed comparison</button>
+                        <button type="button" onclick="downloadReport('${s.id}', 'html')" class="btn-download-small btn-download-label" title="Download HTML report">HTML</button>
+                        <button type="button" onclick="downloadReport('${s.id}', 'json')" class="btn-download-small btn-download-label" title="Download JSON">JSON</button>
+                        ${authToken ? `<button type="button" onclick="deleteReport('${s.id}')" class="btn-download-small btn-delete-report">Delete</button>` : ''}
                     </div>
-                </div>
+                </article>
             `;
         }).join('');
         
@@ -1576,7 +1976,6 @@ async function loadReports(page = 1) {
             paginationContainer.innerHTML = '';
         }
         
-        console.log('Reports rendered successfully');
     } catch(e) { 
         console.error('Error loading reports:', e);
         const reportsList = document.getElementById('reports-list');
@@ -1607,9 +2006,8 @@ async function deleteReport(surveyId) {
         if (!res.ok) {
             throw new Error(`Failed to delete report (status ${res.status})`);
         }
-        // Reload dashboard metrics and current page of reports after successful delete
-        await loadDashboard();
-        await loadReports(currentReportsPage || 1);
+        invalidateSurveysCache();
+        await Promise.all([loadDashboard(), loadReports(currentReportsPage || 1)]);
     } catch (e) {
         console.error('Error deleting report:', e);
         alert('Could not delete report. Please try again.');
@@ -1649,7 +2047,6 @@ function storeResultsAndNavigate(resultsData, surveyId) {
         timestamp: new Date().toISOString()
     };
     
-    console.log('Storing results:', { surveyId, hasData: !!resultsData });
     sessionStorage.setItem('lastValidationResults', JSON.stringify(dataToStore));
     
     // Navigate to results page
@@ -1756,6 +2153,46 @@ function formatTestName(testName) {
     return names[testName] || testName.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
 }
 
+/** Reference: which outcome each engine test targets (matches ml_engine/comparison_engine.py). */
+const STATISTICAL_TESTS_GUIDE = [
+    { test: 'chi_square', purpose: 'Whether synthetic and real values fall into the same histogram bins (frequency pattern).', keyMetric: 'p-value / match score — higher suggests similar binned counts.' },
+    { test: 'ks_test', purpose: 'Whether the two samples follow the same overall distribution (empirical CDF).', keyMetric: 'KS statistic and p-value — smaller D or higher p-value suggests closer distributions.' },
+    { test: 'jensen_shannon', purpose: 'Similarity of the two vectors treated as probability masses (symmetric distance).', keyMetric: 'Divergence — lower is closer; match score is derived from 1 − divergence.' },
+    { test: 'mann_whitney', purpose: 'Non-parametric comparison of ranks / typical level between the two groups.', keyMetric: 'p-value / match score — higher p-value suggests more similar location.' },
+    { test: 't_test', purpose: 'Whether the two groups have the same mean (parametric).', keyMetric: 'p-value / match score — higher p-value suggests similar means.' },
+    { test: 'anderson_darling', purpose: 'k-sample test that both samples come from the same distribution (sensitive to tails).', keyMetric: 'p-value or normalized statistic — higher p-value / lower statistic suggests same distribution.' },
+    { test: 'wasserstein_distance', purpose: 'Minimum “transport cost” to reshape one empirical distribution into the other.', keyMetric: 'Distance and normalized distance — lower distance means closer distributions.' },
+    { test: 'correlation', purpose: 'After trimming to equal length, linear (Pearson) and monotonic (Spearman) alignment point-by-point.', keyMetric: 'Pearson r, Spearman r, average correlation — meaningful only when indices are paired.' },
+    { test: 'error_metrics', purpose: 'Mean absolute error and RMSE between aligned synthetic and real series.', keyMetric: 'MAE / RMSE (and normalized) — lower error means closer paired values.' },
+    { test: 'distribution_summary', purpose: 'How close means, standard deviations, and medians are between the two samples.', keyMetric: 'Normalized mean/std gaps — smaller gaps mean closer summary statistics.' },
+    { test: 'kullback_leibler', purpose: 'Information-theoretic gap between normalized distributions.', keyMetric: 'KL divergence (normalized) — lower divergence means closer distributions.' },
+    { test: 'cramer_von_mises', purpose: 'Another two-sample test that both samples share the same underlying distribution.', keyMetric: 'p-value / statistic — higher p-value or lower statistic suggests same distribution.' },
+];
+
+function buildStatisticalTestsGuideHtml() {
+    const rows = STATISTICAL_TESTS_GUIDE.map((r) => `
+        <tr>
+            <td><strong>${escapeHtml(formatTestName(r.test))}</strong><span class="stat-tests-id"> (${escapeHtml(r.test)})</span></td>
+            <td>${escapeHtml(r.purpose)}</td>
+            <td>${escapeHtml(r.keyMetric)}</td>
+        </tr>
+    `).join('');
+    return `
+        <div class="stat-tests-guide">
+            <h4 class="stat-tests-guide-title">What each statistical test measures</h4>
+            <p class="stat-tests-guide-intro">Twelve complementary checks compare synthetic vs real numeric responses. Match each row below to the same <code>test</code> name in your results.</p>
+            <div class="stat-tests-guide-scroll">
+                <table class="stat-tests-guide-table">
+                    <thead>
+                        <tr><th>Test</th><th>What it assesses</th><th>Key metric to read</th></tr>
+                    </thead>
+                    <tbody>${rows}</tbody>
+                </table>
+            </div>
+        </div>
+    `;
+}
+
 // Derive a short "Study Name" from file-comparison titles; no file names or "vs" shown.
 function formatSurveyTitle(rawTitle) {
     if (!rawTitle) return '';
@@ -1846,6 +2283,119 @@ function generateSparkline(data, id, color) {
 let currentUserRole = null; // Will be fetched from backend
 let authToken = localStorage.getItem('authToken') || null;
 
+/** Last user activity (ms); survives refresh so idle + hard refresh still end the session. */
+const AUTH_LAST_ACTIVITY_KEY = 'authLastActivity';
+/** Match default backend ACCESS_TOKEN_EXPIRE_MINUTES (30). */
+const AUTH_SESSION_IDLE_MS = 30 * 60 * 1000;
+const SESSION_CHECK_INTERVAL_MS = 60 * 1000;
+const AUTH_ACTIVITY_TOUCH_MIN_MS = 10 * 1000;
+let _authActivityTouchClock = 0;
+let _sessionGuardsInstalled = false;
+
+function decodeJwtPayload(token) {
+    if (!token || typeof token !== 'string') return null;
+    const parts = token.split('.');
+    if (parts.length !== 3) return null;
+    try {
+        let b64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+        const pad = b64.length % 4 ? 4 - (b64.length % 4) : 0;
+        b64 += '='.repeat(pad);
+        return JSON.parse(atob(b64));
+    } catch {
+        return null;
+    }
+}
+
+function getJwtExpirationMs(token) {
+    const p = decodeJwtPayload(token);
+    return typeof p?.exp === 'number' ? p.exp * 1000 : null;
+}
+
+function touchAuthActivityForce() {
+    if (!authToken) return;
+    _authActivityTouchClock = Date.now();
+    localStorage.setItem(AUTH_LAST_ACTIVITY_KEY, String(_authActivityTouchClock));
+}
+
+function touchAuthActivity() {
+    if (!authToken) return;
+    const now = Date.now();
+    if (now - _authActivityTouchClock < AUTH_ACTIVITY_TOUCH_MIN_MS) return;
+    touchAuthActivityForce();
+}
+
+function ensureAuthActivityBaseline() {
+    authToken = localStorage.getItem('authToken') || null;
+    if (!authToken) return;
+    const raw = localStorage.getItem(AUTH_LAST_ACTIVITY_KEY);
+    if (!raw || !Number.isFinite(parseInt(raw, 10))) {
+        touchAuthActivityForce();
+    }
+}
+
+function enforceAuthSessionEndIfNeeded() {
+    const token = authToken || localStorage.getItem('authToken');
+    if (!token) {
+        authToken = null;
+        return;
+    }
+    authToken = token;
+    const expMs = getJwtExpirationMs(token);
+    if (expMs != null && Date.now() >= expMs - 2000) {
+        endAuthSession('expired');
+        return;
+    }
+    const raw = localStorage.getItem(AUTH_LAST_ACTIVITY_KEY);
+    const last = raw ? parseInt(raw, 10) : NaN;
+    if (!Number.isFinite(last)) {
+        touchAuthActivityForce();
+        return;
+    }
+    if (Date.now() - last > AUTH_SESSION_IDLE_MS) {
+        endAuthSession('idle');
+    }
+}
+
+/**
+ * Clears auth and returns to public reports view.
+ * @param {'user'|'idle'|'expired'|'invalid'} reason
+ */
+function endAuthSession(reason) {
+    const hadToken = !!(authToken || localStorage.getItem('authToken'));
+    authToken = null;
+    localStorage.removeItem('authToken');
+    localStorage.removeItem(AUTH_LAST_ACTIVITY_KEY);
+    currentUserRole = null;
+    if (!hadToken) return;
+    invalidateSurveysCache();
+    updateNavigationForRole();
+    updateUserDisplay();
+    currentReportsPage = 1;
+    showSection('reports');
+    if (reason === 'idle') {
+        showNotification('You were logged out due to inactivity.', 'warning', 6000);
+    } else if (reason === 'expired' || reason === 'invalid') {
+        showNotification('Your session has expired. Please sign in again.', 'warning', 6000);
+    } else if (reason === 'user') {
+        showNotification('Logged out successfully', 'info');
+    }
+}
+
+function installSessionGuards() {
+    if (_sessionGuardsInstalled) return;
+    _sessionGuardsInstalled = true;
+    const bump = () => touchAuthActivity();
+    ['pointerdown', 'keydown', 'scroll', 'touchstart', 'click'].forEach((evt) => {
+        window.addEventListener(evt, bump, { passive: true, capture: true });
+    });
+    window.addEventListener('pageshow', () => {
+        authToken = localStorage.getItem('authToken') || null;
+        ensureAuthActivityBaseline();
+        enforceAuthSessionEndIfNeeded();
+    });
+    setInterval(() => enforceAuthSessionEndIfNeeded(), SESSION_CHECK_INTERVAL_MS);
+}
+
 // Fetch user privileges from backend
 async function fetchUserPrivileges() {
     try {
@@ -1862,11 +2412,16 @@ async function fetchUserPrivileges() {
             const data = await response.json();
             if (data.authenticated) {
                 currentUserRole = data.is_super_user ? 'super' : 'user';
+                touchAuthActivityForce();
                 updateNavigationForRole();
                 updateUserDisplay();
                 return data;
             } else {
                 currentUserRole = null;
+                if (localStorage.getItem('authToken')) {
+                    endAuthSession('invalid');
+                    return { authenticated: false, role: null, is_super_user: false };
+                }
                 return { authenticated: false, role: null, is_super_user: false };
             }
         } else {
@@ -1899,12 +2454,12 @@ async function login(username, password) {
             const data = await response.json();
             authToken = data.access_token;
             localStorage.setItem('authToken', authToken);
+            touchAuthActivityForce();
             currentUserRole = data.user.role === 'super' ? 'super' : 'user';
             updateNavigationForRole();
             updateUserDisplay();
-            // Navigate to reports page after successful login
+            currentReportsPage = 1;
             showSection('reports');
-            loadReports(1);
             showNotification('Login successful!', 'success');
             return data;
         } else {
@@ -1919,16 +2474,9 @@ async function login(username, password) {
     }
 }
 
-// Logout function
+// Logout function (explicit user action)
 function logout() {
-    authToken = null;
-    localStorage.removeItem('authToken');
-    currentUserRole = null; // No role after logout - show Home
-    updateNavigationForRole();
-    updateUserDisplay();
-    // Navigate to Dashboard & Reports after logout
-    showCombinedDashboardReports();
-    showNotification('Logged out successfully', 'info');
+    endAuthSession('user');
 }
 
 // Handle login form submission
@@ -2126,14 +2674,16 @@ function updateNavigationForRole() {
 
 // Combined Dashboard & Reports function for regular users
 function showCombinedDashboardReports() {
+    currentReportsPage = 1;
     showSection('reports');
-    loadDashboard();
-    loadReports(1);
 }
 
 // Initialize navigation on page load
 document.addEventListener('DOMContentLoaded', async () => {
     initOmiNarrator();
+    installSessionGuards();
+    ensureAuthActivityBaseline();
+    enforceAuthSessionEndIfNeeded();
     // First, set up basic UI state
     updateNavigationForRole();
     updateUserDisplay();
@@ -2154,14 +2704,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         // Load default page based on authentication status
         if (authData && authData.authenticated) {
+            currentReportsPage = 1;
             showSection('reports');
-            loadDashboard();
-            loadReports(1);
         } else {
-            // If not logged in, default to Dashboard & Reports
+            currentReportsPage = 1;
             showSection('reports');
-            loadDashboard();
-            loadReports(1);
         }
     } catch (error) {
         console.error('Error during initialization:', error);
@@ -2203,10 +2750,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('register-modal')?.addEventListener('click', (e) => {
         if (e.target.id === 'register-modal') closeRegisterModal();
     });
+    document.getElementById('lead-capture-modal')?.addEventListener('click', (e) => {
+        if (e.target.id === 'lead-capture-modal') closeLeadCaptureModal();
+    });
+    document.getElementById('mix-popup-modal')?.addEventListener('click', (e) => {
+        if (e.target.id === 'mix-popup-modal') closeMixPopup();
+    });
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
             const modal = document.getElementById('register-modal');
             if (modal && modal.style.display === 'flex') closeRegisterModal();
+            const leadModal = document.getElementById('lead-capture-modal');
+            if (leadModal && leadModal.style.display === 'flex') closeLeadCaptureModal();
+            const mixModal = document.getElementById('mix-popup-modal');
+            if (mixModal && mixModal.style.display === 'flex') closeMixPopup();
         }
     });
 });
@@ -2227,10 +2784,10 @@ function displaySemilatticeStyleResults(data, surveyId, targetDiv) {
             questionComparisons = results.question_comparisons || data.question_comparisons || [];
         }
         
-        const tier = data.overall_tier || data.tier || 'N/A';
-        const accuracyValue = data.overall_accuracy || data.accuracy || 0;
-        const accuracy = (typeof accuracyValue === 'number' ? accuracyValue * 100 : parseFloat(accuracyValue) * 100 || 0).toFixed(1);
-        const tierColor = TIER_COLORS[tier] || '#6b7280';
+        const acc01 = normalizeAccuracy01(data.overall_accuracy ?? data.accuracy);
+        const accuracyValue = acc01 != null ? acc01 : 0;
+        const accuracy = (accuracyValue * 100).toFixed(1);
+        const accentColor = acc01 != null ? matchScoreAccentColor(acc01) : '#6b7280';
     
     const createdDate = survey.created_at ? new Date(survey.created_at).toLocaleString() : 'N/A';
     const validatedDate = survey.validated_at ? new Date(survey.validated_at).toLocaleString() : 'N/A';
@@ -2270,7 +2827,7 @@ function displaySemilatticeStyleResults(data, surveyId, targetDiv) {
                 </div>
                 <div class="model-detail-item">
                     <div class="model-detail-label">Overall File Accuracy</div>
-                    <div class="model-detail-value" style="color: ${tierColor}">${accuracy}%</div>
+                    <div class="model-detail-value" style="color: ${accentColor}">${accuracy}%</div>
                 </div>
             </div>
         </div>
@@ -2370,8 +2927,8 @@ function displaySemilatticeStyleResults(data, surveyId, targetDiv) {
                 </div>
             </div>
             <div class="methodology-note">
-                <strong>Note:</strong> Each test provides a match score (0-100%) and tier classification (TIER_1: >85%, TIER_2: >75%, TIER_3: >50%, TIER_4: ≤50%). 
-                The overall accuracy is calculated as the average of all test match scores.
+                <strong>Note:</strong> Each test provides a match score (0–100%). Higher scores indicate closer alignment between synthetic and real response patterns.
+                Overall accuracy is derived from the combined test results.
             </div>
         </div>
     `;
@@ -2401,8 +2958,9 @@ function displaySemilatticeStyleResults(data, surveyId, targetDiv) {
                         </thead>
                         <tbody>
                             ${questionComparisons.map((q, idx) => {
-                                const qTierColor = TIER_COLORS[q.tier] || '#6b7280';
-                                const matchPercent = (q.match_score * 100).toFixed(1);
+                                const qScore = q.match_score != null ? Number(q.match_score) : null;
+                                const qAccent = qScore != null && !Number.isNaN(qScore) ? matchScoreAccentColor(qScore) : '#6b7280';
+                                const matchPercent = qScore != null && !Number.isNaN(qScore) ? (qScore * 100).toFixed(1) : '—';
                                 const optionComparisons = q.option_comparisons || [];
                                 
                                 // Bar chart: Y = options, X = count; Humans = green, Synthetic = red; count beside each bar
@@ -2488,7 +3046,7 @@ function displaySemilatticeStyleResults(data, surveyId, targetDiv) {
                                             </div>
                                         </td>
                                         <td class="type-cell">${q.type || 'Single-Choice'}</td>
-                                        <td class="match-score-cell" style="color: ${qTierColor}; font-weight: 600;">${matchPercent}%</td>
+                                        <td class="match-score-cell" style="color: ${qAccent}; font-weight: 600;">${matchPercent === '—' ? '—' : matchPercent + '%'}</td>
                                     </tr>
                                 `;
                             }).join('')}
@@ -2514,13 +3072,13 @@ function displaySemilatticeStyleResults(data, surveyId, targetDiv) {
                 <h4>Statistical Tests</h4>
                 <div class="test-results-grid">
                     ${data.tests ? data.tests.filter(t => !t.error).map(test => {
-                        const testTier = getTierForTest(test);
-                        const testTierColor = TIER_COLORS[testTier] || '#6b7280';
-                        const matchPct = test.match_score != null ? (test.match_score * 100).toFixed(1) : '—';
+                        const m = test.match_score != null ? Number(test.match_score) : null;
+                        const testAccent = m != null && !Number.isNaN(m) ? matchScoreAccentColor(m) : '#6b7280';
+                        const matchPct = m != null && !Number.isNaN(m) ? (m * 100).toFixed(1) : '—';
                         return `
-                            <div class="test-result-card" style="border-left-color: ${testTierColor}">
+                            <div class="test-result-card" style="border-left-color: ${testAccent}">
                                 <div class="test-result-name">${formatTestName(test.test)}</div>
-                                <div class="test-result-status" style="color: ${testTierColor}">${matchPct}%</div>
+                                <div class="test-result-status" style="color: ${testAccent}">${matchPct === '—' ? '—' : matchPct + '%'}</div>
                             </div>
                         `;
                     }).join('') : '<p>No test results available</p>'}
@@ -2634,20 +3192,11 @@ function closeMobileMenu() {
 
 // Define compareFiles function
 async function compareFiles() {
-    console.log('compareFiles() called');
-    
     const syntheticFile = document.getElementById('file-synthetic')?.files[0];
     const realFile = document.getElementById('file-real')?.files[0];
     const surveyIdInput = document.getElementById('file-survey-id');
     const surveyId = surveyIdInput ? surveyIdInput.value.trim() : null;
     const method = document.getElementById('extraction-method')?.value || 'totals';
-    
-    console.log('Files selected:', {
-        synthetic: syntheticFile?.name,
-        real: realFile?.name,
-        surveyId: surveyId || 'none',
-        method: method
-    });
     
     if (!syntheticFile || !realFile) {
         showNotification('Please select both files (Synthetic and Real) to compare.', 'warning');
@@ -2687,14 +3236,11 @@ async function compareFiles() {
             formData.append('survey_id', surveyId);
         }
         
-        console.log('Sending request to /api/validation/compare-files');
         const res = await fetch('/api/validation/compare-files', {
             method: 'POST',
             body: formData
         });
-        
-        console.log('Response status:', res.status);
-        
+
         if (!res.ok) {
             const errorText = await res.text();
             let errorDetail = 'File comparison failed';
@@ -2708,18 +3254,15 @@ async function compareFiles() {
         }
         
         const data = await res.json();
-        console.log('Comparison successful, data received:', Object.keys(data));
-        
+
         // Store results and navigate to results page
         storeResultsAndNavigate(data, data.survey_id);
         showNotification('Files compared successfully! Viewing results...', 'success', 3000);
         omiPlay('celebrate', 'Comparison complete! Opening results.');
-        
-        // Refresh dashboard and surveys
-        await loadDashboard();
-        await loadSurveys();
-        await loadReports(); // Refresh reports list
-        
+
+        invalidateSurveysCache();
+        await Promise.all([loadDashboard(), loadSurveys(), loadReports(currentReportsPage || 1)]);
+
     } catch (e) {
         console.error('Error in compareFiles:', e);
         console.error('Error stack:', e.stack);
@@ -2885,26 +3428,60 @@ function displayValidationResults(data, surveyId, resultsDiv = null) {
     const targetDiv = resultsDiv || document.getElementById('validation-results') || document.getElementById('validation-results-manual');
     if (!targetDiv) return;
     
-    const tier = data.overall_tier || 'N/A';
-    const accuracy = (data.overall_accuracy * 100).toFixed(1);
-    const tierColor = TIER_COLORS[tier] || '#6b7280';
+    const acc01 = normalizeAccuracy01(data.overall_accuracy);
+    const accuracyPct = (acc01 != null ? acc01 : 0) * 100;
+    const accuracy = accuracyPct.toFixed(1);
+
+    function qualityFromAccuracy01(a) {
+        const p = (a != null ? a : 0) * 100;
+        if (p >= 85) {
+            return {
+                icon: '✅',
+                title: 'Strong match',
+                description: 'Your synthetic data closely matches the real data. Ready for use!',
+                color: '#10b981',
+            };
+        }
+        if (p >= 75) {
+            return {
+                icon: '⚠️',
+                title: 'Good match',
+                description: 'Your synthetic data is similar to real data with some minor differences.',
+                color: '#f59e0b',
+            };
+        }
+        if (p >= 50) {
+            return {
+                icon: '❌',
+                title: 'Needs improvement',
+                description: 'Significant differences detected. Consider refining your synthetic data generation.',
+                color: '#ef4444',
+            };
+        }
+        return {
+            icon: '🔴',
+            title: 'Weak match',
+            description: 'Poor match. Review detailed results and adjust your data generation strategy.',
+            color: '#7c3aed',
+        };
+    }
+
+    const qualityInfo = qualityFromAccuracy01(acc01);
     
     // Build simplified test list (no complex categorization)
     let testsHtml = '';
     if (data.tests && data.tests.length > 0) {
-        // Filter out error tests and sort by tier (best first)
-        const validTests = data.tests.filter(t => !t.error && t.tier).sort((a, b) => {
-            const tierOrder = { 'TIER_1': 1, 'TIER_2': 2, 'TIER_3': 3, 'TIER_4': 4 };
-            return (tierOrder[a.tier] || 99) - (tierOrder[b.tier] || 99);
+        const validTests = data.tests.filter(t => !t.error).sort((a, b) => {
+            const ma = a.match_score != null ? Number(a.match_score) : -1;
+            const mb = b.match_score != null ? Number(b.match_score) : -1;
+            return mb - ma;
         });
         
         validTests.forEach(test => {
-            const testTier = test.tier || 'N/A';
-            const testTierColor = TIER_COLORS[testTier] || '#6b7280';
+            const m = test.match_score != null ? Number(test.match_score) : null;
+            const testAccent = m != null && !Number.isNaN(m) ? matchScoreAccentColor(m) : '#6b7280';
+            const matchLabel = m != null && !Number.isNaN(m) ? `${(m * 100).toFixed(1)}% match` : '—';
             const metrics = formatTestMetrics(test);
-            
-            const tierEmoji = testTier === 'TIER_1' ? '✅' : testTier === 'TIER_2' ? '⚠️' : testTier === 'TIER_3' ? '❌' : '🔴';
-            const tierText = testTier === 'TIER_1' ? 'Excellent' : testTier === 'TIER_2' ? 'Good' : testTier === 'TIER_3' ? 'Needs Work' : 'Poor Match';
             
             testsHtml += `
                 <div class="test-item-simple">
@@ -2912,44 +3489,14 @@ function displayValidationResults(data, surveyId, resultsDiv = null) {
                         <div class="test-name-simple">
                             ${formatTestName(test.test)}
                         </div>
-                        <div class="test-status-simple" style="color: ${testTierColor}">
-                            ${tierEmoji} ${tierText}
+                        <div class="test-status-simple" style="color: ${testAccent}">
+                            ${matchLabel}
                         </div>
                     </div>
                     ${metrics}
                 </div>
             `;
         });
-    }
-    
-    function getTierDescription(tier) {
-        const descriptions = {
-            'TIER_1': { 
-                icon: '✅', 
-                title: 'Excellent Match', 
-                description: 'Your synthetic data closely matches the real data. Ready for use!',
-                color: '#10b981'
-            },
-            'TIER_2': { 
-                icon: '⚠️', 
-                title: 'Good Match', 
-                description: 'Your synthetic data is similar to real data with some minor differences.',
-                color: '#f59e0b'
-            },
-            'TIER_3': { 
-                icon: '❌', 
-                title: 'Needs Improvement', 
-                description: 'Significant differences detected. Consider refining your synthetic data generation.',
-                color: '#ef4444'
-            },
-            'TIER_4': { 
-                icon: '🔴', 
-                title: 'Needs Significant Improvement', 
-                description: 'Poor match. Review detailed results and adjust your data generation strategy.',
-                color: '#7c3aed'
-            }
-        };
-        return descriptions[tier] || { icon: '❓', title: 'Unknown', description: '', color: '#6b7280' };
     }
     
     function getSimpleMetricLabel(key) {
@@ -3033,12 +3580,38 @@ function displayValidationResults(data, surveyId, resultsDiv = null) {
         return '<div class="simple-metric"><div class="simple-metric-value">—</div></div>';
     }
     
-    const tierInfo = getTierDescription(tier);
-    const progressPercent = tier === 'TIER_1' ? 95 : tier === 'TIER_2' ? 80 : tier === 'TIER_3' ? 60 : 30;
+    const progressPercent = Math.min(95, Math.max(12, Math.round(accuracyPct)));
     
-    // Count successful tests
-    const successfulTests = data.tests ? data.tests.filter(t => t.tier && !t.error).length : 0;
+    const successfulTests = data.tests ? data.tests.filter(t => !t.error).length : 0;
     const totalTests = data.tests ? data.tests.length : 0;
+
+    let recBody = '';
+    if (acc01 != null && acc01 >= 0.85) {
+        recBody = '<p>Your synthetic data is excellent! It closely matches the patterns and characteristics of real data. You can confidently use this data for your analysis.</p>';
+    } else if (acc01 != null && acc01 >= 0.75) {
+        recBody = `<p>Your synthetic data is good but could be improved. The data is similar to real data, but there are some differences. Consider:</p>
+                <ul>
+                    <li>Reviewing the data generation process</li>
+                    <li>Adjusting parameters to better match real patterns</li>
+                    <li>Collecting more training data if possible</li>
+                </ul>`;
+    } else if (acc01 != null && acc01 >= 0.5) {
+        recBody = `<p>Your synthetic data needs improvement. There are significant differences from real data. Consider:</p>
+                <ul>
+                    <li>Revisiting your data generation model</li>
+                    <li>Checking for systematic biases</li>
+                    <li>Using different generation techniques</li>
+                    <li>Consulting with data science experts</li>
+                </ul>`;
+    } else {
+        recBody = `<p>Your synthetic data needs significant improvement. Match quality is below 50%. Consider:</p>
+                <ul>
+                    <li>Revisiting your data generation model and parameters</li>
+                    <li>Checking for systematic biases and data alignment</li>
+                    <li>Using different generation techniques or more representative training data</li>
+                    <li>Consulting with data science experts</li>
+                </ul>`;
+    }
     
     targetDiv.innerHTML = `
         <div class="results-header">
@@ -3049,20 +3622,22 @@ function displayValidationResults(data, surveyId, resultsDiv = null) {
         </div>
         
         <!-- Main Result Card - Always show overall file accuracy -->
-        <div class="main-result-card" style="border-color: ${tierInfo.color}">
-            <div class="main-result-icon" style="color: ${tierInfo.color}">${tierInfo.icon}</div>
+        <div class="main-result-card" style="border-color: ${qualityInfo.color}">
+            <div class="main-result-icon" style="color: ${qualityInfo.color}">${qualityInfo.icon}</div>
             <div class="main-result-content">
-                <h2 style="color: ${tierInfo.color}">${tierInfo.title}</h2>
-                <p class="main-result-description">${tierInfo.description}</p>
+                <h2 style="color: ${qualityInfo.color}">${qualityInfo.title}</h2>
+                <p class="main-result-description">${qualityInfo.description}</p>
                 <div class="accuracy-display">
                     <div class="accuracy-label">Overall File Match Score</div>
-                    <div class="accuracy-value" style="color: ${tierInfo.color}">${accuracy}%</div>
+                    <div class="accuracy-value" style="color: ${qualityInfo.color}">${accuracy}%</div>
                     <div class="progress-bar-container">
-                        <div class="progress-bar" style="width: ${progressPercent}%; background: ${tierInfo.color}"></div>
+                        <div class="progress-bar" style="width: ${progressPercent}%; background: ${qualityInfo.color}"></div>
                     </div>
                 </div>
             </div>
         </div>
+        
+        ${buildStatisticalTestsGuideHtml()}
         
         ${(data.question_comparisons && data.question_comparisons.length === 0) ? `
         <!-- Quick Stats (only show if no question comparisons) -->
@@ -3122,34 +3697,9 @@ function displayValidationResults(data, surveyId, resultsDiv = null) {
         ` : ''}
         
         <!-- Recommendations -->
-        <div class="recommendations-box" style="border-left-color: ${tierInfo.color}">
+        <div class="recommendations-box" style="border-left-color: ${qualityInfo.color}">
             <h4>💡 What This Means</h4>
-            ${tier === 'TIER_1' ? `
-                <p>Your synthetic data is excellent! It closely matches the patterns and characteristics of real data. You can confidently use this data for your analysis.</p>
-            ` : tier === 'TIER_2' ? `
-                <p>Your synthetic data is good but could be improved. The data is similar to real data, but there are some differences. Consider:</p>
-                <ul>
-                    <li>Reviewing the data generation process</li>
-                    <li>Adjusting parameters to better match real patterns</li>
-                    <li>Collecting more training data if possible</li>
-                </ul>
-            ` : tier === 'TIER_3' ? `
-                <p>Your synthetic data needs improvement. There are significant differences from real data. Consider:</p>
-                <ul>
-                    <li>Revisiting your data generation model</li>
-                    <li>Checking for systematic biases</li>
-                    <li>Using different generation techniques</li>
-                    <li>Consulting with data science experts</li>
-                </ul>
-            ` : `
-                <p>Your synthetic data needs significant improvement. Match quality is below 50%. Consider:</p>
-                <ul>
-                    <li>Revisiting your data generation model and parameters</li>
-                    <li>Checking for systematic biases and data alignment</li>
-                    <li>Using different generation techniques or more representative training data</li>
-                    <li>Consulting with data science experts</li>
-                </ul>
-            `}
+            ${recBody}
         </div>
     `;
 }

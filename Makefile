@@ -14,6 +14,10 @@ run:
 test:
 	pytest
 
+# Audit connected DB for Test Lab schema + required values
+audit-test-lab-db:
+	python scripts/audit_test_lab_db.py
+
 docker-run:
 	docker-compose -f deployment/docker-compose.yml up -d
 

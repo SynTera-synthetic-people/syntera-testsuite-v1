@@ -1,10 +1,10 @@
 """Survey Routes"""
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Query
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from database.connection import get_db
 from backend.models.survey import Survey
-from backend.utils.json_helpers import survey_to_dict, sanitize_for_json
+from backend.utils.json_helpers import survey_to_dict, survey_to_summary_dict, sanitize_for_json
 
 router = APIRouter()
 
@@ -36,8 +36,16 @@ async def create_survey(payload: SurveyCreate, db: Session = Depends(get_db)):
 
 
 @router.get("/")
-async def list_surveys(db: Session = Depends(get_db)):
+async def list_surveys(
+    summary: bool = Query(
+        False,
+        description="If true, omit raw response arrays and slim JSON blobs for faster dashboard/reports loads.",
+    ),
+    db: Session = Depends(get_db),
+):
     surveys = db.query(Survey).all()
+    if summary:
+        return [survey_to_summary_dict(survey) for survey in surveys]
     return [survey_to_dict(survey) for survey in surveys]
 
 

@@ -19,7 +19,13 @@ def load_ssm_parameters():
 
     for param in response["Parameters"]:
         key = param["Name"].split("/")[-1]
-        os.environ[key] = param["Value"]
+        # Do not override values already set in environment (e.g., local DB tunnel)
+        if not os.getenv(key):
+            os.environ[key] = param["Value"]
 
-load_ssm_parameters()
+try:
+    load_ssm_parameters()
+except Exception:
+    # Allow local/dev startup even if SSM is unavailable
+    pass
 

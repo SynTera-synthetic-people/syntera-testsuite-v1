@@ -1,5 +1,5 @@
 """Market Research Reverse Engineering - Infer research design from report content."""
-from fastapi import APIRouter, HTTPException, UploadFile, File, Form
+from fastapi import APIRouter, HTTPException, UploadFile, File, Form, Depends
 from pydantic import BaseModel, Field
 from typing import Any, Optional
 import base64
@@ -25,8 +25,15 @@ if os.path.isfile(_env_path):
     except Exception:
         pass
 
+from sqlalchemy.orm import Session
+
 from config.settings import Settings
 from backend.utils.llm_gateway import LlmGateway
+from database.connection import get_db
+from backend.models.survey import MarketResearchExtraction
+from backend.utils.json_helpers import sanitize_for_json
+
+_MAX_RAW_MARKDOWN_PERSIST = 350_000
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -110,6 +117,9 @@ Tasks: (1) Infer overall research objectives and overall sample size if stated. 
 Output exactly this format:
 
 A. Overall Research Objectives
+- Geography: (country/region/market inferred from the report; or "Not stated")
+- Industry: (sector or vertical; or "Not stated")
+- Research scenario: (one line — what is being studied; or "Not stated")
 - Overall sample size (n): (integer if report states total respondents anywhere, e.g. 1000; else omit this line)
 - Objective 1
 - Objective 2
@@ -140,6 +150,9 @@ Rules: Plain text only. Report Output must be integers only (counts). No % symbo
 REVERSE_ENGINEER_JSON_SYSTEM = """You are a Market Research Methodologist. Reverse-engineer the research design from the report.
 
 Output a single JSON object with exactly these keys (no markdown, no code fence):
+- "geography": string or null (country/region/market; null if not inferable)
+- "industry": string or null (sector/vertical; null if not inferable)
+- "scenario": string or null (one line — study focus; null if not inferable)
 - "overall_objectives": array of strings (research objectives)
 - "overall_sample_size_n": integer or null (total respondents if stated in report)
 - "section_objectives": array of { "section_name": string, "research_objective": string }
@@ -192,6 +205,9 @@ class ReconstructedQuestion(BaseModel):
 
 
 class ReverseEngineerResponse(BaseModel):
+    geography: Optional[str] = None
+    industry: Optional[str] = None
+    scenario: Optional[str] = None
     overall_objectives: list[str] = Field(default_factory=list)
     overall_sample_size_n: Optional[int] = Field(None, description="Total respondents from report when stated once; used to compute counts from %")
     section_objectives: list[SectionObjective] = Field(default_factory=list)
@@ -281,8 +297,15 @@ def _get_primary_models() -> tuple[str, str]:
     )
 
 
-def _parse_json_output(raw: str) -> tuple[list[str], Optional[int], list[dict], list[dict]]:
-    """Parse LLM JSON string into (overall_objectives, overall_n, section_objectives, questionnaire). Raises on invalid."""
+def _optional_context_str(raw: Any) -> Optional[str]:
+    if raw is None:
+        return None
+    s = str(raw).strip()
+    return s if s else None
+
+
+def _parse_json_output(raw: str) -> tuple[list[str], Optional[int], list[dict], list[dict], Optional[str], Optional[str], Optional[str]]:
+    """Parse LLM JSON into objectives, questionnaire, and geography/industry/scenario. Raises on invalid."""
     import json
     s = (raw or "").strip()
     # Strip markdown code fence if present
@@ -294,6 +317,9 @@ def _parse_json_output(raw: str) -> tuple[list[str], Optional[int], list[dict], 
             lines = lines[:-1]
         s = "\n".join(lines)
     data = json.loads(s)
+    geography = _optional_context_str(data.get("geography"))
+    industry = _optional_context_str(data.get("industry"))
+    scenario = _optional_context_str(data.get("scenario"))
     overall = list(data.get("overall_objectives") or [])
     if not isinstance(overall, list):
         overall = [str(overall)] if overall else []
@@ -324,9 +350,9 @@ def _parse_json_output(raw: str) -> tuple[list[str], Optional[int], list[dict], 
             "option_values": [str(v).strip() for v in (q.get("option_values") or []) if v is not None],
             "sample_size_n": _int_or_none(q.get("sample_size_n")),
             "target_segment": _strip_markdown_bold(str(q.get("target_segment", "") or "")),
-            "expected_output_pattern": _strip_markdown_bold(str(q.get("expected_output_pattern", "") or "")),
+                    "expected_output_pattern": _strip_markdown_bold(str(q.get("expected_output_pattern", "") or "")),
         })
-    return overall, overall_n, sections, questions
+    return overall, overall_n, sections, questions, geography, industry, scenario
 
 
 def _repair_json(raw: str, openai_key: Optional[str] = None, anthropic_key: Optional[str] = None) -> str:
@@ -660,12 +686,15 @@ def _split_list_items(text: str) -> list[str]:
     return items
 
 
-def _parse_structured_output(raw: str) -> tuple[list[str], Optional[int], list[dict], list[dict]]:
-    """Parse raw markdown into overall_objectives, overall_sample_size_n, section_objectives, reconstructed_questionnaire."""
+def _parse_structured_output(raw: str) -> tuple[list[str], Optional[int], list[dict], list[dict], Optional[str], Optional[str], Optional[str]]:
+    """Parse raw markdown into objectives, questionnaire, and geography/industry/scenario."""
     overall = []
     overall_n: Optional[int] = None
     sections = []
     questions = []
+    geography: Optional[str] = None
+    industry: Optional[str] = None
+    scenario: Optional[str] = None
 
     # A. Overall Research Objectives (and optional Overall sample size (n):)
     block_a = re.search(r"A\.\s*Overall Research Objectives\s*(.*?)(?=B\.|$)", raw, re.DOTALL | re.IGNORECASE)
@@ -678,8 +707,19 @@ def _parse_structured_output(raw: str) -> tuple[list[str], Optional[int], list[d
                     overall_n = int(re.search(r"(\d+)", line).group(1))
                 except (ValueError, AttributeError):
                     pass
+            elif re.match(r"^-\s*Geography:\s*(.+)$", line, re.IGNORECASE):
+                geography = _strip_markdown_bold(re.sub(r"^-\s*Geography:\s*", "", line, flags=re.IGNORECASE).strip())
+                geography = geography or None
+            elif re.match(r"^-\s*Industry:\s*(.+)$", line, re.IGNORECASE):
+                industry = _strip_markdown_bold(re.sub(r"^-\s*Industry:\s*", "", line, flags=re.IGNORECASE).strip())
+                industry = industry or None
+            elif re.match(r"^-\s*Research scenario:\s*(.+)$", line, re.IGNORECASE):
+                scenario = _strip_markdown_bold(re.sub(r"^-\s*Research scenario:\s*", "", line, flags=re.IGNORECASE).strip())
+                scenario = scenario or None
             elif line.startswith("-") and len(line) > 2 and "Overall sample size" not in line:
-                overall.append(line[1:].strip())
+                rest = line[1:].strip()
+                if not re.match(r"^(Geography|Industry|Research scenario):", rest, re.I):
+                    overall.append(rest)
 
     # B. Section-wise Objectives
     block_b = re.search(r"B\.\s*Section-wise Objectives\s*(.*?)(?=C\.|$)", raw, re.DOTALL | re.IGNORECASE)
@@ -753,7 +793,7 @@ def _parse_structured_output(raw: str) -> tuple[list[str], Optional[int], list[d
                     "expected_output_pattern": _strip_markdown_bold(q.get("expected_output_pattern", "")),
                 })
 
-    return overall, overall_n, sections, questions
+    return overall, overall_n, sections, questions, geography, industry, scenario
 
 
 def _heuristic_reverse_engineer(report_text: str) -> tuple[list[str], list[dict], list[dict], str]:
@@ -821,6 +861,9 @@ def _run_reverse_engineer(
 
     raw_md = None
     ai_used = False
+    geography: Optional[str] = None
+    industry: Optional[str] = None
+    scenario: Optional[str] = None
     no_key_message = (
         "No API key. Set OPENAI_API_KEY or ANTHROPIC_API_KEY in your .env file (see .env.example) "
         "and restart the server to get AI-powered questionnaire reconstruction from your report."
@@ -840,20 +883,26 @@ def _run_reverse_engineer(
                 raw_md = call_llm(text, api_key=key)
                 if raw_md and len(raw_md.strip()) > 0:
                     try:
-                        overall, overall_n, section_objs, questionnaire = _parse_json_output(raw_md)
+                        overall, overall_n, section_objs, questionnaire, geography, industry, scenario = _parse_json_output(
+                            raw_md
+                        )
                         ai_used = True
                         break
                     except Exception as json_err:
                         logger.debug("JSON parse failed, trying repair: %s", json_err)
                         try:
                             repaired = _repair_json(raw_md, openai_key=openai_key, anthropic_key=anthropic_key)
-                            overall, overall_n, section_objs, questionnaire = _parse_json_output(repaired)
+                            overall, overall_n, section_objs, questionnaire, geography, industry, scenario = _parse_json_output(
+                                repaired
+                            )
                             ai_used = True
                             break
                         except Exception:
                             pass
                         try:
-                            overall, overall_n, section_objs, questionnaire = _parse_structured_output(raw_md)
+                            overall, overall_n, section_objs, questionnaire, geography, industry, scenario = _parse_structured_output(
+                                raw_md
+                            )
                             ai_used = True
                             break
                         except Exception:
@@ -875,11 +924,14 @@ def _run_reverse_engineer(
                 raw_md = call_llm(text, api_key=key)
                 if raw_md and len(raw_md.strip()) > 0:
                     try:
-                        overall, overall_n, section_objs, questionnaire = _parse_structured_output(raw_md)
+                        overall, overall_n, section_objs, questionnaire, geography, industry, scenario = _parse_structured_output(
+                            raw_md
+                        )
                     except Exception as parse_err:
                         logger.warning("Parse of %s output failed, using fallback structure: %s", name, parse_err)
                         h_overall, h_sections, h_questions, _ = _heuristic_reverse_engineer(text)
                         overall, overall_n, section_objs, questionnaire = [], None, h_sections, h_questions
+                        geography = industry = scenario = None
                     ai_used = True
                     break
             except ValueError as e:
@@ -916,6 +968,9 @@ def _run_reverse_engineer(
     section_objectives = [SectionObjective(section_name=s["section_name"], research_objective=s["research_objective"]) for s in section_objs]
     reconstructed = [ReconstructedQuestion(**q) for q in questionnaire]
     result = {
+        "geography": geography,
+        "industry": industry,
+        "scenario": scenario,
         "overall_objectives": overall,
         "overall_sample_size_n": overall_n,
         "section_objectives": [s.model_dump() for s in section_objectives],
@@ -949,10 +1004,70 @@ def _split_into_chunks(text: str, chunk_size: int = MAX_REPORT_CHARS, overlap: i
     return chunks
 
 
+def _payload_for_db(result: dict) -> dict:
+    """Copy of reverse-engineer API payload; truncate huge raw_markdown for DB."""
+    out = {k: v for k, v in result.items() if k not in ("extraction_id", "persisted_at")}
+    raw = out.get("raw_markdown")
+    if isinstance(raw, str) and len(raw) > _MAX_RAW_MARKDOWN_PERSIST:
+        out["raw_markdown"] = (
+            raw[:_MAX_RAW_MARKDOWN_PERSIST]
+            + "\n\n[Truncated for storage. Run reverse-engineer again for full raw output in memory.]"
+        )
+    return sanitize_for_json(out)
+
+
+def _persist_market_research_result(db: Session, result: dict) -> Optional[str]:
+    """
+    Persist full extraction (objectives, questionnaire, geography/industry/scenario, flags).
+    Always inserts a new row per run so history is kept; latest is loaded by GET /latest-extraction.
+    """
+    payload = _payload_for_db(result)
+    geo = payload.get("geography")
+    ind = payload.get("industry")
+    scen = payload.get("scenario")
+    row = MarketResearchExtraction(
+        geography=(str(geo)[:512] if geo else None),
+        industry=(str(ind)[:200] if ind else None),
+        scenario=(str(scen)[:8000] if scen else None),
+        result_data=payload,
+    )
+    try:
+        db.add(row)
+        db.commit()
+        db.refresh(row)
+        return row.id
+    except Exception as e:
+        logger.warning("Persist market research extraction failed: %s", e)
+        db.rollback()
+        return None
+
+
+def _merge_extraction_row_to_response(row: MarketResearchExtraction) -> dict:
+    base = row.result_data if isinstance(row.result_data, dict) else {}
+    out = dict(base)
+    out["geography"] = row.geography or out.get("geography")
+    out["industry"] = row.industry or out.get("industry")
+    out["scenario"] = row.scenario or out.get("scenario")
+    out["extraction_id"] = row.id
+    out["persisted_at"] = row.created_at.isoformat() if row.created_at else None
+    return sanitize_for_json(out)
+
+
+def _first_non_empty_context(results: list[dict], key: str) -> Optional[str]:
+    for r in results:
+        v = r.get(key)
+        if v is not None and str(v).strip():
+            return str(v).strip()
+    return None
+
+
 def _merge_chunk_results(results: list[dict]) -> dict:
     """Merge multiple _run_reverse_engineer results into one (dedupe objectives/sections/questions)."""
     if not results:
         return {
+            "geography": None,
+            "industry": None,
+            "scenario": None,
             "overall_objectives": [],
             "overall_sample_size_n": None,
             "section_objectives": [],
@@ -995,6 +1110,9 @@ def _merge_chunk_results(results: list[dict]) -> dict:
     raw_merged = "\n\n".join(f"--- Part {i+1} ---\n\n{p}" for i, p in enumerate(raw_parts)) if raw_parts else ""
     overall_n = next((r.get("overall_sample_size_n") for r in results if r.get("overall_sample_size_n") is not None), None)
     return {
+        "geography": _first_non_empty_context(results, "geography"),
+        "industry": _first_non_empty_context(results, "industry"),
+        "scenario": _first_non_empty_context(results, "scenario"),
         "overall_objectives": overall,
         "overall_sample_size_n": overall_n,
         "section_objectives": sections,
@@ -1028,7 +1146,11 @@ def _run_reverse_engineer_maybe_chunked(
         except Exception as e:
             logger.warning("Chunk %s failed: %s", i + 1, e)
             results.append({
+                "geography": None,
+                "industry": None,
+                "scenario": None,
                 "overall_objectives": [],
+                "overall_sample_size_n": None,
                 "section_objectives": [],
                 "reconstructed_questionnaire": [],
                 "raw_markdown": "",
@@ -1036,6 +1158,21 @@ def _run_reverse_engineer_maybe_chunked(
                 "message": str(e),
             })
     return _merge_chunk_results(results)
+
+
+@router.get("/latest-extraction")
+async def get_latest_market_research_extraction(db: Session = Depends(get_db)):
+    """
+    Return the most recently persisted reverse-engineer result for the UI (same shape as POST reverse-engineer).
+    """
+    row = (
+        db.query(MarketResearchExtraction)
+        .order_by(MarketResearchExtraction.created_at.desc())
+        .first()
+    )
+    if not row:
+        return {"has_extraction": False}
+    return {"has_extraction": True, "data": _merge_extraction_row_to_response(row)}
 
 
 @router.get("/ai-status")
@@ -1061,6 +1198,7 @@ async def ai_status():
 async def reverse_engineer_report(
     report_text: Optional[str] = Form(None),
     file: Optional[UploadFile] = File(None),
+    db: Session = Depends(get_db),
 ):
     """
     Reverse-engineer the original research design from a market research report.
@@ -1074,15 +1212,27 @@ async def reverse_engineer_report(
         raise HTTPException(status_code=400, detail="Provide report_text (min 50 chars) or upload a .txt/.pdf file.")
     openai_key = _get_openai_key()
     anthropic_key = _get_anthropic_key()
-    return _run_reverse_engineer_maybe_chunked(text, openai_key=openai_key, anthropic_key=anthropic_key)
+    result = _run_reverse_engineer_maybe_chunked(text, openai_key=openai_key, anthropic_key=anthropic_key)
+    eid = _persist_market_research_result(db, result)
+    out = dict(result)
+    if eid:
+        out["extraction_id"] = eid
+    return out
 
 
 @router.post("/reverse-engineer/json")
-async def reverse_engineer_json(body: ReverseEngineerRequest):
+async def reverse_engineer_json(body: ReverseEngineerRequest, db: Session = Depends(get_db)):
     """Same as reverse-engineer but accepts JSON body with report_text. No length limit; long reports are processed in chunks."""
     openai_key = _get_openai_key()
     anthropic_key = _get_anthropic_key()
-    return _run_reverse_engineer_maybe_chunked(body.report_text.strip(), openai_key=openai_key, anthropic_key=anthropic_key)
+    result = _run_reverse_engineer_maybe_chunked(
+        body.report_text.strip(), openai_key=openai_key, anthropic_key=anthropic_key
+    )
+    eid = _persist_market_research_result(db, result)
+    out = dict(result)
+    if eid:
+        out["extraction_id"] = eid
+    return out
 
 
 def _evict_upload_sessions():
@@ -1120,7 +1270,7 @@ async def append_chunk(body: AppendChunkRequest):
 
 
 @router.post("/reverse-engineer-session")
-async def reverse_engineer_session(body: ReverseEngineerSessionRequest):
+async def reverse_engineer_session(body: ReverseEngineerSessionRequest, db: Session = Depends(get_db)):
     """Run reverse-engineer on the report assembled from append-chunk uploads. No length limit; processed in chunks if long."""
     _evict_upload_sessions()
     sid = body.session_id
@@ -1148,7 +1298,12 @@ async def reverse_engineer_session(body: ReverseEngineerSessionRequest):
         raise HTTPException(status_code=400, detail="Assembled report has fewer than 50 characters.")
     openai_key = _get_openai_key()
     anthropic_key = _get_anthropic_key()
-    return _run_reverse_engineer_maybe_chunked(full_text, openai_key=openai_key, anthropic_key=anthropic_key)
+    result = _run_reverse_engineer_maybe_chunked(full_text, openai_key=openai_key, anthropic_key=anthropic_key)
+    eid = _persist_market_research_result(db, result)
+    out = dict(result)
+    if eid:
+        out["extraction_id"] = eid
+    return out
 
 
 # Sample PDF for testing: place a file named "sample_market_research_report.pdf" in project root

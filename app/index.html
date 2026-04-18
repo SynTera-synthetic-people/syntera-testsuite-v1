@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#030712">
     <title>SynTera Test Suite</title>
-    <link rel="icon" type="image/svg+xml" href="/brand/Icon.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -16,20 +15,18 @@
         <main class="main">
             <header class="top-bar">
                 <div class="top-bar-row">
-                    <div class="brand">
-                        <img src="/brand/Icon.svg" alt="" class="brand-logo-icon" />
+                    <div class="brand brand-text-only">
                         <div>
-                            <h1>SynTera</h1>
-                            <p>Synthetic People Test Suite</p>
+                            <h1>Synthetic People Test Suite</h1>
+                            <p>Compare real human survey output with synthetic people</p>
                         </div>
                     </div>
                     <div class="top-bar-content">
-                        <div class="home-hero header-hero">
+                        <div class="home-hero header-hero header-hero--no-logos">
                             <div class="hero-content">
-                                <img src="/brand/Logo%20on%20Black.svg" alt="SynTera" class="hero-brand-logo" />
                                 <div class="hero-text-block">
-                                    <h1 class="hero-title">SynTera Test Suite</h1>
-                                    <p class="hero-subtitle">Compare real human survey output with synthetic people </p>
+                                    <p class="hero-kicker">Dashboard</p>
+                                    <p class="hero-subtitle hero-subtitle--header">Statistical validation and experiment reports</p>
                                     <div class="hero-badges">
                                         <span class="badge">97.8% Accuracy</span>
                                         <span class="badge">8 Statistical Tests</span>
@@ -37,7 +34,7 @@
                                     </div>
                                 </div>
                             </div>
-                            </div>
+                        </div>
                     </div>
                     <div class="top-bar-auth">
                         <div id="user-info-display" class="user-auth-inline" style="display: none;">
@@ -264,24 +261,26 @@
                     </div>
                     <div class="stats">
                         <div class="stat-card stat-card--tests">
-                            <h3>Tests conducted</h3>
+                            <h3>Tests conducted <span class="metric-tip" title="Number of validation runs executed across multiple human surveys covering different research scenarios to compare human vs synthetic.">i</span></h3>
                             <p id="total-surveys">0</p>
                         </div>
                         <div class="stat-card stat-card--validated">
-                            <h3>Validated runs</h3>
+                            <h3>Scenarios covered <span class="metric-tip" title="Unique research scenarios covered by validation runs (e.g., Pricing, Adoption, Usage, Attitude, Product Launch).">i</span></h3>
                             <p id="validated-surveys">0</p>
+                            <button id="scenario-mix-btn" class="mix-btn" onclick="openMixPopup('scenarios')">View mix</button>
                         </div>
                         <div class="stat-card stat-card--accuracy">
-                            <h3>Avg alignment score</h3>
+                            <h3>Avg similarity <span class="metric-tip" title="Average similarity between human and synthetic responses across all tests at question and response level.">i</span></h3>
                             <p id="avg-accuracy">0%</p>
                         </div>
                         <div class="stat-card stat-card--variance">
-                            <h3>Avg variance range</h3>
+                            <h3>Avg directional alignment <span class="metric-tip" title="How often Synthetic People predicts the same trend direction as human respondents.">i</span></h3>
                             <p id="avg-variance-range">—</p>
                         </div>
                         <div class="stat-card stat-card--stability">
-                            <h3>Avg stability indicator</h3>
+                            <h3>Industries covered <span class="metric-tip" title="Unique industries represented in validation runs and their contribution mix.">i</span></h3>
                             <p id="avg-stability-indicator">—</p>
+                            <button id="industry-mix-btn" class="mix-btn" onclick="openMixPopup('industries')">View mix</button>
                         </div>
                     </div>
                 </div>
@@ -289,9 +288,9 @@
                 <!-- Reports Section -->
                 <div class="reports-section-header">
                     <h3>Test configurations &amp; reports</h3>
-                    <p class="subtitle">Each card represents one experiment: a real survey benchmarked against synthetic people.</p>
+                    <p class="subtitle">One study per screen: design, human vs synthetic economics, and validation metrics. Use the pager below when you have multiple runs.</p>
                 </div>
-                <div id="reports-list" class="reports-grid reports-grid-three"></div>
+                <div id="reports-list" class="reports-grid reports-grid-one"></div>
                 <div id="reports-pagination" class="pagination-container"></div>
             </section>
             <section id="surveys" class="section">
@@ -451,6 +450,42 @@
                 </div>
             </section>
         </main>
+    </div>
+    <div id="lead-capture-modal" class="modal-overlay modal-register" style="display:none;">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2>View Detailed Comparison</h2>
+                <button class="modal-close" onclick="closeLeadCaptureModal()" aria-label="Close">×</button>
+            </div>
+            <div class="modal-body">
+                <p class="help-text">Enter your details to access the full detailed comparison.</p>
+                <label>Name
+                    <input id="lead-name" class="auth-input" type="text" placeholder="Your name" />
+                </label>
+                <label>Company Name
+                    <input id="lead-company" class="auth-input" type="text" placeholder="Your company" />
+                </label>
+                <label>Email
+                    <input id="lead-email" class="auth-input" type="email" placeholder="you@company.com" />
+                </label>
+                <p id="lead-form-error" class="form-error" style="display:none;"></p>
+                <div class="modal-actions">
+                    <button class="btn-secondary" onclick="closeLeadCaptureModal()">Cancel</button>
+                    <button class="btn-primary" onclick="submitLeadCapture()">Continue</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="mix-popup-modal" class="modal-overlay modal-register" style="display:none;">
+        <div class="modal-card mix-modal-card">
+            <div class="modal-header">
+                <h2 id="mix-popup-title">Distribution</h2>
+                <button class="modal-close" onclick="closeMixPopup()" aria-label="Close">×</button>
+            </div>
+            <div class="modal-body">
+                <div id="mix-popup-content"></div>
+            </div>
+        </div>
     </div>
     <div id="omi-narrator" class="omi-narrator" aria-live="polite">
         <div class="omi-bubble" id="omi-bubble">Hi, I am Omi. I will guide you through your test-suite journey.</div>

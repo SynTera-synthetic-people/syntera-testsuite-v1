@@ -39,6 +39,22 @@ The server will start on http://localhost:8000
 
 **Windows:** If `python -m uvicorn backend.main:app --reload` fails with "PermissionError" or "No pyvenv.cfg file", run without reload: `python backend/main.py` or `python -m uvicorn backend.main:app`.
 
+### Staging readiness: Test Lab DB audit
+
+This verifies the connected DB has the required **Test Lab** tables/columns and that required profile values are populated.
+
+```bash
+# PowerShell example
+$env:DATABASE_URL="postgresql://synth_user:...@.../synthdb?sslmode=require"
+python scripts/audit_test_lab_db.py
+```
+
+If you use `make`:
+
+```bash
+make audit-test-lab-db
+```
+
 ### Docker
 ```bash
 docker-compose -f deployment/docker-compose.yml up -d

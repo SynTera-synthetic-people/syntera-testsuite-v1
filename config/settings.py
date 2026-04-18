@@ -11,7 +11,8 @@ class Settings(BaseSettings):
     APP_NAME: str = "SynTera Test Suite"
     DEBUG: bool = os.getenv("DEBUG", "False") == "True"
     ENVIRONMENT: str = os.getenv("ENVIRONMENT", "development")
-    DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite:///./syntera.db")
+    # DATABASE_URL must be provided via environment/SSM; no SQLite default.
+    DATABASE_URL: str = os.getenv("DATABASE_URL", "")
     API_V1_STR: str = "/api/v1"
     BACKEND_CORS_ORIGINS: list = ["*"]
     SECRET_KEY: str = os.getenv("SECRET_KEY", "dev-secret-key")
