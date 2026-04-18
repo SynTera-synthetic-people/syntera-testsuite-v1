@@ -1,12 +1,12 @@
-name:  Deploy to Dev Server
+name: Deploy to Dev Server
 
-# Add manual trigger
+# Manual trigger
 on:
-  workflow_dispatch:      
+  workflow_dispatch:
 
 concurrency:
   group: production-deploy
-  cancel-in-progress: false      
+  cancel-in-progress: false
 
 jobs:
   deploy:
@@ -23,7 +23,9 @@ jobs:
           echo "${{ secrets.DEV_EC2_SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.DEV_EC2_HOST }} >> ~/.ssh/known_hosts 2>/dev/null || true
-          
+
+      - name: Configure SSH keep-alive
+        run: echo "ServerAliveInterval 60" >> ~/.ssh/config
 
       - name: Run Deployment Script on Server
         run: |
@@ -34,4 +36,5 @@ jobs:
           '${{ secrets.DEV_APP_DIR }}' \
           '${{ secrets.DEV_APP_PORT }}' \
           'main'"
+
 
