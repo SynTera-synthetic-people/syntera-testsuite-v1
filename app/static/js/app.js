@@ -1092,17 +1092,18 @@ function stripMarkdownBold(s) {
 function parseQuestionnaireFromRaw(rawSectionC) {
     if (!rawSectionC || !rawSectionC.trim()) return [];
     let blocks = [];
-    if (rawSectionC.match(/-\s*Survey Question:/i)) {
-        blocks = rawSectionC.split(/(?=-\s*Survey Question:)/i).filter(b => b.trim().length > 0);
+    if (rawSectionC.match(/^\s*(?:-\s*)?Survey Question:/im)) {
+        blocks = rawSectionC.split(/(?=^\s*(?:-\s*)?Survey Question:)/im).filter(b => b.trim().length > 0);
     }
-    if (blocks.length <= 1 && rawSectionC.match(/Survey Question:\s*/i)) {
-        blocks = rawSectionC.split(/(?=Survey Question:\s*)/i).filter(b => b.trim().length > 0);
+    if (blocks.length <= 1 && rawSectionC.match(/^\s*(?:-\s*)?(Report Reference|Research Intent):/im)) {
+        blocks = rawSectionC.split(/(?=^\s*(?:-\s*)?(Report Reference|Research Intent):)/im).filter(b => b.trim().length > 0);
     }
     if (blocks.length <= 1) {
-        blocks = rawSectionC.split(/\n(?=-\s*Report Reference:|\n-\s*Research Intent:)/i).filter(b => b.trim().length > 0);
+        blocks = [rawSectionC];
     }
     const questions = [];
-    const optRe = /Answer Options:\s*([\s\S]*?)(?=Target Segment:|Expected Output|-\s*Report Reference:|-\s*Research Intent:|-\s*Survey Question:|\Z)/i;
+    const optRe = /Answer Options:\s*([\s\S]*?)(?=Report Output:|Sample size\s*\(n\):|Target Segment:|Expected Output|^\s*(?:-\s*)?(Report Reference|Research Intent|Survey Question):|$)/im;
+    const reportOutRe = /Report Output:\s*([\s\S]*?)(?=Sample size\s*\(n\):|Target Segment:|Expected Output|^\s*(?:-\s*)?(Report Reference|Research Intent|Survey Question):|$)/im;
     const surveyRe = /Survey Question:\s*([\s\S]*?)(?=Question Type:|Answer Options:|Target Segment:|$)/i;
     const typeRe = /Question Type:\s*([\s\S]*?)(?=Answer Options:|Target Segment:|$)/i;
     blocks.forEach(blk => {
@@ -1111,6 +1112,7 @@ function parseQuestionnaireFromRaw(rawSectionC) {
         const surveyM = blkStr.match(surveyRe);
         const typeM = blkStr.match(typeRe);
         const optM = blkStr.match(optRe);
+        const reportM = blkStr.match(reportOutRe);
         let survey_question = surveyM ? surveyM[1].trim() : '';
         if (!survey_question && (blkStr.includes('Survey Question') || blkStr.includes('Question Type'))) {
             const afterLabel = blkStr.replace(/^[\s\S]*?Survey Question:\s*/i, '').trim();
@@ -1122,6 +1124,7 @@ function parseQuestionnaireFromRaw(rawSectionC) {
         }
         const question_type = typeM ? typeM[1].trim() : '';
         let answer_options = [];
+        let option_values = [];
         if (optM && optM[1]) {
             const optText = optM[1].replace(/^\s*[-•]\s*/gm, '').trim();
             answer_options = optText.split(/[\n]+/).map(line => line.replace(/^\s*[-•]\s*/, '').trim()).filter(o => o && o.length > 0 && o !== 'Option');
@@ -1129,10 +1132,44 @@ function parseQuestionnaireFromRaw(rawSectionC) {
                 answer_options = optM[1].split(/[-•]/).map(o => o.trim()).filter(o => o && o.length > 0);
             }
         }
+        if (reportM && reportM[1]) {
+            const lines = reportM[1]
+                .split(/\r?\n/)
+                .map(line => line.replace(/^\s*[-•]\s*/, '').trim())
+                .filter(line => line && !/^option\s*$/i.test(line));
+            option_values = lines
+                .map(line => {
+                    const m = line.match(/(\d+(?:\.\d+)?)\s*%?/);
+                    return m ? m[1] : '';
+                })
+                .filter(v => v !== '');
+        }
         survey_question = stripMarkdownBold(survey_question);
         answer_options = answer_options.map(o => stripMarkdownBold(o)).filter(o => o);
-        if (survey_question) {
-            questions.push({ survey_question, question_type: stripMarkdownBold(question_type), answer_options });
+        if (option_values.length > 0 && answer_options.length > 0) {
+            if (option_values.length > answer_options.length) {
+                option_values = option_values.slice(0, answer_options.length);
+            } else if (option_values.length < answer_options.length) {
+                option_values = option_values.concat(Array(answer_options.length - option_values.length).fill('0'));
+            }
+        }
+        const qTypeNorm = String(question_type || '').toLowerCase();
+        const isOpenEnded = /(open|text|verbatim|qualitative|free\s*text)/i.test(qTypeNorm);
+        const qTextNorm = String(survey_question || '').toLowerCase().replace(/\s+/g, ' ').trim();
+        const badQuestionText = (
+            !qTextNorm ||
+            qTextNorm.length < 8 ||
+            /^(report reference|research intent|target segment|expected output|answer options|report output)\b/i.test(qTextNorm)
+        );
+        const singleOptionArtifact = (
+            answer_options.length === 1 &&
+            !isOpenEnded &&
+            option_values.length <= 1
+        );
+
+        // Drop malformed parser artifacts (often created by section bleed in raw markdown).
+        if (survey_question && !badQuestionText && !singleOptionArtifact) {
+            questions.push({ survey_question, question_type: stripMarkdownBold(question_type), answer_options, option_values });
         }
     });
     return questions;
@@ -1156,25 +1193,62 @@ function formatOptionValueNumericOnly(val) {
  */
 function getQuestionnaireList(data) {
     const structured = data.reconstructed_questionnaire || [];
-    if (structured.length > 0) {
-        const overallN = (data.overall_sample_size_n != null && data.overall_sample_size_n > 0) ? parseInt(data.overall_sample_size_n, 10) : null;
-        return structured.map(q => {
-            const opts = Array.isArray(q.answer_options) ? q.answer_options : [];
-            const vals = Array.isArray(q.option_values) ? q.option_values : [];
-            const qN = q.sample_size_n != null && q.sample_size_n > 0 ? parseInt(q.sample_size_n, 10) : null;
-            const n = qN != null ? qN : overallN;
-            return {
-                survey_question: stripMarkdownBold(q.survey_question || ''),
-                question_type: stripMarkdownBold(q.question_type || ''),
-                answer_options: opts.map(o => stripMarkdownBold(String(o))).filter(o => o),
-                option_values: vals.map(v => stripMarkdownBold(String(v))).filter(v => v !== undefined && v !== null),
-                sample_size_n: n
-            };
-        });
-    }
     const raw = data.raw_markdown || '';
     const sections = parseRawMarkdownSections(raw);
-    return parseQuestionnaireFromRaw(sections.questionnaire);
+    const fromRaw = parseQuestionnaireFromRaw(sections.questionnaire);
+
+    const normalizeQText = (q) => String((q && q.survey_question) || '').toLowerCase().replace(/\s+/g, ' ').trim();
+    const normalizeOption = (o) => String(o || '').toLowerCase().replace(/\s+/g, ' ').trim();
+    const keyForQ = (q) => {
+        const qText = normalizeQText(q);
+        const opts = (Array.isArray(q?.answer_options) ? q.answer_options : []).map(normalizeOption).filter(Boolean).join('|');
+        return `${qText}__${opts}`;
+    };
+
+    const normalizeStructured = (q, overallN) => {
+        const opts = Array.isArray(q.answer_options) ? q.answer_options : [];
+        const vals = Array.isArray(q.option_values) ? q.option_values : [];
+        const qN = q.sample_size_n != null && q.sample_size_n > 0 ? parseInt(q.sample_size_n, 10) : null;
+        const n = qN != null ? qN : overallN;
+        return {
+            survey_question: stripMarkdownBold(q.survey_question || ''),
+            question_type: stripMarkdownBold(q.question_type || ''),
+            answer_options: opts.map(o => stripMarkdownBold(String(o))).filter(o => o),
+            option_values: vals.map(v => stripMarkdownBold(String(v))).filter(v => v !== undefined && v !== null),
+            sample_size_n: n
+        };
+    };
+
+    if (structured.length > 0) {
+        const overallN = (data.overall_sample_size_n != null && data.overall_sample_size_n > 0) ? parseInt(data.overall_sample_size_n, 10) : null;
+        const fromStructured = structured.map(q => normalizeStructured(q, overallN));
+        if (!fromRaw.length) return fromStructured;
+
+        // Merge both sources: keep structured (richer option values), add raw-only questions.
+        const merged = [];
+        const seen = new Set();
+        fromStructured.forEach((q) => {
+            const k = keyForQ(q);
+            if (!k || seen.has(k)) return;
+            seen.add(k);
+            merged.push(q);
+        });
+        fromRaw.forEach((q) => {
+            const k = keyForQ(q);
+            if (!k || seen.has(k)) return;
+            seen.add(k);
+            merged.push({
+                survey_question: stripMarkdownBold(q.survey_question || ''),
+                question_type: stripMarkdownBold(q.question_type || ''),
+                answer_options: (Array.isArray(q.answer_options) ? q.answer_options : []).map(o => stripMarkdownBold(String(o))).filter(Boolean),
+                option_values: Array.isArray(q.option_values) ? q.option_values : [],
+                sample_size_n: q.sample_size_n || null
+            });
+        });
+        // If structured is clearly partial, prefer fuller merged/raw coverage.
+        return merged.length >= fromStructured.length ? merged : fromStructured;
+    }
+    return fromRaw;
 }
 
 function renderMarketResearchOutput(data, objectivesEl, questionnaireEl) {
@@ -1559,16 +1633,20 @@ function estimatedCostFromRespondents(sampleSize) {
 }
 
 function computeDirectionalAlignment(questionComparisons) {
-    if (!Array.isArray(questionComparisons) || questionComparisons.length === 0) return null;
+    const rows = Array.isArray(questionComparisons)
+        ? questionComparisons.filter((q) => q && q.status === 'Compared')
+        : [];
+    if (rows.length === 0) return null;
     let aligned = 0;
     let comparable = 0;
-    questionComparisons.forEach((q) => {
+    rows.forEach((q) => {
         const options = Array.isArray(q?.option_comparisons) ? q.option_comparisons : [];
         if (!options.length) return;
         const synTop = options.reduce((a, b) => (Number(a.synthetic_count || 0) >= Number(b.synthetic_count || 0) ? a : b));
         const realTop = options.reduce((a, b) => (Number(a.real_count || 0) >= Number(b.real_count || 0) ? a : b));
         comparable += 1;
-        if (String(synTop.option) === String(realTop.option)) aligned += 1;
+        // Option rows are semantically paired; same row = same bucket for both surveys.
+        if (synTop === realTop) aligned += 1;
     });
     if (!comparable) return null;
     return (aligned / comparable) * 100;
@@ -1800,7 +1878,9 @@ async function loadReports(page = 1) {
             
             // Get file info if present
             const fileInfo = s.synthetic_personas || {};
-            const questionComparisons = s.test_suite_report?.question_comparisons || [];
+            const questionComparisons = (s.test_suite_report?.question_comparisons || []).filter(
+                (q) => q && q.status === 'Compared'
+            );
             const slimQc = Number(fileInfo._question_data_count);
             const questionCount = questionComparisons.length
                 || (Number.isFinite(slimQc) && slimQc > 0 ? slimQc : 0)
@@ -2778,11 +2858,15 @@ function displaySemilatticeStyleResults(data, surveyId, targetDiv) {
     try {
         const survey = data.survey || {};
         const fileInfo = data.file_info || {};
-        let questionComparisons = data.question_comparisons || [];
-        if (!questionComparisons || questionComparisons.length === 0) {
+        const commonQuestionsOnly = (rows) => (Array.isArray(rows) ? rows.filter((q) => q && q.status === 'Compared') : []);
+        let questionComparisons = commonQuestionsOnly(data.question_comparisons);
+        if (questionComparisons.length === 0) {
             const results = data.results || {};
-            questionComparisons = results.question_comparisons || data.question_comparisons || [];
+            questionComparisons = commonQuestionsOnly(results.question_comparisons);
         }
+        const unmatchedQuestions = data.unmatched_questions || (data.results || {}).unmatched_questions || {};
+        const synthOnly = Array.isArray(unmatchedQuestions.synthetic_only) ? unmatchedQuestions.synthetic_only : [];
+        const humanOnly = Array.isArray(unmatchedQuestions.human_only) ? unmatchedQuestions.human_only : [];
         
         const acc01 = normalizeAccuracy01(data.overall_accuracy ?? data.accuracy);
         const accuracyValue = acc01 != null ? acc01 : 0;
@@ -2944,8 +3028,17 @@ function displaySemilatticeStyleResults(data, surveyId, targetDiv) {
     // Question-by-question table with option-level comparison (no sparklines)
     let questionsTableHtml = '';
     if (questionComparisons.length > 0) {
+        const unmatchedHtml = (synthOnly.length || humanOnly.length) ? `
+            <div class="methodology-note" style="margin: 0 0 12px 0;">
+                <strong>Unmatched Questions:</strong>
+                ${synthOnly.length ? `Synthetic-only: ${synthOnly.length}` : 'Synthetic-only: 0'},
+                ${humanOnly.length ? `Human-only: ${humanOnly.length}` : 'Human-only: 0'}.
+                Only common matched questions are shown below.
+            </div>
+        ` : '';
         questionsTableHtml = `
             <div id="tab-content-questions" class="results-tab-content active">
+                ${unmatchedHtml}
                 <div class="questions-table-container">
                     <table class="questions-table">
                         <thead>
@@ -2984,9 +3077,15 @@ function displaySemilatticeStyleResults(data, surveyId, targetDiv) {
                                                     const synPct = Math.round((synCount / maxCount) * 100);
                                                     const realDisplay = Math.round(realCount);
                                                     const synDisplay = Math.round(synCount);
+                                                    const humOpt = opt.human_option != null ? String(opt.human_option) : '';
+                                                    const synOpt = opt.synthetic_option != null ? String(opt.synthetic_option) : '';
+                                                    const rowLabel = escapeHtml(String(opt.option || humOpt || synOpt || '—'));
+                                                    const rowTitle = (humOpt && synOpt && humOpt !== synOpt)
+                                                        ? escapeHtml(`Human: ${humOpt} · Synthetic: ${synOpt}`)
+                                                        : rowLabel;
                                                     return `
                                                         <div class="q-bar-row">
-                                                            <div class="q-bar-y-label" title="${opt.option}">${opt.option}</div>
+                                                            <div class="q-bar-y-label" title="${rowTitle}">${rowLabel}</div>
                                                             <div class="q-bar-group">
                                                                 <div class="q-bar-slot">
                                                                     <div class="q-bar q-bar-human" style="width:${realPct}%; background:${HUMAN_COLOR};" title="Humans: ${realDisplay}"></div>
@@ -3639,7 +3738,7 @@ function displayValidationResults(data, surveyId, resultsDiv = null) {
         
         ${buildStatisticalTestsGuideHtml()}
         
-        ${(data.question_comparisons && data.question_comparisons.length === 0) ? `
+        ${((data.question_comparisons || []).filter((q) => q && q.status === 'Compared').length === 0) ? `
         <!-- Quick Stats (only show if no question comparisons) -->
         <div class="quick-stats">
             <div class="quick-stat">

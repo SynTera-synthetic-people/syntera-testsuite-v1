@@ -1,15 +1,70 @@
 """File Parser for Excel and CSV Survey Data"""
-import pandas as pd
-import numpy as np
-from typing import List, Dict, Any
-import logging
 import io
+import logging
+import math
+import re
+from typing import Any, Dict, List, Optional
+
+import numpy as np
+import pandas as pd
 
 logger = logging.getLogger(__name__)
 
 
 class FileParser:
     """Parse Excel and CSV files to extract survey response data."""
+
+    @staticmethod
+    def _is_likely_metadata_column(col_name: Any) -> bool:
+        """Heuristic: columns that look like IDs/timestamps/row metadata, not survey responses."""
+        c = str(col_name or "").strip().lower()
+        if not c:
+            return False
+        patterns = (
+            "id",
+            "response id",
+            "respondent id",
+            "record id",
+            "uuid",
+            "guid",
+            "timestamp",
+            "time",
+            "date",
+            "created",
+            "updated",
+            "email",
+            "phone",
+            "mobile",
+            "name",
+            "serial",
+            "index",
+            "row",
+        )
+        return any(p in c for p in patterns)
+
+    @staticmethod
+    def _select_numeric_response_columns(df: pd.DataFrame) -> list[Any]:
+        """
+        Pick numeric columns likely to be actual survey response fields.
+        Excludes likely metadata and very sparse/almost-empty numeric columns.
+        """
+        if df is None or df.empty:
+            return []
+        n_rows = max(len(df), 1)
+        min_non_null = max(2, int(math.ceil(n_rows * 0.05)))
+        out: list[Any] = []
+        for col in df.columns:
+            ser = pd.to_numeric(df[col], errors="coerce")
+            nn = int(ser.notna().sum())
+            if nn < min_non_null:
+                continue
+            if FileParser._is_likely_metadata_column(col):
+                # Keep classic survey IDs like Q1 only if they are short Q-codes.
+                col_s = str(col).strip()
+                if not re.match(r"^Q\d+$", col_s, re.IGNORECASE):
+                    continue
+            out.append(col)
+        return out
 
     @staticmethod
     def parse_file(file_content: bytes, filename: str) -> Dict[str, Any]:
@@ -87,6 +142,13 @@ class FileParser:
                 df = df.dropna(axis=1, how='all')
             else:
                 df = df_raw  # Use raw dataframe for Data Shell format
+
+            # Aggregated export: one row per option, repeated question number / text forward-filled
+            # (e.g. "Q No., Question Description, Options, Value from report" or "... , Count")
+            if not is_data_shell_format:
+                agg_parsed = FileParser._try_parse_aggregate_option_row_export(df, filename)
+                if agg_parsed is not None:
+                    return agg_parsed
             
             # Check if this is a summary/aggregated format (has Question_ID and Count columns)
             # Case-insensitive check (only if not Data Shell format)
@@ -350,17 +412,19 @@ class FileParser:
                 # Handle raw response format (original logic)
                 # Extract numeric responses
                 # Strategy: Find columns with numeric data (survey responses)
-                numeric_cols = df.select_dtypes(include=[np.number]).columns.tolist()
+                numeric_cols = FileParser._select_numeric_response_columns(df.select_dtypes(include=[np.number]))
                 
                 # If no numeric columns, try to convert string columns
                 if not numeric_cols:
                     for col in df.columns:
                         try:
-                            df[col] = pd.to_numeric(df[col], errors='coerce')
-                            if df[col].notna().any():
+                            converted = pd.to_numeric(df[col], errors='coerce')
+                            if converted.notna().any():
+                                df[col] = converted
                                 numeric_cols.append(col)
                         except:
                             pass
+                    numeric_cols = FileParser._select_numeric_response_columns(df[numeric_cols]) if numeric_cols else []
 
                 # Extract response arrays
                 # Option 1: Sum across rows (total responses per question/option)
@@ -414,6 +478,158 @@ class FileParser:
         except Exception as e:
             logger.error(f"Error parsing file {filename}: {str(e)}")
             raise ValueError(f"Failed to parse file: {str(e)}")
+
+    @staticmethod
+    def _column_lookup(df: pd.DataFrame) -> dict[str, str]:
+        """Map normalized header (no spaces, lower) -> original column name."""
+        out: dict[str, str] = {}
+        for c in df.columns:
+            key = re.sub(r"\s+", "", str(c).strip().lower())
+            out[key] = str(c)
+        return out
+
+    @staticmethod
+    def _try_parse_aggregate_option_row_export(df: pd.DataFrame, filename: str) -> Optional[Dict[str, Any]]:
+        """
+        Detect tabular exports where each option is a row and question number / stem repeat
+        or are forward-filled (common for SPSS-style summaries and Excel crosstabs).
+        """
+        lookup = FileParser._column_lookup(df)
+        aliases_q = ("qno.", "qno", "questionno.", "questionno", "questionnumber", "questionid", "q_id", "qnumber")
+        aliases_opt = ("options", "option", "response", "answer", "category", "label")
+        aliases_cnt = (
+            "valuefromreport",
+            "count",
+            "value",
+            "n",
+            "frequency",
+            "responses",
+            "respondents",
+            "weightedcount",
+        )
+        aliases_txt = (
+            "questiondescription",
+            "questiontext",
+            "question_text",
+            "question",
+            "questiontitle",
+            "stem",
+        )
+
+        def pick(cands: tuple[str, ...]) -> Optional[str]:
+            for a in cands:
+                if a in lookup:
+                    return lookup[a]
+            return None
+
+        q_col = pick(aliases_q)
+        opt_col = pick(aliases_opt)
+        cnt_col = pick(aliases_cnt)
+        txt_col = pick(aliases_txt)
+        if not (q_col and opt_col and cnt_col and txt_col):
+            return None
+
+        work = df[[q_col, txt_col, opt_col, cnt_col]].copy()
+        work = work.dropna(how="all")
+        if len(work) < 3:
+            return None
+
+        work[q_col] = work[q_col].ffill()
+        work[txt_col] = work[txt_col].ffill()
+
+        def row_qid(val: Any) -> Optional[str]:
+            if val is None or (isinstance(val, float) and math.isnan(val)):
+                return None
+            s = str(val).strip()
+            if not s or s.lower() == "nan":
+                return None
+            s_up = s.upper().replace(" ", "")
+            if s_up.startswith("Q"):
+                tail = s_up[1:].lstrip(":-._")
+                m = re.match(r"^(\d+)", tail)
+                if m:
+                    return f"Q{int(m.group(1))}"
+                return s_up
+            try:
+                return f"Q{int(float(s))}"
+            except (TypeError, ValueError):
+                return None
+
+        work["_qid"] = work[q_col].map(row_qid)
+        work = work[work["_qid"].notna()]
+        if work.empty:
+            return None
+
+        question_data: list[dict[str, Any]] = []
+        all_responses: list[float] = []
+        response_totals: list[float] = []
+
+        for qid, g in work.groupby("_qid", sort=False):
+            qname = str(g[txt_col].iloc[0]).strip()
+            response_counts: dict[str, float] = {}
+            individual: list[float] = []
+            q_codes: dict[str, int] = {}
+            for _, r in g.iterrows():
+                opt = str(r[opt_col]).strip()
+                if not opt or opt.lower() == "nan":
+                    continue
+                cnt = pd.to_numeric(r[cnt_col], errors="coerce")
+                if pd.isna(cnt) or float(cnt) <= 0:
+                    continue
+                fv = float(cnt)
+                response_counts[opt] = fv
+                response_totals.append(fv)
+                try:
+                    opt_num = float(opt)
+                    individual.extend([opt_num] * int(fv))
+                except (TypeError, ValueError):
+                    if opt not in q_codes:
+                        q_codes[opt] = len(q_codes) + 1
+                    individual.extend([float(q_codes[opt])] * int(fv))
+
+            if not response_counts:
+                continue
+            q_counts = pd.Series(list(response_counts.values()))
+            question_data.append(
+                {
+                    "question_id": str(qid),
+                    "question_name": qname,
+                    "response_totals": float(q_counts.sum()),
+                    "response_counts": {str(k): float(v) for k, v in response_counts.items()},
+                    "individual_responses": individual[: min(len(individual), 500000)],
+                    "mean": float(q_counts.mean()) if len(q_counts) > 0 else 0.0,
+                    "std": float(q_counts.std()) if len(q_counts) > 1 else 0.0,
+                }
+            )
+            all_responses.extend([float(x) for x in individual[: min(len(individual), 500000)]])
+
+        if len(question_data) < 2:
+            return None
+
+        def _qsort_key(q: dict[str, Any]) -> tuple[int, str]:
+            m = re.match(r"Q(\d+)", str(q.get("question_id", "")))
+            return (int(m.group(1)), str(q.get("question_id"))) if m else (9999, str(q.get("question_id")))
+
+        question_data.sort(key=_qsort_key)
+
+        logger.info(
+            "Detected aggregate option-row export in %s (%s questions)",
+            filename,
+            len(question_data),
+        )
+
+        return {
+            "filename": filename,
+            "total_rows": len(df),
+            "total_columns": len(df.columns),
+            "numeric_columns": [cnt_col],
+            "response_totals": [float(x) for x in response_totals if x is not None],
+            "all_responses": [float(x) for x in all_responses if x is not None],
+            "question_data": question_data,
+            "dataframe_preview": df.head(10).to_dict("records") if len(df) > 0 else [],
+            "column_names": df.columns.tolist(),
+            "format": "aggregate_option_rows",
+        }
 
     @staticmethod
     def extract_response_array(file_data: Dict[str, Any], method: str = "totals") -> List[float]:

@@ -70,6 +70,19 @@ class TestLabProfile(Base):
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
 
+class TestLabVerdict(Base):
+    """
+    Dedicated verdict table so verdict content can evolve independently.
+    Exactly two business columns:
+    - survey_id
+    - verdict (JSON)
+    """
+
+    __tablename__ = "test_lab_verdict"
+    survey_id = Column(String, primary_key=True)
+    verdict = Column(JSON, nullable=True)
+
+
 class MarketResearchExtraction(Base):
     """Full snapshot of a Market Research Reverse Engineering run (objectives, questionnaire, context)."""
 

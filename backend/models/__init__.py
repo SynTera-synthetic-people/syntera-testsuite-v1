@@ -1,4 +1,11 @@
-from backend.models.survey import Survey, ValidationRun, TestLabProfile, TestLabLead, MarketResearchExtraction
+from backend.models.survey import (
+    Survey,
+    ValidationRun,
+    TestLabProfile,
+    TestLabLead,
+    TestLabVerdict,
+    MarketResearchExtraction,
+)
 from backend.models.user import User, UserRole
 
 __all__ = [
@@ -6,6 +13,7 @@ __all__ = [
     "ValidationRun",
     "TestLabProfile",
     "TestLabLead",
+    "TestLabVerdict",
     "MarketResearchExtraction",
     "User",
     "UserRole",

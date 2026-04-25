@@ -12,8 +12,13 @@ import re
 
 from ml_engine.comparison_engine import ComparisonEngine
 from ml_engine.file_parser import FileParser
+from ml_engine.survey_pairing import (
+    normalize_survey_question_id,
+    pair_categorical_response_options,
+    pair_survey_questions_for_comparison,
+)
 from database.connection import get_db
-from backend.models.survey import Survey, ValidationRun, TestLabProfile, TestLabLead
+from backend.models.survey import Survey, ValidationRun, TestLabProfile, TestLabLead, TestLabVerdict
 from backend.utils.json_helpers import sanitize_for_json
 
 logger = logging.getLogger(__name__)
@@ -84,6 +89,171 @@ class LeadCapturePayload(BaseModel):
     consent: bool = True
     source: str = "view_detailed_comparison"
     metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+def _question_data_from_survey_blob(blob: Any) -> list[dict[str, Any]]:
+    if not isinstance(blob, dict):
+        return []
+    qd = blob.get("question_data")
+    return qd if isinstance(qd, list) else []
+
+
+def _build_question_comparisons_from_question_lists(
+    syn_q_data: list[dict[str, Any]],
+    real_q_data: list[dict[str, Any]],
+    *,
+    pair_min_score: float = 0.52,
+) -> list[dict[str, Any]]:
+    """
+    Pair synthetic vs real questions and build per-question comparison rows.
+
+    Only **paired** (common) questions are returned—questions that appear in both surveys
+    with sufficient semantic match. Unpaired items are omitted to avoid misleading rows.
+    """
+    question_comparisons: list[dict[str, Any]] = []
+    paired = pair_survey_questions_for_comparison(syn_q_data, real_q_data, min_score=pair_min_score)
+
+    for syn_q, real_q, pair_conf in paired:
+        q_id = normalize_survey_question_id(syn_q.get("question_id")) or str(syn_q.get("question_id") or "")
+        rid = normalize_survey_question_id(real_q.get("question_id")) or str(real_q.get("question_id") or "")
+
+        if syn_q and real_q:
+            syn_counts = syn_q.get("response_counts", {})
+            real_counts = real_q.get("response_counts", {})
+
+            stat_keys = {"MEAN", "MEDIAN", "STD", "TOTAL_RESPONSES"}
+            syn_filtered = {k: v for k, v in syn_counts.items() if str(k).upper() not in stat_keys}
+            real_filtered = {k: v for k, v in real_counts.items() if str(k).upper() not in stat_keys}
+
+            has_categorical_data = len(syn_filtered) > 0 and len(real_filtered) > 0
+            option_comparisons: list[dict[str, Any]] = []
+
+            if has_categorical_data:
+                option_comparisons = pair_categorical_response_options(syn_filtered, real_filtered)
+                total_diff = 0.0
+                total_sum = 0.0
+                for row in option_comparisons:
+                    sv = float(row.get("synthetic_count", 0) or 0)
+                    rv = float(row.get("real_count", 0) or 0)
+                    total_diff += abs(sv - rv)
+                    total_sum += sv + rv
+                match_score = 1.0 - (total_diff / (total_sum + 1e-9)) if total_sum > 0 else 0.0
+                syn_total = sum(float(v or 0) for v in syn_filtered.values())
+                real_total = sum(float(v or 0) for v in real_filtered.values())
+
+                question_type = "Single-Choice"
+                option_keys = [str(k) for k in syn_filtered.keys()]
+                try:
+                    numeric_keys = [int(k) for k in option_keys if k.isdigit()]
+                    if numeric_keys and min(numeric_keys) >= 1 and max(numeric_keys) <= 10:
+                        question_type = "Rating Scale"
+                    else:
+                        question_type = "Categorical"
+                except Exception:
+                    question_type = "Categorical"
+            else:
+                syn_mean_val = syn_counts.get("MEAN") or syn_q.get("mean") or 0
+                syn_std_val = syn_counts.get("STD") or syn_q.get("std") or 0
+
+                real_mean_val = real_counts.get("MEAN") or real_q.get("mean") or 0
+                real_std_val = real_counts.get("STD") or real_q.get("std") or 0
+
+                mean_diff = abs(float(syn_mean_val or 0) - float(real_mean_val or 0))
+                std_diff = abs(float(syn_std_val or 0) - float(real_std_val or 0))
+
+                avg_mean = (abs(float(syn_mean_val or 0)) + abs(float(real_mean_val or 0))) / 2
+                avg_std = (abs(float(syn_std_val or 0)) + abs(float(real_std_val or 0))) / 2
+
+                norm_mean_diff = mean_diff / (avg_mean + 1e-9) if avg_mean > 0 else 0.0
+                norm_std_diff = std_diff / (avg_std + 1e-9) if avg_std > 0 else 0.0
+
+                avg_error = (norm_mean_diff + norm_std_diff) / 2.0
+                match_score = max(0.0, 1.0 - min(avg_error, 1.0))
+
+                syn_total = float(syn_mean_val or 0)
+                real_total = float(real_mean_val or 0)
+                question_type = "Statistical Summary"
+
+            if match_score is None or (isinstance(match_score, float) and math.isnan(match_score)):
+                match_score = 0.0
+            match_score = max(0.0, min(1.0, float(match_score)))
+
+            if not has_categorical_data:
+                for stat_key in ["MEAN", "MEDIAN", "STD"]:
+                    syn_val = syn_counts.get(stat_key) or 0
+                    real_val = real_counts.get(stat_key) or 0
+                    if syn_val or real_val:
+                        option_comparisons.append(
+                            {
+                                "option": stat_key,
+                                "synthetic_count": float(syn_val or 0),
+                                "real_count": float(real_val or 0),
+                            }
+                        )
+
+            question_comparisons.append(
+                {
+                    "question_id": str(q_id),
+                    "paired_real_question_id": str(rid),
+                    "pairing_confidence": float(round(pair_conf, 4)),
+                    "question_name": syn_q.get("question_name") or real_q.get("question_name") or str(q_id),
+                    "synthetic_total": float(syn_total) if syn_total else 0.0,
+                    "real_total": float(real_total) if real_total else 0.0,
+                    "synthetic_mean": float(syn_q.get("mean", 0) or 0),
+                    "real_mean": float(real_q.get("mean", 0) or 0),
+                    "match_score": float(match_score),
+                    "status": "Compared",
+                    "type": question_type,
+                    "option_comparisons": option_comparisons,
+                    "synthetic_response_counts": dict(syn_filtered) if has_categorical_data else {},
+                    "real_response_counts": dict(real_filtered) if has_categorical_data else {},
+                }
+            )
+
+    return question_comparisons
+
+
+def _only_common_question_comparisons(rows: list[Any]) -> list[dict[str, Any]]:
+    """Keep only paired rows (same question represented in both synthetic and human)."""
+    out: list[dict[str, Any]] = []
+    for q in rows or []:
+        if isinstance(q, dict) and str(q.get("status") or "") == "Compared":
+            out.append(q)
+    return out
+
+
+def _build_unmatched_questions_summary(
+    syn_q_data: list[dict[str, Any]],
+    real_q_data: list[dict[str, Any]],
+    *,
+    pair_min_score: float = 0.52,
+) -> dict[str, Any]:
+    """List questions present only on one side after semantic pairing."""
+    paired = pair_survey_questions_for_comparison(syn_q_data, real_q_data, min_score=pair_min_score)
+    paired_syn_ids = {id(sq) for sq, _, _ in paired}
+    paired_real_ids = {id(rq) for _, rq, _ in paired}
+
+    syn_only = []
+    for q in syn_q_data or []:
+        if id(q) in paired_syn_ids:
+            continue
+        qid = normalize_survey_question_id(q.get("question_id")) or str(q.get("question_id") or "")
+        syn_only.append({"question_id": str(qid), "question_name": str(q.get("question_name") or qid)})
+
+    real_only = []
+    for q in real_q_data or []:
+        if id(q) in paired_real_ids:
+            continue
+        qid = normalize_survey_question_id(q.get("question_id")) or str(q.get("question_id") or "")
+        real_only.append({"question_id": str(qid), "question_name": str(q.get("question_name") or qid)})
+
+    return {
+        "synthetic_only": syn_only,
+        "human_only": real_only,
+        "paired_count": len(paired),
+        "synthetic_total": len(syn_q_data or []),
+        "human_total": len(real_q_data or []),
+    }
 
 
 def _run_comparison(survey: Survey, synthetic: list[float], real: list[float], db: Session):
@@ -398,6 +568,24 @@ def _compute_directional_alignment(question_comparisons: list[dict[str, Any]]) -
     return aligned / comparable
 
 
+def _directional_alignment_with_floor(
+    directional_alignment: Optional[float], avg_similarity: Optional[float]
+) -> Optional[float]:
+    """
+    Business rule: directional alignment must not be lower than average similarity.
+    Inputs are expected in 0..1 (or None).
+    """
+    da = _coerce_unit_interval(directional_alignment)
+    sim = _coerce_unit_interval(avg_similarity)
+    if da is None and sim is None:
+        return None
+    if da is None:
+        return sim
+    if sim is None:
+        return da
+    return max(da, sim)
+
+
 def _build_rule_based_verdict(
     question_comparisons: list[dict[str, Any]],
 ) -> dict[str, Any]:
@@ -497,6 +685,17 @@ def _apply_synthetic_study_to_survey_columns(survey: Survey, synthetic: dict[str
                 pass
 
 
+def _upsert_test_lab_verdict(db: Session, survey_id: str, verdict: Any) -> None:
+    """Keep dedicated verdict table synced with profile verdict."""
+    row = db.query(TestLabVerdict).filter(TestLabVerdict.survey_id == survey_id).first()
+    payload = sanitize_for_json(verdict) if verdict is not None else None
+    if not row:
+        row = TestLabVerdict(survey_id=survey_id, verdict=payload)
+        db.add(row)
+    else:
+        row.verdict = payload
+
+
 def _refresh_checks_passed_from_report(survey: Survey) -> None:
     rep = survey.test_suite_report if isinstance(survey.test_suite_report, dict) else {}
     tests = rep.get("tests") or []
@@ -530,8 +729,7 @@ def _sync_survey_study_metrics(
     _refresh_checks_passed_from_report(survey)
     if question_comparisons:
         da = _compute_directional_alignment(question_comparisons)
-        if da is not None:
-            survey.directional_alignment = da
+        survey.directional_alignment = _directional_alignment_with_floor(da, survey.accuracy_score)
     profile = db.query(TestLabProfile).filter(TestLabProfile.survey_id == survey.id).first()
     stats: dict[str, Any] = {}
     if profile and isinstance(profile.synthetic_study, dict):
@@ -541,6 +739,9 @@ def _sync_survey_study_metrics(
             stats = raw_stats
     if survey.accuracy_score is not None:
         survey.avg_similarity = survey.accuracy_score
+    survey.directional_alignment = _directional_alignment_with_floor(
+        survey.directional_alignment, survey.accuracy_score
+    )
     pu = _coerce_unit_interval(stats.get("avg_prediction_accuracy"))
     rs = _coerce_unit_interval(stats.get("avg_relationship_strength"))
     if pu is not None:
@@ -561,6 +762,7 @@ def _sync_survey_study_metrics(
         if source != "manual":
             profile.verdict = sanitize_for_json(_build_rule_based_verdict(question_comparisons))
             flag_modified(profile, "verdict")
+        _upsert_test_lab_verdict(db, survey.id, profile.verdict)
     _embed_study_metrics_in_report(survey)
     flag_modified(survey, "test_suite_report")
 
@@ -610,29 +812,69 @@ async def get_results(survey_id: str, db: Session = Depends(get_db)):
     survey = db.query(Survey).filter(Survey.id == survey_id).first()
     if not survey or not survey.test_suite_report:
         raise HTTPException(status_code=404, detail="Results not found")
-    
+
+    rep = survey.test_suite_report if isinstance(survey.test_suite_report, dict) else {}
+    qc_raw = rep.get("question_comparisons")
+    qc: list[dict[str, Any]] = qc_raw if isinstance(qc_raw, list) else []
+    unmatched_questions: dict[str, Any] = (
+        rep.get("unmatched_questions") if isinstance(rep.get("unmatched_questions"), dict) else {}
+    )
+
+    syn_stored = _question_data_from_survey_blob(survey.synthetic_personas)
+    real_stored = _question_data_from_survey_blob(survey.survey_questions)
+    if not unmatched_questions and syn_stored and real_stored:
+        unmatched_questions = _build_unmatched_questions_summary(syn_stored, real_stored)
+    if len(qc) == 0 and syn_stored and real_stored:
+        qc = _build_question_comparisons_from_question_lists(syn_stored, real_stored)
+        qc = sanitize_for_json(qc)
+        merged = dict(rep) if isinstance(survey.test_suite_report, dict) else {}
+        merged["question_comparisons"] = qc
+        merged["unmatched_questions"] = sanitize_for_json(unmatched_questions)
+        survey.test_suite_report = merged
+        flag_modified(survey, "test_suite_report")
+        _sync_survey_study_metrics(survey, db, qc)
+        db.commit()
+        db.refresh(survey)
+        rep = survey.test_suite_report if isinstance(survey.test_suite_report, dict) else {}
+        logger.info(
+            "Rebuilt %s question comparisons from stored question_data for survey %s",
+            len(qc),
+            survey_id,
+        )
+    elif len(qc) > 0:
+        logger.info(
+            "Retrieved %s question comparisons from test_suite_report for survey %s",
+            len(qc),
+            survey_id,
+        )
+    else:
+        logger.warning(
+            "No question_comparisons and no usable question_data for survey %s (report keys: %s)",
+            survey_id,
+            list(rep.keys()) if isinstance(rep, dict) else type(rep),
+        )
+
+    qc = _only_common_question_comparisons(qc)
+    rep = survey.test_suite_report if isinstance(survey.test_suite_report, dict) else {}
+    results_out: Any = survey.test_suite_report
+    if isinstance(rep, dict):
+        results_out = {
+            **rep,
+            "question_comparisons": qc,
+            "unmatched_questions": sanitize_for_json(unmatched_questions),
+        }
+
     result = {
         "survey_id": survey_id,
         "accuracy": survey.accuracy_score,
-        "results": survey.test_suite_report,
+        "results": results_out,
         "overall_accuracy": survey.accuracy_score,
-        "tests": survey.test_suite_report.get("tests", []),
-        "test_summary": survey.test_suite_report.get("test_summary", {}),
-        "recommendations": survey.test_suite_report.get("recommendations", []),
+        "tests": rep.get("tests", []) if isinstance(rep, dict) else [],
+        "test_summary": rep.get("test_summary", {}) if isinstance(rep, dict) else {},
+        "recommendations": rep.get("recommendations", []) if isinstance(rep, dict) else [],
+        "question_comparisons": qc,
+        "unmatched_questions": sanitize_for_json(unmatched_questions),
     }
-    
-    # Add question comparisons if available
-    if isinstance(survey.test_suite_report, dict):
-        qc = survey.test_suite_report.get("question_comparisons")
-        if qc:
-            logger.info(f"Retrieved {len(qc)} question comparisons from test_suite_report for survey {survey_id}")
-            result["question_comparisons"] = qc
-        else:
-            logger.warning(f"No question_comparisons found in test_suite_report for survey {survey_id}. Keys: {list(survey.test_suite_report.keys())}")
-            result["question_comparisons"] = []
-    else:
-        logger.warning(f"test_suite_report is not a dict (type: {type(survey.test_suite_report)}) for survey {survey_id}")
-        result["question_comparisons"] = []
     
     # Add survey metadata
     sm = None
@@ -780,153 +1022,19 @@ async def compare_files(
 
         # Generate question-by-question comparison BEFORE running main comparison
         question_comparisons = []
+        unmatched_questions: dict[str, Any] = {}
         syn_q_data = synthetic_data.get("question_data", [])
         real_q_data = real_data.get("question_data", [])
         
         if syn_q_data and real_q_data:
-            logger.info(f"Generating question comparisons: {len(syn_q_data)} synthetic questions, {len(real_q_data)} real questions")
-            
-            # Build dictionaries by question_id, filtering out invalid entries
-            syn_questions = {}
-            for q in syn_q_data:
-                q_id = q.get("question_id")
-                if q_id and q_id not in ["all", "None", ""]:
-                    syn_questions[str(q_id)] = q
-            
-            real_questions = {}
-            for q in real_q_data:
-                q_id = q.get("question_id")
-                if q_id and q_id not in ["all", "None", ""]:
-                    real_questions[str(q_id)] = q
-            
-            logger.info(f"Question ID mapping - Synthetic: {list(syn_questions.keys())[:5]}, Real: {list(real_questions.keys())[:5]}")
-            
-            # Compare matching questions by question_id
-            all_question_ids = sorted(set(list(syn_questions.keys()) + list(real_questions.keys())))
-            
-            for q_id in all_question_ids:
-                syn_q = syn_questions.get(q_id)
-                real_q = real_questions.get(q_id)
-                
-                if syn_q and real_q:
-                    syn_counts = syn_q.get("response_counts", {})
-                    real_counts = real_q.get("response_counts", {})
-                    
-                    # Filter out statistical summary keys (MEAN, MEDIAN, STD, TOTAL_RESPONSES)
-                    stat_keys = {'MEAN', 'MEDIAN', 'STD', 'TOTAL_RESPONSES'}
-                    syn_filtered = {k: v for k, v in syn_counts.items() if str(k).upper() not in stat_keys}
-                    real_filtered = {k: v for k, v in real_counts.items() if str(k).upper() not in stat_keys}
-                    
-                    # Check if we have categorical/rating data (non-statistical options)
-                    has_categorical_data = len(syn_filtered) > 0 and len(real_filtered) > 0
-                    
-                    if has_categorical_data:
-                        # Compare categorical/rating options using response_counts
-                        all_options = set(list(syn_filtered.keys()) + list(real_filtered.keys()))
-                        total_diff = 0
-                        total_sum = 0
-                        for opt in all_options:
-                            syn_count = float(syn_filtered.get(opt, 0) or 0)
-                            real_count = float(real_filtered.get(opt, 0) or 0)
-                            total_diff += abs(syn_count - real_count)
-                            total_sum += syn_count + real_count
-                        match_score = 1.0 - (total_diff / (total_sum + 1e-9)) if total_sum > 0 else 0.0
-                        syn_total = sum(float(v or 0) for v in syn_filtered.values())
-                        real_total = sum(float(v or 0) for v in real_filtered.values())
-                        
-                        # Determine question type
-                        question_type = "Single-Choice"
-                        option_keys = [str(k) for k in syn_filtered.keys()]
-                        try:
-                            numeric_keys = [int(k) for k in option_keys if k.isdigit()]
-                            if numeric_keys and min(numeric_keys) >= 1 and max(numeric_keys) <= 10:
-                                question_type = "Rating Scale"
-                            else:
-                                question_type = "Categorical"
-                        except:
-                            question_type = "Categorical"
-                    else:
-                        # For questions with only statistical summaries (MEAN, MEDIAN, STD),
-                        # compare the statistical values themselves
-                        syn_mean_val = syn_counts.get('MEAN') or syn_q.get("mean") or 0
-                        syn_median_val = syn_counts.get('MEDIAN') or 0
-                        syn_std_val = syn_counts.get('STD') or syn_q.get("std") or 0
-                        
-                        real_mean_val = real_counts.get('MEAN') or real_q.get("mean") or 0
-                        real_median_val = real_counts.get('MEDIAN') or 0
-                        real_std_val = real_counts.get('STD') or real_q.get("std") or 0
-                        
-                        # Calculate match score based on statistical values
-                        # Compare means and std deviations (normalize differences)
-                        mean_diff = abs(float(syn_mean_val or 0) - float(real_mean_val or 0))
-                        std_diff = abs(float(syn_std_val or 0) - float(real_std_val or 0))
-                        
-                        # Normalize differences by the average value
-                        avg_mean = (abs(float(syn_mean_val or 0)) + abs(float(real_mean_val or 0))) / 2
-                        avg_std = (abs(float(syn_std_val or 0)) + abs(float(real_std_val or 0))) / 2
-                        
-                        norm_mean_diff = mean_diff / (avg_mean + 1e-9) if avg_mean > 0 else 0.0
-                        norm_std_diff = std_diff / (avg_std + 1e-9) if avg_std > 0 else 0.0
-                        
-                        # Combined normalized error (lower is better)
-                        avg_error = (norm_mean_diff + norm_std_diff) / 2.0
-                        match_score = max(0.0, 1.0 - min(avg_error, 1.0))
-                        
-                        # For display totals, use the mean value (represents the central tendency)
-                        syn_total = float(syn_mean_val or 0)
-                        real_total = float(real_mean_val or 0)
-                        question_type = "Statistical Summary"
-                    
-                    # Ensure match_score is valid (0.0 to 1.0)
-                    if match_score is None or (isinstance(match_score, float) and math.isnan(match_score)):
-                        match_score = 0.0
-                    match_score = max(0.0, min(1.0, float(match_score)))
-                    
-                    # Build option-level comparison data
-                    option_comparisons = []
-                    if has_categorical_data:
-                        # Get all unique options from both synthetic and real
-                        all_options = set(list(syn_filtered.keys()) + list(real_filtered.keys()))
-                        for opt in sorted(all_options):
-                            syn_count = float(syn_filtered.get(opt, 0) or 0)
-                            real_count = float(real_filtered.get(opt, 0) or 0)
-                            option_comparisons.append({
-                                "option": str(opt),
-                                "synthetic_count": syn_count,
-                                "real_count": real_count,
-                            })
-                    else:
-                        # For statistical summaries, include MEAN, MEDIAN, STD
-                        for stat_key in ['MEAN', 'MEDIAN', 'STD']:
-                            syn_val = syn_counts.get(stat_key) or 0
-                            real_val = real_counts.get(stat_key) or 0
-                            if syn_val or real_val:
-                                option_comparisons.append({
-                                    "option": stat_key,
-                                    "synthetic_count": float(syn_val or 0),
-                                    "real_count": float(real_val or 0),
-                                })
-                    
-                    question_comparisons.append({
-                        "question_id": str(q_id),
-                        "question_name": syn_q.get("question_name") or real_q.get("question_name") or str(q_id),
-                        "synthetic_total": float(syn_total) if syn_total else 0.0,
-                        "real_total": float(real_total) if real_total else 0.0,
-                        "synthetic_mean": float(syn_q.get("mean", 0) or 0),
-                        "real_mean": float(real_q.get("mean", 0) or 0),
-                        "match_score": float(match_score),
-                        "status": "Compared",
-                        "type": question_type,
-                        "option_comparisons": option_comparisons,  # Add option-level data
-                        "synthetic_response_counts": dict(syn_filtered) if has_categorical_data else {},
-                        "real_response_counts": dict(real_filtered) if has_categorical_data else {},
-                    })
-                    
-                    logger.debug(
-                        f"Question {q_id} ({question_type}): match_score={match_score:.3f}, syn_total={syn_total}, real_total={real_total}"
-                    )
-            
-            logger.info(f"Generated {len(question_comparisons)} question comparisons")
+            logger.info(
+                "Generating question comparisons: %s synthetic questions, %s real questions",
+                len(syn_q_data),
+                len(real_q_data),
+            )
+            question_comparisons = _build_question_comparisons_from_question_lists(syn_q_data, real_q_data)
+            unmatched_questions = _build_unmatched_questions_summary(syn_q_data, real_q_data)
+            logger.info("Generated %s question comparisons (semantic pairing)", len(question_comparisons))
         else:
             logger.warning(f"Missing question_data: synthetic={len(syn_q_data)} questions, real={len(real_q_data)} questions")
 
@@ -937,7 +1045,11 @@ async def compare_files(
         # (not the engine's overall from global statistical tests, which can be much lower)
         if question_comparisons:
             result["question_comparisons"] = question_comparisons
-            scores = [float(q.get("match_score", 0)) for q in question_comparisons if q.get("match_score") is not None]
+            scores = [
+                float(q.get("match_score", 0))
+                for q in question_comparisons
+                if q.get("match_score") is not None and q.get("status") == "Compared"
+            ]
             if scores:
                 file_overall_accuracy = sum(scores) / len(scores)
                 file_overall_accuracy = max(0.0, min(1.0, file_overall_accuracy))
@@ -963,6 +1075,8 @@ async def compare_files(
             "synthetic_question_count": len(synthetic_data.get("question_data", [])),
             "real_question_count": len(real_data.get("question_data", [])),
         }
+        if unmatched_questions:
+            result["unmatched_questions"] = sanitize_for_json(unmatched_questions)
         
         # Store question comparisons in survey test_suite_report
         if question_comparisons:
@@ -981,6 +1095,8 @@ async def compare_files(
                 # Create a new dict by copying existing data and adding question_comparisons
                 updated_report = dict(survey.test_suite_report)  # Copy existing dict
                 updated_report["question_comparisons"] = sanitized_qc  # Add question_comparisons
+                if unmatched_questions:
+                    updated_report["unmatched_questions"] = sanitize_for_json(unmatched_questions)
                 if result.get("overall_accuracy") is not None:
                     updated_report["overall_accuracy"] = result["overall_accuracy"]
                 logger.info(f"Created updated test_suite_report with question_comparisons. Keys: {list(updated_report.keys())}")
@@ -996,6 +1112,8 @@ async def compare_files(
                     "real_size": result.get("real_size", 0),
                     "overall_accuracy": result.get("overall_accuracy", 0.0),
                 }
+                if unmatched_questions:
+                    updated_report["unmatched_questions"] = sanitize_for_json(unmatched_questions)
             
             # Sanitize the entire updated_report before storing
             original_qc_count = len(updated_report.get("question_comparisons", []))
@@ -1138,6 +1256,7 @@ async def upsert_test_lab_profile(
         v_in = payload.verdict.model_dump(exclude_none=True)
         existing_v = dict(profile.verdict) if isinstance(profile.verdict, dict) else {}
         profile.verdict = sanitize_for_json({**existing_v, **v_in})
+        _upsert_test_lab_verdict(db, survey_id, profile.verdict)
 
     if "metadata" in raw:
         m = raw.get("metadata")
@@ -1146,6 +1265,7 @@ async def upsert_test_lab_profile(
             profile.extra_data = sanitize_for_json({**prev_m, **m})
 
     _ensure_profile_defaults(profile, survey)
+    _upsert_test_lab_verdict(db, survey_id, profile.verdict)
     db.add(profile)
     db.commit()
     db.refresh(profile)
@@ -1242,6 +1362,7 @@ async def get_test_lab_profiles_batch(survey_ids: str, db: Session = Depends(get
             continue
         if _ensure_profile_defaults(profile, survey):
             changed_any = True
+        _upsert_test_lab_verdict(db, sid, profile.verdict)
     if changed_any:
         db.commit()
         for sid in id_list:
@@ -1295,6 +1416,7 @@ async def get_test_lab_profile(survey_id: str, db: Session = Depends(get_db)):
         db.flush()
 
     if _ensure_profile_defaults(profile, survey):
+        _upsert_test_lab_verdict(db, survey_id, profile.verdict)
         db.add(profile)
         db.commit()
         db.refresh(profile)
@@ -1384,6 +1506,7 @@ async def get_test_lab_metrics(db: Session = Depends(get_db)):
     for s in validated_surveys:
         report = s.test_suite_report if isinstance(s.test_suite_report, dict) else {}
         alignment = _compute_directional_alignment(report.get("question_comparisons") or [])
+        alignment = _directional_alignment_with_floor(alignment, s.accuracy_score)
         if alignment is not None:
             alignments.append(alignment)
     survey_ids = {s.id for s in surveys}

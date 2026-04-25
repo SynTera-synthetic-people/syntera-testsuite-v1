@@ -52,6 +52,22 @@ async def init_db():
             """,
             "CREATE INDEX IF NOT EXISTS ix_test_lab_reports_survey_id ON test_lab_reports (survey_id)",
         ]
+        _verdict_creates = [
+            """
+            CREATE TABLE IF NOT EXISTS test_lab_verdict (
+              survey_id VARCHAR PRIMARY KEY,
+              verdict JSONB NULL
+            )
+            """,
+            """
+            INSERT INTO test_lab_verdict (survey_id, verdict)
+            SELECT survey_id, verdict
+            FROM test_lab_profiles
+            WHERE survey_id IS NOT NULL
+            ON CONFLICT (survey_id) DO UPDATE
+            SET verdict = EXCLUDED.verdict
+            """,
+        ]
         _survey_alters = [
             "ALTER TABLE test_lab_surveys ADD COLUMN IF NOT EXISTS avg_similarity DOUBLE PRECISION",
             "ALTER TABLE test_lab_surveys ADD COLUMN IF NOT EXISTS actions_data_points INTEGER",
@@ -65,6 +81,8 @@ async def init_db():
         try:
             with engine.begin() as conn:
                 for stmt in _report_creates:
+                    conn.execute(text(stmt))
+                for stmt in _verdict_creates:
                     conn.execute(text(stmt))
                 for stmt in _profile_alters:
                     conn.execute(text(stmt))

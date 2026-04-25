@@ -2,6 +2,15 @@
 
 Complete statistical validation framework for synthetic data.
 
+## Documentation
+
+| Document | Audience |
+|----------|----------|
+| [docs/INSTALLATION.md](docs/INSTALLATION.md) | **New developers** — Postgres, Python venv, `.env`, run and verify locally |
+| [docs/PRODUCT_WALKTHROUGH.md](docs/PRODUCT_WALKTHROUGH.md) | **Product / QA / analysts** — step-by-step UI and concepts |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | **Engineers** — components, routers, data flow, extension points |
+| [docs/TEST_LAB_DATABASE_SCHEMA.md](docs/TEST_LAB_DATABASE_SCHEMA.md) | **Canonical Test Lab DB** — tables, relationships, change checklist |
+
 ## Quick Start
 
 ### Local Development
