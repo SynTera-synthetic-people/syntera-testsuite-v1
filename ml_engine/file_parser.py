@@ -67,6 +67,50 @@ class FileParser:
         return out
 
     @staticmethod
+    def _normalize_aggregate_headers(df: pd.DataFrame) -> pd.DataFrame:
+        """
+        Best-effort normalization for aggregate survey exports.
+        Canonical target headers:
+          Q No. | Question Description | Options | Count
+        If headers are missing/blank/unnamed, assign by position/content heuristics.
+        """
+        if df is None or df.empty:
+            return df
+        if len(df.columns) < 3:
+            return df
+
+        cols = list(df.columns)
+        norm = [str(c or "").strip().lower() for c in cols]
+
+        def is_blankish(h: str) -> bool:
+            return (not h) or h in {"nan", "none"} or h.startswith("unnamed:")
+
+        has_q = any(h in {"q no.", "q no", "qno", "questionno", "question no.", "question number", "question_id"} for h in norm)
+        has_opt = any(h in {"options", "option", "response", "answer"} for h in norm)
+        has_cnt = any(h in {"count", "value from report", "valuefromreport", "frequency", "n"} for h in norm)
+        blankish_present = any(is_blankish(h) for h in norm)
+
+        # Trigger normalization only when headers are clearly incomplete/noisy.
+        if not (blankish_present or not has_cnt or not has_q or not has_opt):
+            return df
+
+        # Positional default for common 4-column uploads.
+        # Q No. | Question Description | Options | Count
+        mapping: dict[Any, str] = {}
+        if len(cols) >= 4:
+            mapping[cols[0]] = "Q No."
+            mapping[cols[1]] = "Question Description"
+            mapping[cols[2]] = "Options"
+            mapping[cols[3]] = "Count"
+        elif len(cols) == 3:
+            mapping[cols[0]] = "Q No."
+            mapping[cols[1]] = "Options"
+            mapping[cols[2]] = "Count"
+
+        out = df.rename(columns=mapping).copy()
+        return out
+
+    @staticmethod
     def parse_file(file_content: bytes, filename: str) -> Dict[str, Any]:
         """
         Parse Excel or CSV file and extract response data.
@@ -142,6 +186,9 @@ class FileParser:
                 df = df.dropna(axis=1, how='all')
             else:
                 df = df_raw  # Use raw dataframe for Data Shell format
+
+            if not is_data_shell_format:
+                df = FileParser._normalize_aggregate_headers(df)
 
             # Aggregated export: one row per option, repeated question number / text forward-filled
             # (e.g. "Q No., Question Description, Options, Value from report" or "... , Count")
@@ -522,20 +569,151 @@ class FileParser:
                     return lookup[a]
             return None
 
+        def _is_blankish_header(col_name: Any) -> bool:
+            s = str(col_name or "").strip().lower()
+            if not s or s in {"nan", "none"}:
+                return True
+            # Pandas often labels blank CSV headers as "Unnamed: 3"
+            return s.startswith("unnamed:")
+
         q_col = pick(aliases_q)
         opt_col = pick(aliases_opt)
         cnt_col = pick(aliases_cnt)
         txt_col = pick(aliases_txt)
-        if not (q_col and opt_col and cnt_col and txt_col):
+
+        # Explicit fallback for human files where count header is blank.
+        if not cnt_col:
+            sample = df.head(min(len(df), 120))
+            blankish_numeric_candidates: list[tuple[float, str]] = []
+            for c in df.columns:
+                if not _is_blankish_header(c):
+                    continue
+                ser = pd.to_numeric(sample[c], errors="coerce")
+                non_nan = ser[~pd.isna(ser)]
+                ratio = float(len(non_nan)) / max(1, len(sample))
+                if ratio > 0:
+                    blankish_numeric_candidates.append((ratio, str(c)))
+            if blankish_numeric_candidates:
+                blankish_numeric_candidates.sort(key=lambda x: x[0], reverse=True)
+                cnt_col = blankish_numeric_candidates[0][1]
+
+        # Header-light fallback: infer likely columns by content profile.
+        def _norm(v: Any) -> str:
+            return str(v or "").strip().lower()
+
+        def _is_qid_like(v: Any) -> bool:
+            s = _norm(v)
+            if not s or s == "nan":
+                return False
+            return bool(re.match(r"^q?\s*[\-:._ ]*\d+(\.0+)?$", s))
+
+        def _is_numeric_like(v: Any) -> bool:
+            s = str(v or "").strip()
+            if not s or s.lower() == "nan":
+                return False
+            s = s.replace(",", "").replace(" ", "")
+            s = re.sub(r"[^0-9.\-]", "", s)
+            if not s or s in {"-", ".", "-."}:
+                return False
+            try:
+                float(s)
+                return True
+            except ValueError:
+                return False
+
+        if df is not None and len(df.columns) >= 2:
+            sample = df.head(min(len(df), 120))
+            profiles: list[tuple[str, float, float, float]] = []
+            for c in df.columns:
+                vals = sample[c].tolist()
+                non_empty = [v for v in vals if str(v).strip() and str(v).strip().lower() != "nan"]
+                denom = max(1, len(non_empty))
+                qid_ratio = sum(1 for v in non_empty if _is_qid_like(v)) / denom
+                num_ratio = sum(1 for v in non_empty if _is_numeric_like(v)) / denom
+                text_ratio = sum(
+                    1
+                    for v in non_empty
+                    if not _is_numeric_like(v) and not _is_qid_like(v) and len(str(v).strip()) >= 2
+                ) / denom
+                profiles.append((str(c), qid_ratio, num_ratio, text_ratio))
+
+            if not cnt_col:
+                maybe = sorted(profiles, key=lambda t: t[2], reverse=True)
+                if maybe and maybe[0][2] >= 0.55:
+                    cnt_col = maybe[0][0]
+                # Relaxed fallback for messy exports: pick best numeric-like column even at lower confidence.
+                elif maybe and maybe[0][2] >= 0.22:
+                    cnt_col = maybe[0][0]
+
+            if not q_col:
+                maybe = sorted(profiles, key=lambda t: t[1], reverse=True)
+                if maybe and maybe[0][1] >= 0.35:
+                    q_col = maybe[0][0]
+                # Header-less fallback: first text-heavy column often carries Q ids/stems.
+                elif maybe:
+                    q_col = maybe[0][0]
+
+            if not opt_col:
+                # Prefer a text-heavy non-count, non-qid column.
+                candidates = [p for p in profiles if p[0] not in {cnt_col, q_col}]
+                if candidates:
+                    best = sorted(candidates, key=lambda t: (t[3], -t[2]), reverse=True)[0]
+                    if best[3] >= 0.25 or best[2] < 0.45:
+                        opt_col = best[0]
+
+            if not txt_col:
+                candidates = [p for p in profiles if p[0] not in {cnt_col, q_col, opt_col}]
+                if candidates:
+                    best = sorted(candidates, key=lambda t: t[3], reverse=True)[0]
+                    if best[3] >= 0.35:
+                        txt_col = best[0]
+
+            # Final positional fallback for semi-structured CSVs:
+            # [Q No | Question | Option | Value] or similar.
+            if not cnt_col:
+                cnt_col = str(df.columns[-1])
+            if not opt_col and len(df.columns) >= 2:
+                # Prefer penultimate as option-like in common templates.
+                penultimate = str(df.columns[-2])
+                if penultimate != cnt_col:
+                    opt_col = penultimate
+
+        # Some exports omit question text header but still contain valid rows.
+        # For severe header issues, at least count + option is enough; qid can be synthesized.
+        if not (opt_col and cnt_col):
             return None
 
-        work = df[[q_col, txt_col, opt_col, cnt_col]].copy()
+        cols = ([q_col] if q_col else []) + [opt_col, cnt_col] + ([txt_col] if txt_col else [])
+        work = df[cols].copy()
         work = work.dropna(how="all")
         if len(work) < 3:
             return None
 
-        work[q_col] = work[q_col].ffill()
-        work[txt_col] = work[txt_col].ffill()
+        if q_col:
+            work[q_col] = work[q_col].ffill()
+        if txt_col:
+            work[txt_col] = work[txt_col].ffill()
+
+        def _coerce_count(v: Any) -> float:
+            """
+            Robust count coercion for CSV exports that contain separators/suffixes
+            (e.g. '1,234', '52%', '1 234', '\u20B91,234').
+            """
+            try:
+                if v is None or (isinstance(v, float) and math.isnan(v)):
+                    return float("nan")
+                if isinstance(v, (int, float)):
+                    return float(v)
+                s = str(v).strip()
+                if not s:
+                    return float("nan")
+                s = s.replace(",", "").replace(" ", "")
+                s = re.sub(r"[^0-9.\-]", "", s)
+                if not s or s in {"-", ".", "-."}:
+                    return float("nan")
+                return float(s)
+            except (TypeError, ValueError):
+                return float("nan")
 
         def row_qid(val: Any) -> Optional[str]:
             if val is None or (isinstance(val, float) and math.isnan(val)):
@@ -555,17 +733,54 @@ class FileParser:
             except (TypeError, ValueError):
                 return None
 
-        work["_qid"] = work[q_col].map(row_qid)
-        work = work[work["_qid"].notna()]
-        if work.empty:
-            return None
+        if q_col:
+            work["_qid"] = work[q_col].map(row_qid)
+            # If many rows fail qid parse, synthesize sequential blocks by text transitions.
+            if work["_qid"].notna().sum() == 0:
+                if txt_col:
+                    # New question when question text changes (after forward fill).
+                    qseq = 0
+                    prev = None
+                    qids: list[str] = []
+                    for v in work[txt_col].tolist():
+                        cur = str(v).strip().lower()
+                        if cur != prev:
+                            qseq += 1
+                            prev = cur
+                        qids.append(f"Q{qseq}")
+                    work["_qid"] = qids
+                else:
+                    # Final fallback: single synthetic question bucket.
+                    work["_qid"] = "Q1"
+            else:
+                work = work[work["_qid"].notna()]
+                if work.empty:
+                    return None
+        else:
+            if txt_col:
+                # Build ids from text-group transitions.
+                qseq = 0
+                prev = None
+                qids: list[str] = []
+                for v in work[txt_col].tolist():
+                    cur = str(v).strip().lower()
+                    if cur != prev:
+                        qseq += 1
+                        prev = cur
+                    qids.append(f"Q{qseq}")
+                work["_qid"] = qids
+            else:
+                work["_qid"] = "Q1"
 
         question_data: list[dict[str, Any]] = []
         all_responses: list[float] = []
         response_totals: list[float] = []
 
         for qid, g in work.groupby("_qid", sort=False):
-            qname = str(g[txt_col].iloc[0]).strip()
+            if txt_col:
+                qname = str(g[txt_col].iloc[0]).strip()
+            else:
+                qname = str(qid).strip()
             response_counts: dict[str, float] = {}
             individual: list[float] = []
             q_codes: dict[str, int] = {}
@@ -573,7 +788,7 @@ class FileParser:
                 opt = str(r[opt_col]).strip()
                 if not opt or opt.lower() == "nan":
                     continue
-                cnt = pd.to_numeric(r[cnt_col], errors="coerce")
+                cnt = _coerce_count(r[cnt_col])
                 if pd.isna(cnt) or float(cnt) <= 0:
                     continue
                 fv = float(cnt)
@@ -603,7 +818,8 @@ class FileParser:
             )
             all_responses.extend([float(x) for x in individual[: min(len(individual), 500000)]])
 
-        if len(question_data) < 2:
+        # Single-question parse with many option rows is still valid for question-level display.
+        if len(question_data) < 1:
             return None
 
         def _qsort_key(q: dict[str, Any]) -> tuple[int, str]:

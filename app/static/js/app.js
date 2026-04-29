@@ -1086,6 +1086,19 @@ function stripMarkdownBold(s) {
     return t.trim();
 }
 
+/** Keep wrapped question lines; remove parser/separator artifacts. */
+function normalizeSurveyQuestionText(s) {
+    if (s == null || typeof s !== 'string') return '';
+    let t = stripMarkdownBold(s);
+    if (!t) return '';
+    // Remove common markdown/separator artifacts.
+    t = t.replace(/^\s*[-•]+\s*/gm, '').replace(/^\s*--+\s*$/gm, '');
+    // Join wrapped lines into a single readable question.
+    t = t.replace(/\r?\n+/g, ' ');
+    t = t.replace(/\s{2,}/g, ' ').trim();
+    return t;
+}
+
 /**
  * Parse "C. Reconstructed Questionnaire" raw text into [{ survey_question, question_type, answer_options }].
  */
@@ -1116,7 +1129,10 @@ function parseQuestionnaireFromRaw(rawSectionC) {
         let survey_question = surveyM ? surveyM[1].trim() : '';
         if (!survey_question && (blkStr.includes('Survey Question') || blkStr.includes('Question Type'))) {
             const afterLabel = blkStr.replace(/^[\s\S]*?Survey Question:\s*/i, '').trim();
-            survey_question = afterLabel.replace(/\n.*?(?=Question Type:|Answer Options:|Target Segment:|$)/is, '').trim();
+            // Keep multi-line wrapped question text until the next labeled field.
+            survey_question = afterLabel
+                .replace(/\n\s*(?:-\s*)?(?:Question Type:|Answer Options:|Target Segment:)[\s\S]*$/i, '')
+                .trim();
         }
         if (!survey_question && blkStr.includes('Question Type:')) {
             const beforeType = blkStr.replace(/\n\s*Question Type:[\s\S]*/i, '').replace(/^[\s\S]*?Survey Question:\s*/i, '').trim();
@@ -1144,7 +1160,7 @@ function parseQuestionnaireFromRaw(rawSectionC) {
                 })
                 .filter(v => v !== '');
         }
-        survey_question = stripMarkdownBold(survey_question);
+        survey_question = normalizeSurveyQuestionText(survey_question);
         answer_options = answer_options.map(o => stripMarkdownBold(o)).filter(o => o);
         if (option_values.length > 0 && answer_options.length > 0) {
             if (option_values.length > answer_options.length) {
@@ -1211,7 +1227,7 @@ function getQuestionnaireList(data) {
         const qN = q.sample_size_n != null && q.sample_size_n > 0 ? parseInt(q.sample_size_n, 10) : null;
         const n = qN != null ? qN : overallN;
         return {
-            survey_question: stripMarkdownBold(q.survey_question || ''),
+            survey_question: normalizeSurveyQuestionText(q.survey_question || ''),
             question_type: stripMarkdownBold(q.question_type || ''),
             answer_options: opts.map(o => stripMarkdownBold(String(o))).filter(o => o),
             option_values: vals.map(v => stripMarkdownBold(String(v))).filter(v => v !== undefined && v !== null),
@@ -1238,7 +1254,7 @@ function getQuestionnaireList(data) {
             if (!k || seen.has(k)) return;
             seen.add(k);
             merged.push({
-                survey_question: stripMarkdownBold(q.survey_question || ''),
+                survey_question: normalizeSurveyQuestionText(q.survey_question || ''),
                 question_type: stripMarkdownBold(q.question_type || ''),
                 answer_options: (Array.isArray(q.answer_options) ? q.answer_options : []).map(o => stripMarkdownBold(String(o))).filter(Boolean),
                 option_values: Array.isArray(q.option_values) ? q.option_values : [],
@@ -2872,6 +2888,50 @@ function displaySemilatticeStyleResults(data, surveyId, targetDiv) {
         const accuracyValue = acc01 != null ? acc01 : 0;
         const accuracy = (accuracyValue * 100).toFixed(1);
         const accentColor = acc01 != null ? matchScoreAccentColor(acc01) : '#6b7280';
+        const categoryOrder = [
+            'Attribute', 'Behavior', 'Knowledge', 'Preference',
+            'Evaluation', 'Emotion', 'Reason / Explanation', 'Intent'
+        ];
+        const categoryBuckets = new Map();
+        questionComparisons.forEach((q) => {
+            const s = Number(q?.match_score);
+            if (!Number.isFinite(s)) return;
+            const cat = String(q?.question_category || q?.type || 'Evaluation').trim() || 'Evaluation';
+            const prev = categoryBuckets.get(cat) || { sum: 0, n: 0 };
+            prev.sum += s;
+            prev.n += 1;
+            categoryBuckets.set(cat, prev);
+        });
+        const categoryTrend = Array.from(categoryBuckets.entries()).map(([category, v]) => ({
+            category,
+            avg: v.n > 0 ? v.sum / v.n : 0,
+            n: v.n
+        })).sort((a, b) => {
+            const ia = categoryOrder.indexOf(a.category);
+            const ib = categoryOrder.indexOf(b.category);
+            if (ia !== -1 || ib !== -1) return (ia === -1 ? 999 : ia) - (ib === -1 ? 999 : ib);
+            return b.avg - a.avg;
+        });
+        const categoryTrendHtml = categoryTrend.length > 0 ? `
+            <div class="category-trend-card category-trend-top-right">
+                <div class="category-trend-title">Avg Similarity by Category</div>
+                <div class="category-trend-list">
+                    ${categoryTrend.map((c) => {
+                        const pct = Math.max(0, Math.min(100, Math.round(c.avg * 100)));
+                        const barColor = matchScoreAccentColor(c.avg);
+                        return `
+                            <div class="category-trend-row">
+                                <div class="category-trend-label" title="${escapeHtml(c.category)}">${escapeHtml(c.category)}</div>
+                                <div class="category-trend-bar-wrap">
+                                    <div class="category-trend-bar" style="width:${pct}%; background:${barColor};"></div>
+                                </div>
+                                <div class="category-trend-value">${pct}%</div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            </div>
+        ` : '';
     
     const createdDate = survey.created_at ? new Date(survey.created_at).toLocaleString() : 'N/A';
     const validatedDate = survey.validated_at ? new Date(survey.validated_at).toLocaleString() : 'N/A';
@@ -2891,6 +2951,7 @@ function displaySemilatticeStyleResults(data, surveyId, targetDiv) {
                         <button class="copy-btn" onclick="copyToClipboard('${surveyId || survey.id || ''}')" title="Copy ID">📋</button>
                     </div>
                 </div>
+                ${categoryTrendHtml}
             </div>
             <div class="model-details-grid">
                 <div class="model-detail-item">
@@ -3144,7 +3205,7 @@ function displaySemilatticeStyleResults(data, surveyId, targetDiv) {
                                                 ${optionsHtml}
                                             </div>
                                         </td>
-                                        <td class="type-cell">${q.type || 'Single-Choice'}</td>
+                                        <td class="type-cell">${q.question_category || q.type || 'Evaluation'}</td>
                                         <td class="match-score-cell" style="color: ${qAccent}; font-weight: 600;">${matchPercent === '—' ? '—' : matchPercent + '%'}</td>
                                     </tr>
                                 `;
@@ -3185,7 +3246,7 @@ function displaySemilatticeStyleResults(data, surveyId, targetDiv) {
             </div>
         </div>
     `;
-    
+
         targetDiv.innerHTML = `
             ${modelDetailsHtml}
             ${tabsHtml}
@@ -3193,9 +3254,11 @@ function displaySemilatticeStyleResults(data, surveyId, targetDiv) {
             ${questionComparisons.length === 0 ? summaryHtml : ''}
             ${methodologyHtml}
             <div class="results-actions">
-                ${currentUserRole ? `<button onclick="showSection('validation')" class="btn-primary">Run New Validation</button>` : `<button onclick="showSection('reports')" class="btn-primary">← Dashboard</button>`}
-                <button onclick="downloadReport('${surveyId || ''}', 'html')" class="btn-download">📄 Download HTML Report</button>
-                <button onclick="downloadReport('${surveyId || ''}', 'json')" class="btn-download">📋 Download JSON</button>
+                <div class="results-actions-left">
+                    ${currentUserRole ? `<button onclick="showSection('validation')" class="btn-primary">Run New Validation</button>` : `<button onclick="showSection('reports')" class="btn-primary">← Dashboard</button>`}
+                    <button onclick="downloadReport('${surveyId || ''}', 'html')" class="btn-download">📄 Download HTML Report</button>
+                    <button onclick="downloadReport('${surveyId || ''}', 'json')" class="btn-download">📋 Download JSON</button>
+                </div>
             </div>
         `;
     } catch (error) {

@@ -98,6 +98,38 @@ def _question_data_from_survey_blob(blob: Any) -> list[dict[str, Any]]:
     return qd if isinstance(qd, list) else []
 
 
+def _classify_question_category(question_text: Any) -> str:
+    """
+    Semantic category mapping based on Test Lab's survey signal framework:
+    Attribute, Behavior, Knowledge, Preference, Evaluation, Emotion,
+    Reason / Explanation, Intent.
+    """
+    t = str(question_text or "").strip().lower()
+    if not t:
+        return "Evaluation"
+
+    def has_any(tokens: tuple[str, ...]) -> bool:
+        return any(tok in t for tok in tokens)
+
+    if has_any(("why ", "reason", "main reason", "because", "driver", "explain")):
+        return "Reason / Explanation"
+    if has_any(("likely", "plan", "intend", "intention", "future", "next ", "willing", "probability")):
+        return "Intent"
+    if has_any(("feel", "feeling", "worried", "worry", "anxious", "anxiety", "confidence", "excited", "concerned")):
+        return "Emotion"
+    if has_any(("how often", "frequency", "usually", "typically", "have you", "do you", "did you", "usage", "buy", "invest")):
+        return "Behavior"
+    if has_any(("heard of", "aware", "awareness", "know", "recognize", "identify", "recall")):
+        return "Knowledge"
+    if has_any(("prefer", "would you choose", "which would you choose", "choice", "select", "favour", "favor")):
+        return "Preference"
+    if has_any(("satisf", "rate", "rating", "importance", "agree", "agreement", "effective", "evaluation", "quality")):
+        return "Evaluation"
+    if has_any(("age", "gender", "income", "budget", "city", "location", "occupation", "profile", "bhk", "stage of property")):
+        return "Attribute"
+    return "Evaluation"
+
+
 def _build_question_comparisons_from_question_lists(
     syn_q_data: list[dict[str, Any]],
     real_q_data: list[dict[str, Any]],
@@ -197,6 +229,9 @@ def _build_question_comparisons_from_question_lists(
                     "paired_real_question_id": str(rid),
                     "pairing_confidence": float(round(pair_conf, 4)),
                     "question_name": syn_q.get("question_name") or real_q.get("question_name") or str(q_id),
+                    "question_category": _classify_question_category(
+                        syn_q.get("question_name") or real_q.get("question_name") or str(q_id)
+                    ),
                     "synthetic_total": float(syn_total) if syn_total else 0.0,
                     "real_total": float(real_total) if real_total else 0.0,
                     "synthetic_mean": float(syn_q.get("mean", 0) or 0),
