@@ -90,6 +90,7 @@ class MarketResearchExtraction(Base):
     id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
     geography = Column(String(512), nullable=True)
     industry = Column(String(200), nullable=True)
+    publisher = Column(String(200), nullable=True)
     scenario = Column(Text, nullable=True)
     result_data = Column(JSON, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())

@@ -27,6 +27,7 @@ async def init_db():
         # create_all does not add new columns to existing tables
         _mre_alters = [
             "ALTER TABLE market_research_extractions ADD COLUMN IF NOT EXISTS result_data JSONB",
+            "ALTER TABLE market_research_extractions ADD COLUMN IF NOT EXISTS publisher VARCHAR(200)",
         ]
         _profile_alters = [
             "ALTER TABLE test_lab_profiles ADD COLUMN IF NOT EXISTS geography VARCHAR(512)",

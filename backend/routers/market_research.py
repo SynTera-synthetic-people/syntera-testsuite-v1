@@ -172,6 +172,7 @@ List EVERY survey question. option_values must be counts only; sum equals sample
 
 class ReverseEngineerRequest(BaseModel):
     report_text: str = Field(..., min_length=50, description="Full text of the market research report")
+    publisher: Optional[str] = None
 
 
 class AppendChunkRequest(BaseModel):
@@ -181,10 +182,12 @@ class AppendChunkRequest(BaseModel):
     content: str = Field(..., min_length=1)
     is_file_part: bool = False
     filename: Optional[str] = None
+    publisher: Optional[str] = None
 
 
 class ReverseEngineerSessionRequest(BaseModel):
     session_id: str = Field(..., min_length=1)
+    publisher: Optional[str] = None
 
 
 class SectionObjective(BaseModel):
@@ -207,6 +210,7 @@ class ReconstructedQuestion(BaseModel):
 class ReverseEngineerResponse(BaseModel):
     geography: Optional[str] = None
     industry: Optional[str] = None
+    publisher: Optional[str] = None
     scenario: Optional[str] = None
     overall_objectives: list[str] = Field(default_factory=list)
     overall_sample_size_n: Optional[int] = Field(None, description="Total respondents from report when stated once; used to compute counts from %")
@@ -302,6 +306,69 @@ def _optional_context_str(raw: Any) -> Optional[str]:
         return None
     s = str(raw).strip()
     return s if s else None
+
+
+def _normalize_publisher(value: Any) -> Optional[str]:
+    s = _optional_context_str(value)
+    if not s:
+        return None
+    return s[:200]
+
+
+def _infer_scenario_from_content(
+    report_text: str,
+    overall_objectives: list[str],
+    section_objectives: list[dict[str, Any]],
+    questionnaire: list[dict[str, Any]],
+) -> Optional[str]:
+    """Infer a primary scenario using Test Lab scenario taxonomy and priority."""
+    corpus_parts: list[str] = [str(report_text or "")]
+    corpus_parts.extend(str(x or "") for x in (overall_objectives or []))
+    for sec in section_objectives or []:
+        if isinstance(sec, dict):
+            corpus_parts.append(str(sec.get("section_name") or ""))
+            corpus_parts.append(str(sec.get("research_objective") or ""))
+    for q in questionnaire or []:
+        if isinstance(q, dict):
+            corpus_parts.append(str(q.get("research_intent") or ""))
+            corpus_parts.append(str(q.get("survey_question") or ""))
+            corpus_parts.append(str(q.get("question_type") or ""))
+            corpus_parts.extend(str(o or "") for o in (q.get("answer_options") or []))
+    t = " ".join(corpus_parts).lower()
+
+    def has_any(tokens: tuple[str, ...]) -> bool:
+        return any(tok in t for tok in tokens)
+
+    # Priority order mirrors Scenario_Test Lab_Logic.xlsx
+    if has_any(("willingness to pay", "price sensitivity", "pricing tier", "too expensive", "discount threshold", "subscription pricing", "price point")):
+        return "Price Optimization"
+    if has_any(("concept testing", "concept validation", "product-market fit", "proposition testing", "launch readiness", "should we launch", "new feature")):
+        return "Concept Validation"
+    if has_any(("a/b", "ab test", "ranking", "preference selection", "option comparison", "prioritization", "which option should")):
+        return "Preference Mapping"
+    if has_any(("purchase intent", "usage intent", "trial intent", "conversion probability", "likelihood to buy")):
+        return "Purchase Intent"
+    if has_any(("adoption barrier", "onboarding readiness", "switching intent", "first-time usage", "start using")):
+        return "Adoption Readiness"
+    if has_any(("retention", "repeat purchase", "churn", "loyalty", "long-term engagement", "keep using")):
+        return "Retention Drivers"
+    if has_any(("ux testing", "usability", "navigation", "task completion", "onboarding flow", "experience working")):
+        return "Experience Evaluation"
+    if has_any(("usage frequency", "behavioral pattern", "habit", "decision-making behavior", "what do users actually do")):
+        return "Behavior Analysis"
+    if has_any(("message testing", "positioning", "campaign effectiveness", "copy testing", "does this communication land")):
+        return "Message Testing"
+    if has_any(("brand awareness", "brand perception", "trust", "recall", "affinity", "brand understood")):
+        return "Brand Perception"
+    if has_any(("csat", "nps", "satisfaction", "happiness", "experience quality")):
+        return "Satisfaction Assessment"
+    if has_any(("pain point", "objection", "abandonment", "friction analysis", "non-conversion", "what is stopping")):
+        return "Barrier Identification"
+    if has_any(("discovery channel", "acquisition pathway", "referral", "awareness source", "how users discover")):
+        return "Discovery Mapping"
+    if has_any(("goal completion", "success metric", "benefit realization", "outcome achieved", "did this deliver value")):
+        return "Outcome Validation"
+    return None
 
 
 def _parse_json_output(raw: str) -> tuple[list[str], Optional[int], list[dict], list[dict], Optional[str], Optional[str], Optional[str]]:
@@ -846,6 +913,7 @@ Set OPENAI_API_KEY or ANTHROPIC_API_KEY in .env and re-run to get AI-generated q
 
 def _run_reverse_engineer(
     text: str,
+    publisher: Optional[str] = None,
     openai_key: Optional[str] = None,
     anthropic_key: Optional[str] = None,
     use_cache: bool = True,
@@ -947,6 +1015,10 @@ def _run_reverse_engineer(
         )
         overall, section_objs, questionnaire, raw_md = _heuristic_reverse_engineer(text)
         overall_n = None
+    publisher_norm = _normalize_publisher(publisher)
+    inferred_scenario = _infer_scenario_from_content(text, overall, section_objs, questionnaire)
+    if inferred_scenario:
+        scenario = inferred_scenario
     # Use overall n from parser, or extract from report text when LLM didn't return it
     if overall_n is None and text:
         overall_n = _extract_overall_sample_size(text)
@@ -970,6 +1042,7 @@ def _run_reverse_engineer(
     result = {
         "geography": geography,
         "industry": industry,
+        "publisher": publisher_norm,
         "scenario": scenario,
         "overall_objectives": overall,
         "overall_sample_size_n": overall_n,
@@ -1024,10 +1097,12 @@ def _persist_market_research_result(db: Session, result: dict) -> Optional[str]:
     payload = _payload_for_db(result)
     geo = payload.get("geography")
     ind = payload.get("industry")
+    pub = payload.get("publisher")
     scen = payload.get("scenario")
     row = MarketResearchExtraction(
         geography=(str(geo)[:512] if geo else None),
         industry=(str(ind)[:200] if ind else None),
+        publisher=(str(pub)[:200] if pub else None),
         scenario=(str(scen)[:8000] if scen else None),
         result_data=payload,
     )
@@ -1047,6 +1122,7 @@ def _merge_extraction_row_to_response(row: MarketResearchExtraction) -> dict:
     out = dict(base)
     out["geography"] = row.geography or out.get("geography")
     out["industry"] = row.industry or out.get("industry")
+    out["publisher"] = row.publisher or out.get("publisher")
     out["scenario"] = row.scenario or out.get("scenario")
     out["extraction_id"] = row.id
     out["persisted_at"] = row.created_at.isoformat() if row.created_at else None
@@ -1067,6 +1143,7 @@ def _merge_chunk_results(results: list[dict]) -> dict:
         return {
             "geography": None,
             "industry": None,
+            "publisher": None,
             "scenario": None,
             "overall_objectives": [],
             "overall_sample_size_n": None,
@@ -1112,6 +1189,7 @@ def _merge_chunk_results(results: list[dict]) -> dict:
     return {
         "geography": _first_non_empty_context(results, "geography"),
         "industry": _first_non_empty_context(results, "industry"),
+        "publisher": _first_non_empty_context(results, "publisher"),
         "scenario": _first_non_empty_context(results, "scenario"),
         "overall_objectives": overall,
         "overall_sample_size_n": overall_n,
@@ -1125,29 +1203,53 @@ def _merge_chunk_results(results: list[dict]) -> dict:
 
 def _run_reverse_engineer_maybe_chunked(
     text: str,
+    publisher: Optional[str] = None,
     openai_key: Optional[str] = None,
     anthropic_key: Optional[str] = None,
 ) -> dict:
     """Run reverse engineer on full text; if text exceeds MAX_REPORT_CHARS, process in chunks and merge."""
     text = (text or "").strip()
     if not text or len(text) < 50:
-        return _run_reverse_engineer("", openai_key=openai_key, anthropic_key=anthropic_key, use_cache=False)
+        return _run_reverse_engineer(
+            "",
+            publisher=publisher,
+            openai_key=openai_key,
+            anthropic_key=anthropic_key,
+            use_cache=False,
+        )
     if len(text) <= MAX_REPORT_CHARS:
-        return _run_reverse_engineer(text, openai_key=openai_key, anthropic_key=anthropic_key)
+        return _run_reverse_engineer(
+            text,
+            publisher=publisher,
+            openai_key=openai_key,
+            anthropic_key=anthropic_key,
+        )
     chunks = _split_into_chunks(text)
     if not chunks:
-        return _run_reverse_engineer(text[:MAX_REPORT_CHARS], openai_key=openai_key, anthropic_key=anthropic_key)
+        return _run_reverse_engineer(
+            text[:MAX_REPORT_CHARS],
+            publisher=publisher,
+            openai_key=openai_key,
+            anthropic_key=anthropic_key,
+        )
     logger.info("Processing report in %d chunks (total %d chars)", len(chunks), len(text))
     results = []
     for i, chunk in enumerate(chunks):
         try:
-            r = _run_reverse_engineer(chunk, openai_key=openai_key, anthropic_key=anthropic_key, use_cache=False)
+            r = _run_reverse_engineer(
+                chunk,
+                publisher=publisher,
+                openai_key=openai_key,
+                anthropic_key=anthropic_key,
+                use_cache=False,
+            )
             results.append(r)
         except Exception as e:
             logger.warning("Chunk %s failed: %s", i + 1, e)
             results.append({
                 "geography": None,
                 "industry": None,
+                "publisher": _normalize_publisher(publisher),
                 "scenario": None,
                 "overall_objectives": [],
                 "overall_sample_size_n": None,
@@ -1198,6 +1300,7 @@ async def ai_status():
 async def reverse_engineer_report(
     report_text: Optional[str] = Form(None),
     file: Optional[UploadFile] = File(None),
+    publisher: Optional[str] = Form(None),
     db: Session = Depends(get_db),
 ):
     """
@@ -1212,7 +1315,12 @@ async def reverse_engineer_report(
         raise HTTPException(status_code=400, detail="Provide report_text (min 50 chars) or upload a .txt/.pdf file.")
     openai_key = _get_openai_key()
     anthropic_key = _get_anthropic_key()
-    result = _run_reverse_engineer_maybe_chunked(text, openai_key=openai_key, anthropic_key=anthropic_key)
+    result = _run_reverse_engineer_maybe_chunked(
+        text,
+        publisher=publisher,
+        openai_key=openai_key,
+        anthropic_key=anthropic_key,
+    )
     eid = _persist_market_research_result(db, result)
     out = dict(result)
     if eid:
@@ -1226,7 +1334,10 @@ async def reverse_engineer_json(body: ReverseEngineerRequest, db: Session = Depe
     openai_key = _get_openai_key()
     anthropic_key = _get_anthropic_key()
     result = _run_reverse_engineer_maybe_chunked(
-        body.report_text.strip(), openai_key=openai_key, anthropic_key=anthropic_key
+        body.report_text.strip(),
+        publisher=body.publisher,
+        openai_key=openai_key,
+        anthropic_key=anthropic_key,
     )
     eid = _persist_market_research_result(db, result)
     out = dict(result)
@@ -1257,12 +1368,15 @@ async def append_chunk(body: AppendChunkRequest):
             "created_at": time.time(),
             "is_file": bool(body.is_file_part),
             "filename": body.filename if body.is_file_part else None,
+            "publisher": _normalize_publisher(body.publisher),
         }
     store = _upload_chunks_store[sid]
     if store["total_chunks"] != body.total_chunks:
         raise HTTPException(status_code=400, detail="total_chunks mismatch for this session")
     if body.is_file_part and body.filename:
         store["filename"] = body.filename
+    if body.publisher is not None:
+        store["publisher"] = _normalize_publisher(body.publisher)
     store["chunks"][body.chunk_index] = body.content
     received = len(store["chunks"])
     complete = received == body.total_chunks
@@ -1298,7 +1412,13 @@ async def reverse_engineer_session(body: ReverseEngineerSessionRequest, db: Sess
         raise HTTPException(status_code=400, detail="Assembled report has fewer than 50 characters.")
     openai_key = _get_openai_key()
     anthropic_key = _get_anthropic_key()
-    result = _run_reverse_engineer_maybe_chunked(full_text, openai_key=openai_key, anthropic_key=anthropic_key)
+    publisher = body.publisher if body.publisher is not None else store.get("publisher")
+    result = _run_reverse_engineer_maybe_chunked(
+        full_text,
+        publisher=publisher,
+        openai_key=openai_key,
+        anthropic_key=anthropic_key,
+    )
     eid = _persist_market_research_result(db, result)
     out = dict(result)
     if eid:
