@@ -879,6 +879,7 @@ function readFileChunkAsBase64(file, start, end) {
 async function runMarketResearchReverseEngineer() {
     const textEl = document.getElementById('market-research-report-text');
     const publisherEl = document.getElementById('market-research-publisher');
+    const surveyIdEl = document.getElementById('market-research-survey-id');
     const fileEl = document.getElementById('market-research-file');
     const statusEl = document.getElementById('market-research-status');
     const outputPanel = document.getElementById('market-research-output-panel');
@@ -899,6 +900,7 @@ async function runMarketResearchReverseEngineer() {
         const file = fileEl?.files[0];
         let reportText = (textEl?.value || '').trim();
         const publisher = (publisherEl?.value || '').trim();
+        const surveyId = (surveyIdEl?.value || '').trim();
 
         if (file && file.size > 0) {
             var totalFileChunks = Math.ceil(file.size / FILE_CHUNK_BYTES);
@@ -908,6 +910,7 @@ async function runMarketResearchReverseEngineer() {
                 formData.append('file', file);
                 if (reportText.length >= 50) formData.append('report_text', reportText.length > MAX_UPLOAD_CHARS ? reportText.substring(0, MAX_UPLOAD_CHARS) : reportText);
                 if (publisher) formData.append('publisher', publisher);
+                if (surveyId) formData.append('survey_id', surveyId);
                 var res = await fetch('/api/market-research/reverse-engineer', { method: 'POST', headers: authHeader, body: formData });
                 if (!res.ok) {
                     var err = await res.json().catch(function() { return { detail: res.statusText }; });
@@ -946,7 +949,8 @@ async function runMarketResearchReverseEngineer() {
                         content: b64,
                         is_file_part: true,
                         filename: fc === 0 ? file.name : undefined,
-                        publisher: fc === 0 ? publisher : undefined
+                        publisher: fc === 0 ? publisher : undefined,
+                        survey_id: fc === 0 ? surveyId || undefined : undefined
                     })
                 });
                 if (!chunkRes.ok) {
@@ -958,7 +962,7 @@ async function runMarketResearchReverseEngineer() {
             var runRes = await fetch('/api/market-research/reverse-engineer-session', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', ...authHeader },
-                body: JSON.stringify({ session_id: sessionId })
+                body: JSON.stringify({ session_id: sessionId, publisher: publisher || undefined, survey_id: surveyId || undefined })
             });
             if (!runRes.ok) {
                 var runErr = await runRes.json().catch(function() { return { detail: runRes.statusText }; });
@@ -993,7 +997,7 @@ async function runMarketResearchReverseEngineer() {
             const res = await fetch('/api/market-research/reverse-engineer/json', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', ...authHeader },
-                body: JSON.stringify({ report_text: reportText, publisher })
+                body: JSON.stringify({ report_text: reportText, publisher, survey_id: surveyId || undefined })
             });
             if (!res.ok) {
                 const err = await res.json().catch(() => ({ detail: res.statusText }));
@@ -1031,7 +1035,8 @@ async function runMarketResearchReverseEngineer() {
                     chunk_index: c,
                     total_chunks: totalChunks,
                     content: content,
-                    publisher: c === 0 ? publisher : undefined
+                    publisher: c === 0 ? publisher : undefined,
+                    survey_id: c === 0 ? surveyId || undefined : undefined
                 })
             });
             if (!chunkRes.ok) {
@@ -1043,7 +1048,7 @@ async function runMarketResearchReverseEngineer() {
         var runRes = await fetch('/api/market-research/reverse-engineer-session', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', ...authHeader },
-            body: JSON.stringify({ session_id: sessionId, publisher })
+            body: JSON.stringify({ session_id: sessionId, publisher, survey_id: surveyId || undefined })
         });
         if (!runRes.ok) {
             var runErr = await runRes.json().catch(function() { return { detail: runRes.statusText }; });
@@ -1290,8 +1295,10 @@ function renderMarketResearchOutput(data, objectivesEl, questionnaireEl) {
     const ctxInd = data.industry;
     const ctxPub = data.publisher;
     const ctxScen = data.scenario;
-    if (ctxGeo || ctxInd || ctxPub || ctxScen) {
+    const ctxSurveyId = data.survey_id;
+    if (ctxGeo || ctxInd || ctxPub || ctxScen || ctxSurveyId) {
         objectivesHtml += '<div class="mre-block mre-extracted-context"><h4>Geography, industry, publisher & scenario</h4><dl class="mre-context-dl">';
+        if (ctxSurveyId) objectivesHtml += '<dt>Survey ID</dt><dd><code>' + escapeHtml(String(ctxSurveyId)) + '</code></dd>';
         if (ctxGeo) objectivesHtml += '<dt>Geography</dt><dd>' + escapeHtml(String(ctxGeo)) + '</dd>';
         if (ctxInd) objectivesHtml += '<dt>Industry</dt><dd>' + escapeHtml(String(ctxInd)) + '</dd>';
         if (ctxPub) objectivesHtml += '<dt>Publisher</dt><dd>' + escapeHtml(String(ctxPub)) + '</dd>';

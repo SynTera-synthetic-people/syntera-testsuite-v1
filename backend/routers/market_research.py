@@ -30,7 +30,7 @@ from sqlalchemy.orm import Session
 from config.settings import Settings
 from backend.utils.llm_gateway import LlmGateway
 from database.connection import get_db
-from backend.models.survey import MarketResearchExtraction
+from backend.models.survey import MarketResearchExtraction, Survey, TestLabProfile
 from backend.utils.json_helpers import sanitize_for_json
 
 _MAX_RAW_MARKDOWN_PERSIST = 350_000
@@ -173,6 +173,7 @@ List EVERY survey question. option_values must be counts only; sum equals sample
 class ReverseEngineerRequest(BaseModel):
     report_text: str = Field(..., min_length=50, description="Full text of the market research report")
     publisher: Optional[str] = None
+    survey_id: Optional[str] = Field(None, description="test_lab_surveys.id — links scenario to this survey")
 
 
 class AppendChunkRequest(BaseModel):
@@ -183,11 +184,13 @@ class AppendChunkRequest(BaseModel):
     is_file_part: bool = False
     filename: Optional[str] = None
     publisher: Optional[str] = None
+    survey_id: Optional[str] = None
 
 
 class ReverseEngineerSessionRequest(BaseModel):
     session_id: str = Field(..., min_length=1)
     publisher: Optional[str] = None
+    survey_id: Optional[str] = None
 
 
 class SectionObjective(BaseModel):
@@ -208,6 +211,7 @@ class ReconstructedQuestion(BaseModel):
 
 
 class ReverseEngineerResponse(BaseModel):
+    survey_id: Optional[str] = None
     geography: Optional[str] = None
     industry: Optional[str] = None
     publisher: Optional[str] = None
@@ -313,6 +317,32 @@ def _normalize_publisher(value: Any) -> Optional[str]:
     if not s:
         return None
     return s[:200]
+
+
+def _normalize_survey_id(value: Any) -> Optional[str]:
+    """test_lab_surveys primary key (UUID string)."""
+    s = _optional_context_str(value)
+    if not s:
+        return None
+    return s[:120]
+
+
+def _sync_profile_scenario_from_extraction(db: Session, survey_id: str, scenario: Optional[str]) -> None:
+    """If survey exists, copy inferred scenario onto test_lab_profiles.scenario (120 char cap)."""
+    if not survey_id or not scenario or not str(scenario).strip():
+        return
+    text = str(scenario).strip()[:120]
+    if not db.query(Survey.id).filter(Survey.id == survey_id).first():
+        logger.info(
+            "Market research: survey_id %s not in test_lab_surveys; scenario stored on extraction only",
+            survey_id,
+        )
+        return
+    profile = db.query(TestLabProfile).filter(TestLabProfile.survey_id == survey_id).first()
+    if profile is None:
+        db.add(TestLabProfile(survey_id=survey_id, scenario=text))
+    else:
+        profile.scenario = text
 
 
 def _infer_scenario_from_content(
@@ -914,6 +944,7 @@ Set OPENAI_API_KEY or ANTHROPIC_API_KEY in .env and re-run to get AI-generated q
 def _run_reverse_engineer(
     text: str,
     publisher: Optional[str] = None,
+    survey_id: Optional[str] = None,
     openai_key: Optional[str] = None,
     anthropic_key: Optional[str] = None,
     use_cache: bool = True,
@@ -923,7 +954,14 @@ def _run_reverse_engineer(
         norm_text = (text or "").strip()[:MAX_REPORT_CHARS]
         cache_key = hashlib.sha256(norm_text.encode("utf-8")).hexdigest()
         if cache_key in _reverse_engineer_cache:
-            return _reverse_engineer_cache[cache_key]
+            out = dict(_reverse_engineer_cache[cache_key])
+            pub = _normalize_publisher(publisher)
+            if pub is not None:
+                out["publisher"] = pub
+            sid = _normalize_survey_id(survey_id)
+            if sid:
+                out["survey_id"] = sid
+            return out
     else:
         cache_key = None
 
@@ -1056,6 +1094,10 @@ def _run_reverse_engineer(
         if len(_reverse_engineer_cache) >= REVERSE_ENGINEER_CACHE_MAX:
             _reverse_engineer_cache.pop(next(iter(_reverse_engineer_cache)))
         _reverse_engineer_cache[cache_key] = result
+    sid = _normalize_survey_id(survey_id)
+    if sid:
+        result = dict(result)
+        result["survey_id"] = sid
     return result
 
 
@@ -1093,13 +1135,16 @@ def _persist_market_research_result(db: Session, result: dict) -> Optional[str]:
     """
     Persist full extraction (objectives, questionnaire, geography/industry/scenario, flags).
     Always inserts a new row per run so history is kept; latest is loaded by GET /latest-extraction.
+    When survey_id is set and matches test_lab_surveys.id, scenario is copied to test_lab_profiles.
     """
     payload = _payload_for_db(result)
     geo = payload.get("geography")
     ind = payload.get("industry")
     pub = payload.get("publisher")
     scen = payload.get("scenario")
+    survey_pk = _normalize_survey_id(payload.get("survey_id"))
     row = MarketResearchExtraction(
+        survey_id=survey_pk,
         geography=(str(geo)[:512] if geo else None),
         industry=(str(ind)[:200] if ind else None),
         publisher=(str(pub)[:200] if pub else None),
@@ -1108,6 +1153,8 @@ def _persist_market_research_result(db: Session, result: dict) -> Optional[str]:
     )
     try:
         db.add(row)
+        if survey_pk and scen:
+            _sync_profile_scenario_from_extraction(db, survey_pk, scen)
         db.commit()
         db.refresh(row)
         return row.id
@@ -1120,6 +1167,7 @@ def _persist_market_research_result(db: Session, result: dict) -> Optional[str]:
 def _merge_extraction_row_to_response(row: MarketResearchExtraction) -> dict:
     base = row.result_data if isinstance(row.result_data, dict) else {}
     out = dict(base)
+    out["survey_id"] = row.survey_id or out.get("survey_id")
     out["geography"] = row.geography or out.get("geography")
     out["industry"] = row.industry or out.get("industry")
     out["publisher"] = row.publisher or out.get("publisher")
@@ -1141,6 +1189,7 @@ def _merge_chunk_results(results: list[dict]) -> dict:
     """Merge multiple _run_reverse_engineer results into one (dedupe objectives/sections/questions)."""
     if not results:
         return {
+            "survey_id": None,
             "geography": None,
             "industry": None,
             "publisher": None,
@@ -1187,6 +1236,7 @@ def _merge_chunk_results(results: list[dict]) -> dict:
     raw_merged = "\n\n".join(f"--- Part {i+1} ---\n\n{p}" for i, p in enumerate(raw_parts)) if raw_parts else ""
     overall_n = next((r.get("overall_sample_size_n") for r in results if r.get("overall_sample_size_n") is not None), None)
     return {
+        "survey_id": _first_non_empty_context(results, "survey_id"),
         "geography": _first_non_empty_context(results, "geography"),
         "industry": _first_non_empty_context(results, "industry"),
         "publisher": _first_non_empty_context(results, "publisher"),
@@ -1204,23 +1254,36 @@ def _merge_chunk_results(results: list[dict]) -> dict:
 def _run_reverse_engineer_maybe_chunked(
     text: str,
     publisher: Optional[str] = None,
+    survey_id: Optional[str] = None,
     openai_key: Optional[str] = None,
     anthropic_key: Optional[str] = None,
 ) -> dict:
     """Run reverse engineer on full text; if text exceeds MAX_REPORT_CHARS, process in chunks and merge."""
     text = (text or "").strip()
+    sid = _normalize_survey_id(survey_id)
+
+    def _attach_survey_id(out: dict) -> dict:
+        if sid:
+            merged = dict(out)
+            merged["survey_id"] = sid
+            return merged
+        return out
+
     if not text or len(text) < 50:
-        return _run_reverse_engineer(
-            "",
-            publisher=publisher,
-            openai_key=openai_key,
-            anthropic_key=anthropic_key,
-            use_cache=False,
+        return _attach_survey_id(
+            _run_reverse_engineer(
+                "",
+                publisher=publisher,
+                openai_key=openai_key,
+                anthropic_key=anthropic_key,
+                use_cache=False,
+            )
         )
     if len(text) <= MAX_REPORT_CHARS:
         return _run_reverse_engineer(
             text,
             publisher=publisher,
+            survey_id=survey_id,
             openai_key=openai_key,
             anthropic_key=anthropic_key,
         )
@@ -1229,6 +1292,7 @@ def _run_reverse_engineer_maybe_chunked(
         return _run_reverse_engineer(
             text[:MAX_REPORT_CHARS],
             publisher=publisher,
+            survey_id=survey_id,
             openai_key=openai_key,
             anthropic_key=anthropic_key,
         )
@@ -1259,7 +1323,7 @@ def _run_reverse_engineer_maybe_chunked(
                 "ai_used": False,
                 "message": str(e),
             })
-    return _merge_chunk_results(results)
+    return _attach_survey_id(_merge_chunk_results(results))
 
 
 @router.get("/latest-extraction")
@@ -1301,6 +1365,7 @@ async def reverse_engineer_report(
     report_text: Optional[str] = Form(None),
     file: Optional[UploadFile] = File(None),
     publisher: Optional[str] = Form(None),
+    survey_id: Optional[str] = Form(None),
     db: Session = Depends(get_db),
 ):
     """
@@ -1318,6 +1383,7 @@ async def reverse_engineer_report(
     result = _run_reverse_engineer_maybe_chunked(
         text,
         publisher=publisher,
+        survey_id=survey_id,
         openai_key=openai_key,
         anthropic_key=anthropic_key,
     )
@@ -1336,6 +1402,7 @@ async def reverse_engineer_json(body: ReverseEngineerRequest, db: Session = Depe
     result = _run_reverse_engineer_maybe_chunked(
         body.report_text.strip(),
         publisher=body.publisher,
+        survey_id=body.survey_id,
         openai_key=openai_key,
         anthropic_key=anthropic_key,
     )
@@ -1369,6 +1436,7 @@ async def append_chunk(body: AppendChunkRequest):
             "is_file": bool(body.is_file_part),
             "filename": body.filename if body.is_file_part else None,
             "publisher": _normalize_publisher(body.publisher),
+            "survey_id": _normalize_survey_id(body.survey_id),
         }
     store = _upload_chunks_store[sid]
     if store["total_chunks"] != body.total_chunks:
@@ -1377,6 +1445,8 @@ async def append_chunk(body: AppendChunkRequest):
         store["filename"] = body.filename
     if body.publisher is not None:
         store["publisher"] = _normalize_publisher(body.publisher)
+    if body.survey_id is not None:
+        store["survey_id"] = _normalize_survey_id(body.survey_id)
     store["chunks"][body.chunk_index] = body.content
     received = len(store["chunks"])
     complete = received == body.total_chunks
@@ -1413,9 +1483,11 @@ async def reverse_engineer_session(body: ReverseEngineerSessionRequest, db: Sess
     openai_key = _get_openai_key()
     anthropic_key = _get_anthropic_key()
     publisher = body.publisher if body.publisher is not None else store.get("publisher")
+    survey_pk = body.survey_id if body.survey_id is not None else store.get("survey_id")
     result = _run_reverse_engineer_maybe_chunked(
         full_text,
         publisher=publisher,
+        survey_id=survey_pk,
         openai_key=openai_key,
         anthropic_key=anthropic_key,
     )

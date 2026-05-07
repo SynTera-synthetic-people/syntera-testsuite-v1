@@ -88,6 +88,7 @@ class MarketResearchExtraction(Base):
 
     __tablename__ = "market_research_extractions"
     id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    survey_id = Column(String, nullable=True, index=True)
     geography = Column(String(512), nullable=True)
     industry = Column(String(200), nullable=True)
     publisher = Column(String(200), nullable=True)

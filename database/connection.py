@@ -28,6 +28,8 @@ async def init_db():
         _mre_alters = [
             "ALTER TABLE market_research_extractions ADD COLUMN IF NOT EXISTS result_data JSONB",
             "ALTER TABLE market_research_extractions ADD COLUMN IF NOT EXISTS publisher VARCHAR(200)",
+            "ALTER TABLE market_research_extractions ADD COLUMN IF NOT EXISTS survey_id VARCHAR(120)",
+            "CREATE INDEX IF NOT EXISTS ix_market_research_extractions_survey_id ON market_research_extractions (survey_id)",
         ]
         _profile_alters = [
             "ALTER TABLE test_lab_profiles ADD COLUMN IF NOT EXISTS geography VARCHAR(512)",
