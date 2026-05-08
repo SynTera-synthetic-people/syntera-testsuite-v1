@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import math
 import re
+from collections import defaultdict
 from difflib import SequenceMatcher
 from typing import Any, Optional
 
@@ -41,8 +42,11 @@ def normalize_survey_question_id(q_id: Any) -> str:
 
 def _norm_question_text(text: Any) -> str:
     t = str(text or "").strip().lower()
+    t = t.replace("\u2013", "-").replace("\u2014", "-").replace("&", " and ")
+    # Ignore punctuation/special chars and spacing differences.
+    t = re.sub(r"[^a-z0-9\s]", " ", t)
     t = re.sub(r"\s+", " ", t)
-    return t
+    return t.strip()
 
 
 def _name_similarity(name_a: Any, name_b: Any) -> float:
@@ -73,9 +77,11 @@ def _option_label_jaccard(syn: dict[str, Any], real: dict[str, Any]) -> float:
 
 def _norm_option_label(text: Any) -> str:
     t = str(text or "").strip().lower()
-    t = t.replace("\u2013", "-").replace("\u2014", "-")
+    t = t.replace("\u2013", "-").replace("\u2014", "-").replace("&", " and ")
+    # Option matching should ignore punctuation/case/extra symbols.
+    t = re.sub(r"[^a-z0-9\s]", " ", t)
     t = re.sub(r"\s+", " ", t)
-    return t
+    return t.strip()
 
 
 def _satisfaction_polarity_opposed(a: str, b: str) -> bool:
@@ -123,7 +129,7 @@ def pair_categorical_response_options(
     syn_counts: dict[str, Any],
     human_counts: dict[str, Any],
     *,
-    min_score: float = 0.52,
+    min_score: float = 0.44,
 ) -> list[dict[str, Any]]:
     """
     Align synthetic vs human option labels for one question (wording may differ).
@@ -220,40 +226,70 @@ def pair_categorical_response_options(
 def pair_survey_questions_for_comparison(
     syn_q_data: list[dict[str, Any]],
     real_q_data: list[dict[str, Any]],
-    min_score: float = 0.48,
+    min_score: float = 0.42,
 ) -> list[tuple[dict[str, Any], dict[str, Any], float]]:
     """
-    Greedy many-to-one matching: each synthetic question pairs with at most one real question.
+    Greedy matching: phase 1 pairs identical normalized question IDs (Q1=Q1).
+    Phase 2 fuzzy-matches remaining rows (text + option overlap).
 
-    Scores combine question-text similarity and option-label overlap so different Q-numbers
-    for the same wording still align.
+    Each synthetic row pairs with at most one real row.
     """
     if not syn_q_data or not real_q_data:
         return []
 
-    candidates: list[tuple[float, int, int]] = []
+    used_s: set[int] = set()
+    used_r: set[int] = set()
+    out: list[tuple[dict[str, Any], dict[str, Any], float]] = []
+
+    syn_by_id: defaultdict[str, list[int]] = defaultdict(list)
     for i, sq in enumerate(syn_q_data):
         sid = normalize_survey_question_id(sq.get("question_id"))
+        if sid:
+            syn_by_id[sid].append(i)
+    real_by_id: defaultdict[str, list[int]] = defaultdict(list)
+    for j, rq in enumerate(real_q_data):
+        rid = normalize_survey_question_id(rq.get("question_id"))
+        if rid:
+            real_by_id[rid].append(j)
+
+    for qid in set(syn_by_id.keys()) & set(real_by_id.keys()):
+        for i in syn_by_id[qid]:
+            if i in used_s:
+                continue
+            for j in real_by_id[qid]:
+                if j in used_r:
+                    continue
+                sq, rq = syn_q_data[i], real_q_data[j]
+                used_s.add(i)
+                used_r.add(j)
+                out.append((sq, rq, 1.0))
+                break
+
+    candidates: list[tuple[float, int, int]] = []
+    for i, sq in enumerate(syn_q_data):
+        if i in used_s:
+            continue
+        sid = normalize_survey_question_id(sq.get("question_id"))
         for j, rq in enumerate(real_q_data):
+            if j in used_r:
+                continue
             rid = normalize_survey_question_id(rq.get("question_id"))
             name = _name_similarity(sq.get("question_name", ""), rq.get("question_name", ""))
             jac = _option_label_jaccard(sq, rq)
-            score = min(1.0, 0.58 * name + 0.42 * jac)
+            score = min(1.0, 0.68 * name + 0.32 * jac)
             if sid and rid and sid == rid:
                 score = min(1.0, score + 0.12)
-            # Avoid pairing on option overlap alone when stems are unrelated (common with Likert scales).
-            if name < 0.32 and jac < 0.55:
+            elif sid and rid and sid != rid:
+                # Allow cross-ID mapping (Q1 may correspond to Q6), but require stronger semantic evidence.
+                score = max(0.0, score - 0.08)
+            if name < 0.28 and jac < 0.50:
                 continue
-            # Medium fuzzy text + weak option overlap often means different questions (e.g. two 5-point scales).
-            if jac < 0.48 and name < 0.75:
+            if jac < 0.42 and name < 0.70:
                 continue
             if score >= min_score:
                 candidates.append((score, i, j))
 
     candidates.sort(key=lambda t: t[0], reverse=True)
-    used_s: set[int] = set()
-    used_r: set[int] = set()
-    out: list[tuple[dict[str, Any], dict[str, Any], float]] = []
     for score, i, j in candidates:
         if i in used_s or j in used_r:
             continue

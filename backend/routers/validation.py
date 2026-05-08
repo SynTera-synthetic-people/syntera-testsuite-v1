@@ -1,5 +1,6 @@
 """Validation Routes"""
 from fastapi import APIRouter, HTTPException, Depends, UploadFile, File, Form
+from sqlalchemy import desc
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.attributes import flag_modified
 from pydantic import BaseModel, Field, EmailStr
@@ -18,10 +19,28 @@ from ml_engine.survey_pairing import (
     pair_survey_questions_for_comparison,
 )
 from database.connection import get_db
-from backend.models.survey import Survey, ValidationRun, TestLabProfile, TestLabLead, TestLabVerdict
+from backend.models.survey import Survey, ValidationRun, TestLabProfile, TestLabLead, TestLabVerdict, MarketResearchExtraction
 from backend.utils.json_helpers import sanitize_for_json
 
 logger = logging.getLogger(__name__)
+
+
+def _mr_counts_for_survey_from_db(db: Session, survey_id: str) -> tuple[Optional[int], Optional[int]]:
+    """Prefer latest market research extraction linked to this survey (inferred N + questionnaire length)."""
+    row = (
+        db.query(MarketResearchExtraction)
+        .filter(MarketResearchExtraction.survey_id == survey_id)
+        .order_by(desc(MarketResearchExtraction.created_at))
+        .first()
+    )
+    if not row or not isinstance(row.result_data, dict):
+        return None, None
+    from backend.routers import market_research as mr
+
+    n = mr._infer_overall_sample_size_n(row.result_data)
+    qs = row.result_data.get("reconstructed_questionnaire") or []
+    tq = len(qs) if isinstance(qs, list) and len(qs) > 0 else None
+    return n, tq
 
 
 router = APIRouter()
@@ -134,7 +153,7 @@ def _build_question_comparisons_from_question_lists(
     syn_q_data: list[dict[str, Any]],
     real_q_data: list[dict[str, Any]],
     *,
-    pair_min_score: float = 0.52,
+    pair_min_score: float = 0.42,
 ) -> list[dict[str, Any]]:
     """
     Pair synthetic vs real questions and build per-question comparison rows.
@@ -161,7 +180,40 @@ def _build_question_comparisons_from_question_lists(
             option_comparisons: list[dict[str, Any]] = []
 
             if has_categorical_data:
-                option_comparisons = pair_categorical_response_options(syn_filtered, real_filtered)
+                raw_option_comparisons = pair_categorical_response_options(
+                    syn_filtered, real_filtered, min_score=0.44
+                )
+                # For UI comparison rows, keep only true paired options to avoid
+                # synthetic-only/human-only artifacts appearing as "extra options".
+                option_comparisons = [
+                    row
+                    for row in raw_option_comparisons
+                    if isinstance(row, dict)
+                    and row.get("synthetic_option") is not None
+                    and row.get("human_option") is not None
+                ]
+                syn_opt_n = len(syn_filtered)
+                real_opt_n = len(real_filtered)
+                min_opts = min(syn_opt_n, real_opt_n)
+                # Non-strict fallback requested: when textual option pairing is too weak,
+                # align by option order within the paired question (Qx ↔ Qy).
+                if min_opts > 0 and len(option_comparisons) < max(1, min_opts // 2):
+                    syn_items = list(syn_filtered.items())
+                    real_items = list(real_filtered.items())
+                    option_comparisons = []
+                    for idx in range(min_opts):
+                        sk, sv = syn_items[idx]
+                        hk, rv = real_items[idx]
+                        disp = hk if str(sk).strip().lower() == str(hk).strip().lower() else f"{hk} ↔ {sk}"
+                        option_comparisons.append(
+                            {
+                                "option": disp,
+                                "synthetic_option": str(sk),
+                                "human_option": str(hk),
+                                "synthetic_count": float(sv or 0),
+                                "real_count": float(rv or 0),
+                            }
+                        )
                 total_diff = 0.0
                 total_sum = 0.0
                 for row in option_comparisons:
@@ -475,6 +527,23 @@ def _coerce_respondent_count(value: Any) -> Optional[int]:
         return None
 
 
+_CAMEL_CASE_RE = re.compile(r"^[A-Z][a-zA-Z0-9]*(?: [A-Z][a-zA-Z0-9]*)*$")
+
+
+def _is_camel_case_phrase(value: Optional[str]) -> bool:
+    txt = str(value or "").strip()
+    if not txt:
+        return False
+    return bool(_CAMEL_CASE_RE.match(txt))
+
+
+def _require_positive_int_field(field_name: str, raw: Optional[str]) -> int:
+    val = _coerce_respondent_count(raw)
+    if val is None or val <= 0:
+        raise HTTPException(status_code=400, detail=f"{field_name} must be a positive numeric value.")
+    return int(val)
+
+
 def _coerce_unit_interval(value: Any) -> Optional[float]:
     """Normalize a similarity / accuracy value to 0..1 (accepts 0-100 as percent)."""
     if value is None:
@@ -499,12 +568,21 @@ def _synthetic_random_defaults() -> dict[str, int]:
     }
 
 
-def _ensure_profile_defaults(profile: TestLabProfile, survey: Survey) -> bool:
+def _ensure_profile_defaults(
+    profile: TestLabProfile,
+    survey: Survey,
+    db: Optional[Session] = None,
+) -> bool:
     """Backfill static defaults so frontend always receives persisted profile data."""
     changed = False
 
     effective_study_name = _default_study_name_for_survey(survey)
     derived_industry = _default_industry_from_study_name(effective_study_name)
+
+    mr_n: Optional[int] = None
+    mr_tq: Optional[int] = None
+    if db is not None and profile.survey_id:
+        mr_n, mr_tq = _mr_counts_for_survey_from_db(db, profile.survey_id)
 
     if not profile.geography or str(profile.geography).strip().lower() in {"united states", "usa", "us"}:
         profile.geography = "India"
@@ -521,8 +599,8 @@ def _ensure_profile_defaults(profile: TestLabProfile, survey: Survey) -> bool:
     verdict = profile.verdict if isinstance(profile.verdict, dict) else {}
     metadata = profile.extra_data if isinstance(profile.extra_data, dict) else {}
 
-    default_sample_size = int(survey.total_personas or 1000)
-    default_questions = int(survey.total_questions or 10)
+    default_sample_size = mr_n if mr_n is not None else int(survey.total_personas or 1000)
+    default_questions = mr_tq if mr_tq is not None else int(survey.total_questions or 10)
     economics = _build_human_economics(default_sample_size, None)
     expected_human = {
         "survey_name": effective_study_name,
@@ -554,6 +632,15 @@ def _ensure_profile_defaults(profile: TestLabProfile, survey: Survey) -> bool:
         if synthetic.get(key) in (None, "", []):
             synthetic[key] = value
             changed = True
+    # Latest market research row for this survey overrides stale 100/10 from ORM defaults
+    if mr_n is not None:
+        human["sample_size"] = mr_n
+        synthetic["sample_size"] = mr_n
+        human["economics"] = _build_human_economics(mr_n, None)
+        changed = True
+    if mr_tq is not None:
+        human["total_questions"] = mr_tq
+        changed = True
     if not verdict:
         verdict = {
             "what_matches": [],
@@ -603,22 +690,65 @@ def _compute_directional_alignment(question_comparisons: list[dict[str, Any]]) -
     return aligned / comparable
 
 
-def _directional_alignment_with_floor(
-    directional_alignment: Optional[float], avg_similarity: Optional[float]
+# Ordered outcome bands (Test Lab business rules):
+#   similarity < directional_alignment < 1
+#   avg_prediction_accuracy < avg_relationship_strength < 1
+_METRIC_STRICT_LT_ONE = 1.0 - 1e-6
+_METRIC_ORDER_GAP = 1e-4
+
+
+def _band_directional_above_similarity(
+    directional: Optional[float], similarity: Optional[float]
 ) -> Optional[float]:
-    """
-    Business rule: directional alignment must not be lower than average similarity.
-    Inputs are expected in 0..1 (or None).
-    """
-    da = _coerce_unit_interval(directional_alignment)
-    sim = _coerce_unit_interval(avg_similarity)
-    if da is None and sim is None:
+    """Enforce similarity < directional < 1 (strict interior when similarity is known)."""
+    sim = _coerce_unit_interval(similarity)
+    da = _coerce_unit_interval(directional)
+    cap = _METRIC_STRICT_LT_ONE
+    gap = _METRIC_ORDER_GAP
+
+    if sim is None and da is None:
+        return None
+    if sim is None:
+        if da is None:
+            return None
+        return min(cap, da)
+    lower = sim + gap
+    if lower >= cap:
         return None
     if da is None:
-        return sim
-    if sim is None:
-        return da
-    return max(da, sim)
+        return (sim + cap) / 2.0
+    if da <= sim:
+        da = lower
+    da = min(da, cap)
+    if da <= sim:
+        da = min(cap, lower + (cap - lower) * 0.5)
+    return da
+
+
+def _band_prediction_relationship_order(
+    prediction: Optional[float], relationship: Optional[float],
+) -> tuple[Optional[float], Optional[float]]:
+    """Enforce prediction < relationship < 1 when values exist."""
+    cap = _METRIC_STRICT_LT_ONE
+    gap = _METRIC_ORDER_GAP
+    pu = _coerce_unit_interval(prediction)
+    rs = _coerce_unit_interval(relationship)
+
+    if pu is None and rs is None:
+        return None, None
+    if pu is None:
+        return None, (min(cap, rs) if rs is not None else None)
+    lower_rs = pu + gap
+    if lower_rs >= cap:
+        return pu, None
+    if rs is None:
+        return pu, (pu + cap) / 2.0
+    if rs <= pu:
+        rs = lower_rs
+    rs = min(rs, cap)
+    if rs <= pu:
+        rs = min(cap, lower_rs + (cap - lower_rs) * 0.5)
+    return pu, rs
 
 
 def _build_rule_based_verdict(
@@ -731,6 +861,23 @@ def _upsert_test_lab_verdict(db: Session, survey_id: str, verdict: Any) -> None:
         row.verdict = payload
 
 
+def _get_or_create_profile_for_survey(db: Session, survey_id: str) -> TestLabProfile:
+    """
+    Safe profile upsert helper when SessionLocal uses autoflush=False.
+    Checks pending objects first to avoid duplicate unique(survey_id) inserts.
+    """
+    for obj in list(db.new):
+        if isinstance(obj, TestLabProfile) and str(obj.survey_id) == str(survey_id):
+            return obj
+    profile = db.query(TestLabProfile).filter(TestLabProfile.survey_id == survey_id).first()
+    if profile is not None:
+        return profile
+    profile = TestLabProfile(survey_id=survey_id)
+    db.add(profile)
+    db.flush()
+    return profile
+
+
 def _refresh_checks_passed_from_report(survey: Survey) -> None:
     rep = survey.test_suite_report if isinstance(survey.test_suite_report, dict) else {}
     tests = rep.get("tests") or []
@@ -762,9 +909,11 @@ def _sync_survey_study_metrics(
     question_comparisons: Optional[list[dict[str, Any]]] = None,
 ) -> None:
     _refresh_checks_passed_from_report(survey)
+    raw_da: Optional[float] = None
     if question_comparisons:
-        da = _compute_directional_alignment(question_comparisons)
-        survey.directional_alignment = _directional_alignment_with_floor(da, survey.accuracy_score)
+        raw_da = _compute_directional_alignment(question_comparisons)
+    elif survey.directional_alignment is not None:
+        raw_da = float(survey.directional_alignment)
     profile = db.query(TestLabProfile).filter(TestLabProfile.survey_id == survey.id).first()
     stats: dict[str, Any] = {}
     if profile and isinstance(profile.synthetic_study, dict):
@@ -774,9 +923,10 @@ def _sync_survey_study_metrics(
             stats = raw_stats
     if survey.accuracy_score is not None:
         survey.avg_similarity = survey.accuracy_score
-    survey.directional_alignment = _directional_alignment_with_floor(
-        survey.directional_alignment, survey.accuracy_score
-    )
+
+    sim = _coerce_unit_interval(survey.avg_similarity)
+    survey.directional_alignment = _band_directional_above_similarity(raw_da, sim)
+
     pu = _coerce_unit_interval(stats.get("avg_prediction_accuracy"))
     rs = _coerce_unit_interval(stats.get("avg_relationship_strength"))
     if pu is not None:
@@ -787,6 +937,13 @@ def _sync_survey_study_metrics(
         survey.avg_relationship_strength = rs
     elif getattr(survey, "avg_relationship_strength", None) is None and survey.accuracy_score is not None:
         survey.avg_relationship_strength = survey.accuracy_score
+
+    pu2, rs2 = _band_prediction_relationship_order(
+        _coerce_unit_interval(survey.avg_prediction_accuracy),
+        _coerce_unit_interval(survey.avg_relationship_strength),
+    )
+    survey.avg_prediction_accuracy = pu2
+    survey.avg_relationship_strength = rs2
     # Auto-generate deterministic verdict from question-level similarities unless explicitly manual.
     if question_comparisons:
         if not profile:
@@ -890,6 +1047,11 @@ async def get_results(survey_id: str, db: Session = Depends(get_db)):
         )
 
     qc = _only_common_question_comparisons(qc)
+    if len(qc) > 0:
+        _sync_survey_study_metrics(survey, db, qc)
+        db.commit()
+        db.refresh(survey)
+
     rep = survey.test_suite_report if isinstance(survey.test_suite_report, dict) else {}
     results_out: Any = survey.test_suite_report
     if isinstance(rep, dict):
@@ -957,7 +1119,17 @@ async def get_results(survey_id: str, db: Session = Depends(get_db)):
             "synthetic_question_count": synthetic_q_count,
             "real_question_count": real_q_count,
         }
-    
+
+    profile = db.query(TestLabProfile).filter(TestLabProfile.survey_id == survey_id).first()
+    if profile is None:
+        profile = TestLabProfile(survey_id=survey_id)
+        db.add(profile)
+        db.flush()
+    if _ensure_profile_defaults(profile, survey, db):
+        db.commit()
+        db.refresh(profile)
+    result["test_lab_profile"] = _serialize_test_lab_profile(survey_id, profile)
+
     return result
 
 
@@ -966,7 +1138,17 @@ async def compare_files(
     synthetic_file: UploadFile = File(..., description="Synthetic/Questionnaire 1 file (Excel or CSV)"),
     real_file: UploadFile = File(..., description="Real/Questionnaire 2 file (Excel or CSV)"),
     survey_id: Optional[str] = Form(None, description="Optional: Link to existing survey"),
-    method: str = Form("totals", description="Extraction method: 'totals' or 'all'"),
+    survey_title: str = Form(..., description="Survey title in Camel Case"),
+    publisher_name: str = Form(..., description="Publisher name in Camel Case"),
+    industry: str = Form(..., description="Industry"),
+    scenario: str = Form(..., description="Scenario"),
+    geography: str = Form(..., description="Country / geography"),
+    sample_size: str = Form(..., description="Sample size (numeric)"),
+    number_of_questions: str = Form(..., description="No. of questions (numeric)"),
+    link_orphan_market_research: bool = Form(
+        True,
+        description="If true and this survey has no MR row yet, attach the latest unlinked Market Research extraction.",
+    ),
     db: Session = Depends(get_db),
 ):
     """
@@ -974,6 +1156,22 @@ async def compare_files(
     Creates a new survey if survey_id is not provided.
     """
     file_parser = FileParser()
+    survey_title_clean = str(survey_title or "").strip()
+    publisher_clean = str(publisher_name or "").strip()
+    industry_clean = str(industry or "").strip()
+    scenario_clean = str(scenario or "").strip()
+    geography_clean = _normalize_country_name(geography) or str(geography or "").strip()
+    sample_size_int = _require_positive_int_field("Sample Size", sample_size)
+    questions_int = _require_positive_int_field("No. of Questions", number_of_questions)
+
+    if not _is_camel_case_phrase(publisher_clean):
+        raise HTTPException(status_code=400, detail="Publisher Name must be in Camel Case.")
+    if not industry_clean:
+        raise HTTPException(status_code=400, detail="Industry is required.")
+    if not scenario_clean:
+        raise HTTPException(status_code=400, detail="Scenario is required.")
+    if not geography_clean:
+        raise HTTPException(status_code=400, detail="Geography is required.")
 
     try:
         # Parse both files
@@ -1007,15 +1205,21 @@ async def compare_files(
             logger.info(f"Sample real question: {real_q_data[0].get('question_id', 'N/A')} - {real_q_data[0].get('question_name', 'N/A')}")
 
         # Extract response arrays
-        synthetic_responses = file_parser.extract_response_array(synthetic_data, method=method)
-        real_responses = file_parser.extract_response_array(real_data, method=method)
+        extraction_method = "totals"
+        synthetic_responses = file_parser.extract_response_array(synthetic_data, method=extraction_method)
+        real_responses = file_parser.extract_response_array(real_data, method=extraction_method)
         
-        logger.info(f"Extracted responses using method '{method}': Synthetic={len(synthetic_responses)} values, Real={len(real_responses)} values")
+        logger.info(
+            "Extracted responses using method '%s': Synthetic=%s values, Real=%s values",
+            extraction_method,
+            len(synthetic_responses),
+            len(real_responses),
+        )
 
         if not synthetic_responses or not real_responses:
             raise HTTPException(
                 status_code=400,
-                detail=f"Could not extract numeric responses from files using method '{method}'. Synthetic file: {len(synthetic_responses)} values, Real file: {len(real_responses)} values. Ensure files contain numeric data in columns.",
+                detail=f"Could not extract numeric responses from files using method '{extraction_method}'. Synthetic file: {len(synthetic_responses)} values, Real file: {len(real_responses)} values. Ensure files contain numeric data in columns.",
             )
 
         # Get or create survey
@@ -1026,12 +1230,15 @@ async def compare_files(
         else:
             # Create a new survey for this comparison
             survey = Survey(
-                title=f"File Comparison: {synthetic_file.filename} vs {real_file.filename}",
+                title=survey_title_clean,
                 description=f"Automated comparison from file uploads",
             )
             db.add(survey)
             db.commit()
             db.refresh(survey)
+        survey.title = survey_title_clean
+        survey.total_personas = sample_size_int
+        survey.total_questions = questions_int
 
         # Store file metadata
         survey.synthetic_responses = synthetic_responses
@@ -1106,7 +1313,7 @@ async def compare_files(
             "real_file": real_file.filename,
             "synthetic_responses_count": len(synthetic_responses),
             "real_responses_count": len(real_responses),
-            "extraction_method": method,
+            "extraction_method": extraction_method,
             "synthetic_question_count": len(synthetic_data.get("question_data", [])),
             "real_question_count": len(real_data.get("question_data", [])),
         }
@@ -1184,6 +1391,31 @@ async def compare_files(
             else None
         )
         _sync_survey_study_metrics(survey, db, qc_for_sync)
+        if link_orphan_market_research:
+            from backend.routers.market_research import link_latest_orphan_extraction_to_survey
+
+            if link_latest_orphan_extraction_to_survey(db, survey.id):
+                # Ensure pending profile insert from MR merge is visible for reuse.
+                db.flush()
+                prof = _get_or_create_profile_for_survey(db, survey.id)
+                _ensure_profile_defaults(prof, survey, db)
+
+        profile = _get_or_create_profile_for_survey(db, survey.id)
+        profile.geography = str(geography_clean).strip()[:512]
+        profile.industry = industry_clean[:120]
+        profile.scenario = scenario_clean[:120]
+        existing_human = dict(profile.human_study) if isinstance(profile.human_study, dict) else {}
+        existing_human.update(
+            {
+                "survey_name": survey_title_clean[:255],
+                "publisher_name": publisher_clean[:200],
+                "geography": str(geography_clean).strip()[:512],
+                "sample_size": sample_size_int,
+                "total_questions": questions_int,
+            }
+        )
+        profile.human_study = sanitize_for_json(existing_human)
+        flag_modified(profile, "human_study")
         db.commit()
         db.refresh(survey)
 
@@ -1198,6 +1430,7 @@ async def compare_files(
         
         # Sanitize the entire result before returning
         sanitized_result = sanitize_for_json(result)
+        sanitized_result["survey_id"] = survey.id
         
         # Verify question_comparisons survived sanitization
         if "question_comparisons" in sanitized_result:
@@ -1299,7 +1532,7 @@ async def upsert_test_lab_profile(
             prev_m = dict(profile.extra_data) if isinstance(profile.extra_data, dict) else {}
             profile.extra_data = sanitize_for_json({**prev_m, **m})
 
-    _ensure_profile_defaults(profile, survey)
+    _ensure_profile_defaults(profile, survey, db)
     _upsert_test_lab_verdict(db, survey_id, profile.verdict)
     db.add(profile)
     db.commit()
@@ -1395,7 +1628,7 @@ async def get_test_lab_profiles_batch(survey_ids: str, db: Session = Depends(get
         profile = profile_by_id.get(sid)
         if not survey or not profile:
             continue
-        if _ensure_profile_defaults(profile, survey):
+        if _ensure_profile_defaults(profile, survey, db):
             changed_any = True
         _upsert_test_lab_verdict(db, sid, profile.verdict)
     if changed_any:
@@ -1450,7 +1683,7 @@ async def get_test_lab_profile(survey_id: str, db: Session = Depends(get_db)):
         db.add(profile)
         db.flush()
 
-    if _ensure_profile_defaults(profile, survey):
+    if _ensure_profile_defaults(profile, survey, db):
         _upsert_test_lab_verdict(db, survey_id, profile.verdict)
         db.add(profile)
         db.commit()
@@ -1532,24 +1765,42 @@ async def get_test_lab_metrics(db: Session = Depends(get_db)):
     profiles = db.query(TestLabProfile).all()
 
     tests_conducted = len(validated_surveys)
-    accuracies = [float(s.accuracy_score) for s in validated_surveys if s.accuracy_score is not None]
+    accuracies = []
+    for s in validated_surveys:
+        sim = _coerce_unit_interval(s.avg_similarity)
+        if sim is None:
+            sim = _coerce_unit_interval(s.accuracy_score)
+        if sim is not None:
+            accuracies.append(float(sim))
     avg_similarity = (sum(accuracies) / len(accuracies)) if accuracies else 0.0
 
     alignments = []
     scenario_counts: dict[str, int] = {}
     industry_counts: dict[str, int] = {}
+    validated_ids = {s.id for s in validated_surveys}
     for s in validated_surveys:
-        report = s.test_suite_report if isinstance(s.test_suite_report, dict) else {}
-        alignment = _compute_directional_alignment(report.get("question_comparisons") or [])
-        alignment = _directional_alignment_with_floor(alignment, s.accuracy_score)
+        alignment = _coerce_unit_interval(s.directional_alignment)
+        if alignment is None:
+            report = s.test_suite_report if isinstance(s.test_suite_report, dict) else {}
+            alignment = _compute_directional_alignment(report.get("question_comparisons") or [])
+            sim = _coerce_unit_interval(s.avg_similarity)
+            if sim is None:
+                sim = _coerce_unit_interval(s.accuracy_score)
+            alignment = _band_directional_above_similarity(alignment, sim)
         if alignment is not None:
-            alignments.append(alignment)
-    survey_ids = {s.id for s in surveys}
+            alignments.append(float(alignment))
     for p in profiles:
-        if p.survey_id not in survey_ids:
+        if p.survey_id not in validated_ids:
             continue
-        if p.scenario:
-            scenario_counts[p.scenario] = scenario_counts.get(p.scenario, 0) + 1
+        scenario_val = None
+        if isinstance(p.human_study, dict):
+            hs = p.human_study.get("scenario")
+            if hs is not None and str(hs).strip():
+                scenario_val = str(hs).strip()
+        if scenario_val is None and p.scenario and str(p.scenario).strip():
+            scenario_val = str(p.scenario).strip()
+        if scenario_val:
+            scenario_counts[scenario_val] = scenario_counts.get(scenario_val, 0) + 1
         if p.industry:
             industry_counts[p.industry] = industry_counts.get(p.industry, 0) + 1
 

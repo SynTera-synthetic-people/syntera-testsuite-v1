@@ -25,7 +25,9 @@ if os.path.isfile(_env_path):
     except Exception:
         pass
 
+from sqlalchemy import desc
 from sqlalchemy.orm import Session
+from sqlalchemy.orm.attributes import flag_modified
 
 from config.settings import Settings
 from backend.utils.llm_gateway import LlmGateway
@@ -327,22 +329,190 @@ def _normalize_survey_id(value: Any) -> Optional[str]:
     return s[:120]
 
 
-def _sync_profile_scenario_from_extraction(db: Session, survey_id: str, scenario: Optional[str]) -> None:
-    """If survey exists, copy inferred scenario onto test_lab_profiles.scenario (120 char cap)."""
-    if not survey_id or not scenario or not str(scenario).strip():
+def _infer_n_from_option_value_sums(questionnaire: list[Any]) -> Optional[int]:
+    """
+    If each question's option_values are counts, the row sum is an implied sample size.
+    When all questions agree on the same sum, return it; else return the maximum sum as a fallback.
+    """
+    sums: list[int] = []
+    for q in questionnaire or []:
+        if not isinstance(q, dict):
+            continue
+        ovs = q.get("option_values") or []
+        if not ovs:
+            continue
+        total = 0
+        for v in ovs:
+            try:
+                s = str(v).strip().replace(",", "")
+                if not s or s.endswith("%"):
+                    total = -1
+                    break
+                total += int(float(s))
+            except (ValueError, TypeError):
+                total = -1
+                break
+        if total > 0:
+            sums.append(total)
+    if not sums:
+        return None
+    if len(set(sums)) == 1:
+        return sums[0]
+    return max(sums)
+
+
+def _text_blob_for_n_extraction(result: dict[str, Any]) -> str:
+    parts: list[str] = []
+    for k in ("raw_markdown", "geography", "industry", "scenario"):
+        v = result.get(k)
+        if v:
+            parts.append(str(v))
+    og = result.get("overall_objectives") or []
+    if isinstance(og, list):
+        parts.extend(str(x) for x in og if x)
+    return "\n".join(parts)[:80000]
+
+
+def _infer_overall_sample_size_n(result: dict[str, Any]) -> Optional[int]:
+    """Prefer explicit overall_sample_size_n; else per-question n, count sums, regex on embedded text."""
+    n = result.get("overall_sample_size_n")
+    if n is not None:
+        try:
+            v = int(n)
+            if v > 0:
+                return v
+        except (TypeError, ValueError):
+            pass
+    max_n: Optional[int] = None
+    qlist = result.get("reconstructed_questionnaire") or []
+    for q in qlist:
+        if not isinstance(q, dict) or q.get("sample_size_n") is None:
+            continue
+        try:
+            vn = int(q["sample_size_n"])
+            if vn > 0:
+                max_n = vn if max_n is None else max(max_n, vn)
+        except (TypeError, ValueError):
+            continue
+    n_sum = _infer_n_from_option_value_sums(qlist if isinstance(qlist, list) else [])
+    if n_sum is not None:
+        max_n = n_sum if max_n is None else max(max_n, n_sum)
+
+    blob = _text_blob_for_n_extraction(result)
+    ex = _extract_overall_sample_size(blob) if blob else None
+    if ex is not None:
+        max_n = ex if max_n is None else max(max_n, ex)
+    return max_n
+
+
+def link_latest_orphan_extraction_to_survey(db: Session, survey_id: str) -> bool:
+    """
+    If this survey has no linked Market Research row, attach the most recent extraction
+    with survey_id NULL and merge its payload into test_lab_profiles. Connects the MR tab
+    workflow to Dashboard/Reports when users forget to enter Survey ID on reverse-engineer.
+    """
+    sid = _normalize_survey_id(survey_id)
+    if not sid:
+        return False
+    if not db.query(Survey.id).filter(Survey.id == sid).first():
+        return False
+    exists = (
+        db.query(MarketResearchExtraction.id)
+        .filter(MarketResearchExtraction.survey_id == sid)
+        .limit(1)
+        .first()
+    )
+    if exists:
+        return False
+    orphan = (
+        db.query(MarketResearchExtraction)
+        .filter(MarketResearchExtraction.survey_id.is_(None))
+        .order_by(desc(MarketResearchExtraction.created_at))
+        .first()
+    )
+    if not orphan:
+        return False
+    orphan.survey_id = sid
+    payload = orphan.result_data if isinstance(orphan.result_data, dict) else {}
+    _merge_market_research_into_profile(db, sid, payload)
+    return True
+
+
+def _merge_market_research_into_profile(db: Session, survey_id: str, result: dict[str, Any]) -> None:
+    """
+    When reverse-engineer is tied to a survey, persist geography/industry/scenario and human_study
+    fields so Dashboard / Results can show the same context as the MR tab (title, N, question count).
+    """
+    sid = _normalize_survey_id(survey_id)
+    if not sid:
         return
-    text = str(scenario).strip()[:120]
-    if not db.query(Survey.id).filter(Survey.id == survey_id).first():
+    if not db.query(Survey.id).filter(Survey.id == sid).first():
         logger.info(
-            "Market research: survey_id %s not in test_lab_surveys; scenario stored on extraction only",
-            survey_id,
+            "Market research: survey_id %s not in test_lab_surveys; extraction row only",
+            sid,
         )
         return
-    profile = db.query(TestLabProfile).filter(TestLabProfile.survey_id == survey_id).first()
+    profile = None
+    # SessionLocal uses autoflush=False; check pending objects first to avoid duplicate unique(survey_id) inserts.
+    for obj in list(db.new):
+        if isinstance(obj, TestLabProfile) and str(obj.survey_id) == str(sid):
+            profile = obj
+            break
     if profile is None:
-        db.add(TestLabProfile(survey_id=survey_id, scenario=text))
-    else:
-        profile.scenario = text
+        profile = db.query(TestLabProfile).filter(TestLabProfile.survey_id == sid).first()
+    if profile is None:
+        profile = TestLabProfile(survey_id=sid)
+        db.add(profile)
+        db.flush()
+
+    geo = result.get("geography")
+    if geo and str(geo).strip():
+        profile.geography = str(geo).strip()[:512]
+    ind = result.get("industry")
+    if ind and str(ind).strip():
+        profile.industry = str(ind).strip()[:120]
+    scen = result.get("scenario")
+    if scen and str(scen).strip():
+        profile.scenario = str(scen).strip()[:120]
+
+    human: dict[str, Any] = dict(profile.human_study) if isinstance(profile.human_study, dict) else {}
+    n_human = _infer_overall_sample_size_n(result)
+    if n_human is not None:
+        human["sample_size"] = n_human
+    qs = result.get("reconstructed_questionnaire") or []
+    if isinstance(qs, list) and len(qs) > 0:
+        human["total_questions"] = len(qs)
+        # Help geography inside human block match profile / extraction
+        if geo and str(geo).strip():
+            human["geography"] = str(geo).strip()[:512]
+
+    overall = result.get("overall_objectives") or []
+    survey_title = _optional_context_str(result.get("survey_title"))
+    if survey_title:
+        human["survey_name"] = survey_title[:255]
+    elif isinstance(overall, list) and overall:
+        title = str(overall[0]).strip()
+        if title:
+            human["survey_name"] = title[:255]
+    elif result.get("publisher"):
+        human["survey_name"] = f"Market research — {result.get('publisher')}"[:255]
+
+    profile.human_study = sanitize_for_json(human)
+    flag_modified(profile, "human_study")
+
+    syn: dict[str, Any] = dict(profile.synthetic_study) if isinstance(profile.synthetic_study, dict) else {}
+    n_for_syn = human.get("sample_size") or n_human
+    if n_for_syn is not None:
+        syn["sample_size"] = int(n_for_syn)
+    profile.synthetic_study = sanitize_for_json(syn)
+    flag_modified(profile, "synthetic_study")
+
+    srv = db.query(Survey).filter(Survey.id == sid).first()
+    if srv is not None:
+        if n_human is not None:
+            srv.total_personas = int(n_human)
+        if isinstance(qs, list) and len(qs) > 0:
+            srv.total_questions = len(qs)
 
 
 def _infer_scenario_from_content(
@@ -735,9 +905,12 @@ def _extract_overall_sample_size(report_text: str) -> Optional[int]:
         r"\bN\s*=\s*([0-9,]+)",
         r"\(n\s*=\s*([0-9,]+)\)",
         r"sample\s+size\s+(?:of\s+)?([0-9,]+)",
+        r"sample\s+of\s*([0-9,]+)",
+        r"base\s*(?:of|size)?\s*[:\s]*([0-9,]+)\s*(?:respondents|participants|completed)?",
         r"([0-9,]+)\s+respondents",
         r"([0-9,]+)\s+participants",
         r"total\s+(?:of\s+)?([0-9,]+)\s+(?:respondents|participants|samples)",
+        r"([0-9,]+)\s+completed\s+(?:the\s+)?survey",
     ]
     for pat in patterns:
         m = re.search(pat, report_text[:15000], re.IGNORECASE)
@@ -1082,6 +1255,7 @@ def _run_reverse_engineer(
         "industry": industry,
         "publisher": publisher_norm,
         "scenario": scenario,
+        "survey_title": (str(overall[0]).strip()[:255] if isinstance(overall, list) and overall and str(overall[0]).strip() else None),
         "overall_objectives": overall,
         "overall_sample_size_n": overall_n,
         "section_objectives": [s.model_dump() for s in section_objectives],
@@ -1135,7 +1309,8 @@ def _persist_market_research_result(db: Session, result: dict) -> Optional[str]:
     """
     Persist full extraction (objectives, questionnaire, geography/industry/scenario, flags).
     Always inserts a new row per run so history is kept; latest is loaded by GET /latest-extraction.
-    When survey_id is set and matches test_lab_surveys.id, scenario is copied to test_lab_profiles.
+    When survey_id is set and matches test_lab_surveys.id, merge into test_lab_profiles (scenario,
+    industry, geography, human_study title/sample_size/total_questions) for Dashboard/Results.
     """
     payload = _payload_for_db(result)
     geo = payload.get("geography")
@@ -1153,8 +1328,8 @@ def _persist_market_research_result(db: Session, result: dict) -> Optional[str]:
     )
     try:
         db.add(row)
-        if survey_pk and scen:
-            _sync_profile_scenario_from_extraction(db, survey_pk, scen)
+        if survey_pk:
+            _merge_market_research_into_profile(db, survey_pk, payload)
         db.commit()
         db.refresh(row)
         return row.id
@@ -1220,21 +1395,37 @@ def _merge_chunk_results(results: list[dict]) -> dict:
             if name and name not in seen_section:
                 seen_section.add(name)
                 sections.append(s)
-    # Dedupe by report_reference + survey_question so we keep all distinct questions (different ref or different text)
-    seen_question = set()
-    questions = []
+    # Dedupe: same stem + same option labels = duplicate; keep distinct questions even if text is similar but options differ
+    seen_question: set[tuple[str, str]] = set()
+    questions: list[dict[str, Any]] = []
     for r in results:
         for q in r.get("reconstructed_questionnaire") or []:
-            ref = (q.get("report_reference") or "").strip()[:100]
+            if not isinstance(q, dict):
+                continue
             sq = (q.get("survey_question") or "").strip()
-            key = (ref + "\n" + sq).lower()[:500]
-            if key and key not in seen_question:
-                seen_question.add(key)
-                questions.append(q)
+            opts = q.get("answer_options") or []
+            opt_key = "|".join(str(x).strip().lower()[:80] for x in (opts if isinstance(opts, list) else [])[:24])
+            stem = sq.lower()[:400]
+            key = (stem, opt_key[:800])
+            if key in seen_question:
+                continue
+            seen_question.add(key)
+            questions.append(q)
     raw_parts = [r.get("raw_markdown") or "" for r in results if r.get("raw_markdown")]
     ai_used = any(r.get("ai_used") for r in results)
     raw_merged = "\n\n".join(f"--- Part {i+1} ---\n\n{p}" for i, p in enumerate(raw_parts)) if raw_parts else ""
-    overall_n = next((r.get("overall_sample_size_n") for r in results if r.get("overall_sample_size_n") is not None), None)
+    overall_n_candidates: list[int] = []
+    for r in results:
+        n = r.get("overall_sample_size_n")
+        if n is None:
+            continue
+        try:
+            v = int(n)
+            if v > 0:
+                overall_n_candidates.append(v)
+        except (TypeError, ValueError):
+            pass
+    overall_n = max(overall_n_candidates) if overall_n_candidates else None
     return {
         "survey_id": _first_non_empty_context(results, "survey_id"),
         "geography": _first_non_empty_context(results, "geography"),

@@ -56,7 +56,6 @@
                     <button onclick="showSection('surveys')" id="nav-surveys" class="nav-item">Surveys</button>
                     <button onclick="showSection('validation')" id="nav-validation" class="nav-item">Validation Runs</button>
                     <button onclick="showSection('results')" id="nav-results" class="nav-item">Test Results</button>
-                    <button onclick="showSection('industry-surveys')" id="nav-industry-surveys" class="nav-item">Industry Surveys</button>
                     <button onclick="showSection('market-research')" id="nav-market-research" class="nav-item">Market Research Reverse Eng.</button>
                 </nav>
             </header>
@@ -187,7 +186,7 @@
                         </div>
                         <div class="cta-buttons">
                             <button onclick="showSection('validation')" class="cta-primary">Start Validation →</button>
-                            <button onclick="showSection('industry-surveys')" class="cta-secondary">Explore Industry Surveys →</button>
+                            <button onclick="showSection('market-research')" class="cta-secondary">Market Research Reverse Eng. →</button>
                         </div>
                     </div>
                 </div>
@@ -310,12 +309,11 @@
                 <div class="section-header-row">
                     <div>
                         <h2>Validation Runs</h2>
-                        <p class="subtitle">Compare two questionnaires via file upload or manual data entry.</p>
+                        <p class="subtitle">Compare two questionnaires via file upload.</p>
                     </div>
                 </div>
                 <div class="validation-tabs">
                     <button class="tab-btn active" onclick="switchTab('files')" id="tab-files">📁 File Upload</button>
-                    <button class="tab-btn" onclick="switchTab('manual')" id="tab-manual">✏️ Manual Entry</button>
                 </div>
                 <div id="tab-content-files" class="tab-content active">
                     <div class="two-column">
@@ -333,38 +331,32 @@
                             <label class="field-label">Survey ID (optional)
                                 <input id="file-survey-id" type="text" placeholder="Paste survey ID from Surveys panel (leave empty to create new)" />
                             </label>
-                            <label class="field-label">Extraction Method
-                                <select id="extraction-method">
-                                    <option value="totals">Totals (sum per column)</option>
-                                    <option value="all">All responses (individual values)</option>
-                                </select>
+                            <label class="field-label">Survey Title
+                                <input id="file-survey-title" type="text" placeholder="e.g., Food Delivery Behavior India" />
+                            </label>
+                            <label class="field-label">Publisher Name
+                                <input id="file-publisher-name" type="text" placeholder="e.g., Kantar" />
+                            </label>
+                            <label class="field-label">Industry
+                                <select id="file-industry"></select>
+                            </label>
+                            <label class="field-label">Scenario
+                                <select id="file-scenario"></select>
+                            </label>
+                            <label class="field-label">Geography
+                                <select id="file-geography"></select>
+                            </label>
+                            <label class="field-label">Sample Size
+                                <input id="file-sample-size" type="text" inputmode="numeric" placeholder="Numeric only" />
+                            </label>
+                            <label class="field-label">No. of Questions
+                                <input id="file-number-of-questions" type="text" inputmode="numeric" placeholder="Numeric only" />
                             </label>
                             <button class="btn-primary full-width" onclick="compareFiles()">Compare Files</button>
                         </div>
                         <div class="panel">
                             <h3>2. Ready to compare</h3>
                             <p class="help-text">Click "Compare Files" to run the validation. Results will appear on the Test Results page.</p>
-                        </div>
-                    </div>
-                </div>
-                <div id="tab-content-manual" class="tab-content">
-                    <div class="two-column">
-                        <div class="panel">
-                            <h3>1. Select survey &amp; data</h3>
-                            <label class="field-label">Survey ID
-                                <input id="validation-survey-id" type="text" placeholder="Paste survey ID from Surveys panel" />
-                            </label>
-                            <label class="field-label">Synthetic responses (JSON array)
-                                <textarea id="synthetic-input" rows="4" placeholder="[42, 33, 18, 7]"></textarea>
-                            </label>
-                            <label class="field-label">Real responses (JSON array)
-                                <textarea id="real-input" rows="4" placeholder="[40, 35, 20, 5]"></textarea>
-                            </label>
-                            <button class="btn-primary full-width" onclick="runValidation()">Run Validation</button>
-                        </div>
-                        <div class="panel">
-                            <h3>2. Ready to validate</h3>
-                            <p class="help-text">Click "Run Validation" to start. Results will appear on the Test Results page.</p>
                         </div>
                     </div>
                 </div>
@@ -385,27 +377,6 @@
                         <button id="results-empty-action-btn" onclick="showSection('reports')" class="btn-primary">Go to Dashboard</button>
                     </div>
                 </div>
-            </section>
-            <section id="industry-surveys" class="section">
-                <div class="section-header-row">
-                    <div>
-                        <h2>Industry Survey Reports</h2>
-                        <p class="subtitle">Industry-specific surveys and data from S3, plus reference surveys across domains.</p>
-                    </div>
-                </div>
-                <div id="industry-surveys-s3-container" class="industry-s3-section" style="margin-bottom: 28px;">
-                    <h3 class="industry-subsection-title">Industry data (S3)</h3>
-                    <p class="help-text" id="industry-s3-help">Loading…</p>
-                    <div class="industry-s3-filter-row" id="industry-s3-filter-row" style="display: none;">
-                        <label for="industry-s3-filter" class="industry-s3-filter-label">Industry type</label>
-                        <select id="industry-s3-filter" class="industry-s3-filter-select">
-                            <option value="">All industries</option>
-                        </select>
-                    </div>
-                    <div id="industry-surveys-s3-list" class="cards-grid"></div>
-                </div>
-                <h3 class="industry-subsection-title">Reference surveys</h3>
-                <div id="industry-surveys-list" class="cards-grid"></div>
             </section>
             <section id="market-research" class="section">
                 <div class="section-header-row">

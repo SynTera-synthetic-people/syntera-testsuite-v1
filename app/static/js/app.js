@@ -16,6 +16,63 @@ function normalizeAccuracy01(value) {
     return n > 1 ? n / 100 : n;
 }
 
+const VALIDATION_INDUSTRY_OPTIONS = [
+    'Advertising & Marketing',
+    'Agriculture',
+    'Automotive',
+    'Banking & Financial Services',
+    'Biotechnology',
+    'Construction',
+    'Consumer Goods',
+    'Consumer Services',
+    'Education',
+    'Energy & Utilities',
+    'Entertainment & Media',
+    'Fashion & Apparel',
+    'Food & Beverage',
+    'Government & Public Sector',
+    'Healthcare & Pharmaceuticals',
+    'Hospitality & Travel',
+    'Human Resources & Staffing',
+    'Information Technology & Software',
+    'Insurance',
+    'Legal Services',
+    'Logistics & Supply Chain',
+    'Manufacturing',
+    'Market Research & Consulting',
+    'Nonprofit',
+    'Real Estate',
+    'Retail & E-commerce',
+    'Telecommunications',
+    'Transportation',
+    'Venture Capital & Private Equity',
+    'Wholesale & Distribution',
+    'Other'
+];
+
+const VALIDATION_SCENARIO_OPTIONS = [
+    'Adoption Readiness',
+    'Barrier Identification',
+    'Behavior Analysis',
+    'Brand Perception',
+    'Concept Validation',
+    'Discovery Mapping',
+    'Experience Evaluation',
+    'Message Testing',
+    'Outcome Validation',
+    'Preference Mapping',
+    'Price Optimization',
+    'Purchase Intent',
+    'Retention Drivers',
+    'Satisfaction Assessment'
+];
+
+const VALIDATION_GEOGRAPHY_OPTIONS = [
+    'Australia', 'Brazil', 'Canada', 'China', 'France', 'Germany', 'India', 'Indonesia',
+    'Italy', 'Japan', 'Mexico', 'Netherlands', 'Singapore', 'South Africa', 'Spain',
+    'United Arab Emirates', 'United Kingdom', 'United States'
+];
+
 const OMI_STATES = {
     first: {
         webm: 'First Appearance_Original.webm',
@@ -120,12 +177,11 @@ function omiPlay(state, customMessage = null) {
 
 function omiStateForSection(id) {
     const map = {
-        home: ['greet', 'Welcome! Start with Validation Runs or Industry Surveys.'],
+        home: ['greet', 'Welcome! Start with Validation Runs or Market Research.'],
         reports: ['idle', 'Your dashboard gives a quick health check of validations.'],
         surveys: ['input', 'Create and manage survey experiments from here.'],
         validation: ['task', 'Upload synthetic and real files to run comparisons.'],
         results: ['idle', 'Review scores and recommendations here.'],
-        'industry-surveys': ['greet', 'Browse industry references and S3 files quickly.'],
         'market-research': ['task', 'Paste or upload a report and I will help reconstruct the questionnaire.'],
         dashboard: ['idle', 'Track metrics and trends in one place.'],
     };
@@ -175,7 +231,7 @@ function showSection(id) {
     }
 
     // highlight nav - handle combined dashboard-reports
-    const sections = ['home','dashboard','surveys','validation','results','industry-surveys','market-research','reports'];
+    const sections = ['home','dashboard','surveys','validation','results','market-research','reports'];
     sections.forEach(key => {
         const btn = document.getElementById(`nav-${key}`);
         if (btn) btn.classList.toggle('active', key === id);
@@ -193,7 +249,6 @@ function showSection(id) {
         surveys: 'Surveys',
         validation: 'Validation Runs',
         results: 'Test Results',
-        'industry-surveys': 'Industry Surveys',
         'market-research': 'Market Research Reverse Engineering',
         reports: 'Dashboard & Reports',
     };
@@ -202,9 +257,8 @@ function showSection(id) {
         home: 'Welcome to SynTera Test Suite - Statistical Validation Framework',
         dashboard: 'Metrics, statistics, and validation reports',
         surveys: 'Manage your survey comparisons',
-        validation: 'Compare two questionnaires via file upload or manual data entry',
+        validation: 'Compare two questionnaires via file upload',
         results: 'Compare synthetic vs real survey responses question-by-question',
-        'industry-surveys': 'Explore standard industry surveys with validation data',
         'market-research': 'Reverse-engineer the original research design from a market research report',
         reports: 'Metrics, statistics, and validation reports for all completed surveys',
     };
@@ -221,13 +275,17 @@ function showSection(id) {
     else if(id==='dashboard' || id==='reports') {
         Promise.all([loadDashboard(), loadReports(currentReportsPage)]).catch((err) => console.error(err));
     }
-    else if(id==='industry-surveys') {
-        loadIndustrySurveys();
-    }
     else if(id==='results') {
         loadResultsPage();
     }
     else if (id === 'market-research') {
+        const mrSid = document.getElementById('market-research-survey-id');
+        if (mrSid && !String(mrSid.value || '').trim()) {
+            try {
+                const remembered = localStorage.getItem('syntera:lastTestLabSurveyId');
+                if (remembered) mrSid.value = remembered;
+            } catch (_) {}
+        }
         loadLatestMarketResearchExtraction();
     }
     // Home section doesn't need any loading function
@@ -309,6 +367,28 @@ function createNewSurvey() {
     });
 }
 
+function hydrateValidationMetadataInputs() {
+    const fillSelect = (id, values, placeholder) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const options = [`<option value="">${placeholder}</option>`]
+            .concat(values.map((v) => `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`));
+        el.innerHTML = options.join('');
+    };
+    fillSelect('file-industry', VALIDATION_INDUSTRY_OPTIONS, 'Select industry');
+    fillSelect('file-scenario', VALIDATION_SCENARIO_OPTIONS, 'Select scenario');
+    fillSelect('file-geography', VALIDATION_GEOGRAPHY_OPTIONS, 'Select geography');
+
+    const numericOnlyIds = ['file-sample-size', 'file-number-of-questions'];
+    numericOnlyIds.forEach((id) => {
+        const input = document.getElementById(id);
+        if (!input) return;
+        input.addEventListener('input', () => {
+            input.value = (input.value || '').replace(/\D+/g, '');
+        });
+    });
+}
+
 async function runValidation() {
     const surveyId = document.getElementById('validation-survey-id').value.trim();
     const syntheticText = document.getElementById('synthetic-input').value;
@@ -364,6 +444,8 @@ function downloadReport(surveyId, format) {
 }
 
 async function loadIndustrySurveys() {
+    // Industry surveys (including S3 loading) are deprecated and disabled.
+    return;
     const surveysList = document.getElementById('industry-surveys-list');
     const s3List = document.getElementById('industry-surveys-s3-list');
     const s3Help = document.getElementById('industry-s3-help');
@@ -1296,13 +1378,23 @@ function renderMarketResearchOutput(data, objectivesEl, questionnaireEl) {
     const ctxPub = data.publisher;
     const ctxScen = data.scenario;
     const ctxSurveyId = data.survey_id;
-    if (ctxGeo || ctxInd || ctxPub || ctxScen || ctxSurveyId) {
-        objectivesHtml += '<div class="mre-block mre-extracted-context"><h4>Geography, industry, publisher & scenario</h4><dl class="mre-context-dl">';
+    const ctxSurveyTitle = String(
+        data.survey_title
+        || ((Array.isArray(data.overall_objectives) && data.overall_objectives.length) ? data.overall_objectives[0] : '')
+        || ''
+    ).trim();
+    const ctxSampleSize = Number(data.overall_sample_size_n || 0);
+    const ctxQuestionCount = Array.isArray(data.reconstructed_questionnaire) ? data.reconstructed_questionnaire.length : 0;
+    if (ctxGeo || ctxInd || ctxPub || ctxScen || ctxSurveyId || ctxSurveyTitle || ctxSampleSize > 0 || ctxQuestionCount > 0) {
+        objectivesHtml += '<div class="mre-block mre-extracted-context"><h4>Extracted Study Metadata</h4><dl class="mre-context-dl">';
         if (ctxSurveyId) objectivesHtml += '<dt>Survey ID</dt><dd><code>' + escapeHtml(String(ctxSurveyId)) + '</code></dd>';
-        if (ctxGeo) objectivesHtml += '<dt>Geography</dt><dd>' + escapeHtml(String(ctxGeo)) + '</dd>';
+        if (ctxSurveyTitle) objectivesHtml += '<dt>Survey Title</dt><dd>' + escapeHtml(ctxSurveyTitle) + '</dd>';
+        if (ctxPub) objectivesHtml += '<dt>Publisher Name</dt><dd>' + escapeHtml(String(ctxPub)) + '</dd>';
         if (ctxInd) objectivesHtml += '<dt>Industry</dt><dd>' + escapeHtml(String(ctxInd)) + '</dd>';
-        if (ctxPub) objectivesHtml += '<dt>Publisher</dt><dd>' + escapeHtml(String(ctxPub)) + '</dd>';
         if (ctxScen) objectivesHtml += '<dt>Scenario</dt><dd>' + escapeHtml(String(ctxScen)) + '</dd>';
+        if (ctxGeo) objectivesHtml += '<dt>Geography</dt><dd>' + escapeHtml(String(ctxGeo)) + '</dd>';
+        if (ctxSampleSize > 0) objectivesHtml += '<dt>Sample Size</dt><dd>' + escapeHtml(String(ctxSampleSize)) + '</dd>';
+        if (ctxQuestionCount > 0) objectivesHtml += '<dt>No. of Questions</dt><dd>' + escapeHtml(String(ctxQuestionCount)) + '</dd>';
         objectivesHtml += '</dl></div>';
     }
     if (!aiUsed && message) {
@@ -1499,8 +1591,9 @@ function downloadMarketResearchCsv() {
             opts.forEach((opt, j) => {
                 const optVal = (opt || '').trim().replace(/^["']+|["']+$/g, '');
                 const reportVal = formatOptionValueNumericOnly(vals[j]).replace(/^["']+|["']+$/g, '');
-                const rowQNo = j === 0 ? qNo : '';
-                const rowDesc = j === 0 ? desc : '';
+                // Repeat question number + description for every option row.
+                const rowQNo = qNo;
+                const rowDesc = desc;
                 rows.push(hasAnyValues ? [rowQNo, rowDesc, optVal, reportVal] : [rowQNo, rowDesc, optVal]);
             });
         }
@@ -1994,6 +2087,7 @@ async function loadReports(page = 1) {
                             <h3 class="verdict-panel-title">Human Study</h3>
                             <div class="verdict-panel-body">
                                 <div class="vrow"><span class="vlabel">Survey title</span><strong class="vvalue">${escapeHtml(commonSurveyName)}</strong></div>
+                                <div class="vrow"><span class="vlabel">Publisher name</span><strong class="vvalue">${escapeHtml(String(humanStudy.publisher_name || '—'))}</strong></div>
                                 <div class="vrow"><span class="vlabel">Industry</span><strong class="vvalue">${escapeHtml(industry)}</strong></div>
                                 <div class="vrow"><span class="vlabel">Scenario</span><strong class="vvalue">${escapeHtml(scenario)}</strong></div>
                                 <div class="vrow"><span class="vlabel">Target audience</span><strong class="vvalue">${escapeHtml(commonTargetAudience)}</strong></div>
@@ -2154,6 +2248,10 @@ function storeResultsAndNavigate(resultsData, surveyId) {
         resultsData.survey_id = surveyId;
     }
     
+    const sidFinal = surveyId || resultsData.survey_id;
+    if (sidFinal) {
+        try { localStorage.setItem('syntera:lastTestLabSurveyId', String(sidFinal)); } catch (_) {}
+    }
     // Store results data with consistent structure
     const dataToStore = {
         data: resultsData,
@@ -2754,7 +2852,6 @@ function updateNavigationForRole() {
     const navSurveys = document.getElementById('nav-surveys');
     const navValidation = document.getElementById('nav-validation');
     const navResults = document.getElementById('nav-results');
-    const navIndustrySurveys = document.getElementById('nav-industry-surveys');
     const navMarketResearch = document.getElementById('nav-market-research');
     
     if (currentUserRole === null) {
@@ -2764,7 +2861,6 @@ function updateNavigationForRole() {
         if (navSurveys) navSurveys.style.display = 'none';
         if (navValidation) navValidation.style.display = 'none';
         if (navResults) navResults.style.display = 'none';
-        if (navIndustrySurveys) navIndustrySurveys.style.display = 'none';
         if (navMarketResearch) navMarketResearch.style.display = 'none';
     } else if (currentUserRole === 'user') {
         // User: show all except maybe admin-only in the future
@@ -2773,7 +2869,6 @@ function updateNavigationForRole() {
         if (navSurveys) navSurveys.style.display = '';
         if (navValidation) navValidation.style.display = '';
         if (navResults) navResults.style.display = '';
-        if (navIndustrySurveys) navIndustrySurveys.style.display = '';
         if (navMarketResearch) navMarketResearch.style.display = '';
     } else {
         // Super User: Show all tabs
@@ -2782,7 +2877,6 @@ function updateNavigationForRole() {
         if (navSurveys) navSurveys.style.display = '';
         if (navValidation) navValidation.style.display = '';
         if (navResults) navResults.style.display = '';
-        if (navIndustrySurveys) navIndustrySurveys.style.display = '';
         if (navMarketResearch) navMarketResearch.style.display = '';
     }
 }
@@ -2843,6 +2937,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     
     // File input change handlers
+    hydrateValidationMetadataInputs();
     document.getElementById('file-synthetic')?.addEventListener('change', (e) => {
         const file = e.target.files[0];
         document.getElementById('file-synthetic-info').textContent = 
@@ -2892,8 +2987,20 @@ function displaySemilatticeStyleResults(data, surveyId, targetDiv) {
     
     try {
         const survey = data.survey || {};
+        const tlp = data.test_lab_profile || {};
+        const humanFromProfile = tlp.human_study || {};
+        const studyTitleRaw = humanFromProfile.survey_name || survey.title || 'Survey Comparison';
+        const profileScenario = (tlp.scenario && String(tlp.scenario).trim()) ? String(tlp.scenario).trim() : '';
+        const profileIndustry = derivedIndustry(studyTitleRaw, tlp.industry);
+        const profileGeo = (tlp.geography && String(tlp.geography).trim()) || (humanFromProfile.geography && String(humanFromProfile.geography).trim()) || '';
         const fileInfo = data.file_info || {};
-        const commonQuestionsOnly = (rows) => (Array.isArray(rows) ? rows.filter((q) => q && q.status === 'Compared') : []);
+        const commonQuestionsOnly = (rows) => {
+            if (!Array.isArray(rows)) return [];
+            const strict = rows.filter((q) => q && q.status === 'Compared');
+            if (strict.length > 0) return strict;
+            // Backward-compat: if status flag is absent/mixed, still render available rows.
+            return rows.filter((q) => q && (q.question_name || q.question_id || q.option_comparisons));
+        };
         let questionComparisons = commonQuestionsOnly(data.question_comparisons);
         if (questionComparisons.length === 0) {
             const results = data.results || {};
@@ -2955,13 +3062,25 @@ function displaySemilatticeStyleResults(data, surveyId, targetDiv) {
     const createdDate = survey.created_at ? new Date(survey.created_at).toLocaleString() : 'N/A';
     const validatedDate = survey.validated_at ? new Date(survey.validated_at).toLocaleString() : 'N/A';
     
+    const qcCount = questionComparisons.length > 0 ? questionComparisons.length : (fileInfo.synthetic_question_count || fileInfo.real_question_count || 0);
+    const questionCountDisplay = (humanFromProfile.total_questions != null && humanFromProfile.total_questions > 0)
+        ? humanFromProfile.total_questions
+        : qcCount;
+    const metaParts = [];
+    if (profileIndustry && profileIndustry !== 'General') metaParts.push(`Industry: ${escapeHtml(profileIndustry)}`);
+    if (profileScenario) metaParts.push(`Scenario: ${escapeHtml(profileScenario)}`);
+    if (profileGeo) metaParts.push(`Geography: ${escapeHtml(profileGeo)}`);
+    const modelDesc = metaParts.length > 0
+        ? metaParts.join(' · ')
+        : (survey.description || 'Comparison between synthetic and real survey responses');
+
     // Model details section – compact; no synthetic/real file names
     const modelDetailsHtml = `
         <div class="model-details-card model-details-compact">
             <div class="model-details-header">
                 <div>
-                    <h3><strong class="seed-label-bold">Study Name:</strong> <span class="seed-value-normal">${formatSurveyName(survey.title || 'Survey Comparison')}</span></h3>
-                    <p class="model-description">${survey.description || 'Comparison between synthetic and real survey responses'}</p>
+                    <h3><strong class="seed-label-bold">Study Name:</strong> <span class="seed-value-normal">${formatSurveyName(studyTitleRaw)}</span></h3>
+                    <p class="model-description">${modelDesc}</p>
                 </div>
                 <div class="model-id-section">
                     <div class="model-id">
@@ -2987,8 +3106,13 @@ function displaySemilatticeStyleResults(data, surveyId, targetDiv) {
                 </div>
                 <div class="model-detail-item">
                     <div class="model-detail-label">Question Count</div>
-                    <div class="model-detail-value">${questionComparisons.length > 0 ? questionComparisons.length : (fileInfo.synthetic_question_count || fileInfo.real_question_count || 0)}</div>
+                    <div class="model-detail-value">${questionCountDisplay}</div>
                 </div>
+                ${humanFromProfile.sample_size != null && Number(humanFromProfile.sample_size) > 0 ? `
+                <div class="model-detail-item">
+                    <div class="model-detail-label">Human sample (report)</div>
+                    <div class="model-detail-value">${escapeHtml(String(humanFromProfile.sample_size))}</div>
+                </div>` : ''}
                 <div class="model-detail-item">
                     <div class="model-detail-label">Overall File Accuracy</div>
                     <div class="model-detail-value" style="color: ${accentColor}">${accuracy}%</div>
@@ -3108,17 +3232,8 @@ function displaySemilatticeStyleResults(data, surveyId, targetDiv) {
     // Question-by-question table with option-level comparison (no sparklines)
     let questionsTableHtml = '';
     if (questionComparisons.length > 0) {
-        const unmatchedHtml = (synthOnly.length || humanOnly.length) ? `
-            <div class="methodology-note" style="margin: 0 0 12px 0;">
-                <strong>Unmatched Questions:</strong>
-                ${synthOnly.length ? `Synthetic-only: ${synthOnly.length}` : 'Synthetic-only: 0'},
-                ${humanOnly.length ? `Human-only: ${humanOnly.length}` : 'Human-only: 0'}.
-                Only common matched questions are shown below.
-            </div>
-        ` : '';
         questionsTableHtml = `
             <div id="tab-content-questions" class="results-tab-content active">
-                ${unmatchedHtml}
                 <div class="questions-table-container">
                     <table class="questions-table">
                         <thead>
@@ -3377,10 +3492,33 @@ async function compareFiles() {
     const realFile = document.getElementById('file-real')?.files[0];
     const surveyIdInput = document.getElementById('file-survey-id');
     const surveyId = surveyIdInput ? surveyIdInput.value.trim() : null;
-    const method = document.getElementById('extraction-method')?.value || 'totals';
+    const surveyTitle = document.getElementById('file-survey-title')?.value?.trim() || '';
+    const publisherName = document.getElementById('file-publisher-name')?.value?.trim() || '';
+    const industry = document.getElementById('file-industry')?.value || '';
+    const scenario = document.getElementById('file-scenario')?.value || '';
+    const geography = document.getElementById('file-geography')?.value || '';
+    const sampleSize = document.getElementById('file-sample-size')?.value?.trim() || '';
+    const numberOfQuestions = document.getElementById('file-number-of-questions')?.value?.trim() || '';
+    const camelCasePhrase = /^[A-Z][a-zA-Z0-9]*(?: [A-Z][a-zA-Z0-9]*)*$/;
     
     if (!syntheticFile || !realFile) {
         showNotification('Please select both files (Synthetic and Real) to compare.', 'warning');
+        return;
+    }
+    if (!surveyTitle || !publisherName || !industry || !scenario || !geography || !sampleSize || !numberOfQuestions) {
+        showNotification('Please fill all mandatory metadata fields before comparing files.', 'warning');
+        return;
+    }
+    if (!camelCasePhrase.test(publisherName)) {
+        showNotification('Publisher Name must be in Camel Case.', 'warning');
+        return;
+    }
+    if (!/^\d+$/.test(sampleSize) || Number(sampleSize) <= 0) {
+        showNotification('Sample Size must be a positive number.', 'warning');
+        return;
+    }
+    if (!/^\d+$/.test(numberOfQuestions) || Number(numberOfQuestions) <= 0) {
+        showNotification('No. of Questions must be a positive number.', 'warning');
         return;
     }
     
@@ -3412,7 +3550,13 @@ async function compareFiles() {
         const formData = new FormData();
         formData.append('synthetic_file', syntheticFile);
         formData.append('real_file', realFile);
-        formData.append('method', method);
+        formData.append('survey_title', surveyTitle);
+        formData.append('publisher_name', publisherName);
+        formData.append('industry', industry);
+        formData.append('scenario', scenario);
+        formData.append('geography', geography);
+        formData.append('sample_size', sampleSize);
+        formData.append('number_of_questions', numberOfQuestions);
         if (surveyId) {
             formData.append('survey_id', surveyId);
         }
