@@ -5,7 +5,7 @@ One-shot backfill: align all TestLabProfile rows with current default rules.
 - Geography: India
 - Industry: derived from study name (Food, Automotive/EV, else General)
 - Human study: age-group audience, economics from respondent rule
-- Synthetic study: cost_display $999
+- Synthetic study: cost_display $2499
 
 Usage (from repo root):
   set DATABASE_URL=postgresql://...
@@ -70,7 +70,7 @@ def main() -> None:
             ss_sample = int(ss.get("sample_size") or sample)
             ss["sample_size"] = ss_sample
             econ = ss.get("economics") if isinstance(ss.get("economics"), dict) else {}
-            econ["cost_display"] = "$999"
+            econ["cost_display"] = "$2499"
             econ.setdefault("time_display", "3-4 hrs")
             econ.setdefault("effort_display", "1-2 hrs")
             ss["economics"] = econ

@@ -379,7 +379,14 @@ function hydrateValidationMetadataInputs() {
     fillSelect('file-scenario', VALIDATION_SCENARIO_OPTIONS, 'Select scenario');
     fillSelect('file-geography', VALIDATION_GEOGRAPHY_OPTIONS, 'Select geography');
 
-    const numericOnlyIds = ['file-sample-size', 'file-number-of-questions'];
+    const numericOnlyIds = [
+        'file-sample-size',
+        'file-number-of-questions',
+        'file-behaviour-signals',
+        'file-neuroscience-signals',
+        'file-context-threads',
+        'file-knowledge-bank',
+    ];
     numericOnlyIds.forEach((id) => {
         const input = document.getElementById(id);
         if (!input) return;
@@ -2042,7 +2049,7 @@ async function loadReports(page = 1) {
             const spEconomics = syntheticStudy.economics || {};
             const spCostLabel = spEconomics.cost_display != null && String(spEconomics.cost_display).trim() !== ''
                 ? escapeHtml(String(spEconomics.cost_display))
-                : '$999';
+                : '$2499';
             const spTime = spEconomics.time_display || '3-4 hrs';
             const spEffort = spEconomics.effort_display || '1-2 hrs';
 
@@ -3499,6 +3506,11 @@ async function compareFiles() {
     const geography = document.getElementById('file-geography')?.value || '';
     const sampleSize = document.getElementById('file-sample-size')?.value?.trim() || '';
     const numberOfQuestions = document.getElementById('file-number-of-questions')?.value?.trim() || '';
+    const estimatedCost = document.getElementById('file-est-cost')?.value?.trim() || '$2499';
+    const behaviourSignals = document.getElementById('file-behaviour-signals')?.value?.trim() || '';
+    const neuroscienceSignals = document.getElementById('file-neuroscience-signals')?.value?.trim() || '';
+    const contextThreads = document.getElementById('file-context-threads')?.value?.trim() || '';
+    const knowledgeBank = document.getElementById('file-knowledge-bank')?.value?.trim() || '';
     const camelCasePhrase = /^[A-Z][a-zA-Z0-9]*(?: [A-Z][a-zA-Z0-9]*)*$/;
     
     if (!syntheticFile || !realFile) {
@@ -3507,6 +3519,14 @@ async function compareFiles() {
     }
     if (!surveyTitle || !publisherName || !industry || !scenario || !geography || !sampleSize || !numberOfQuestions) {
         showNotification('Please fill all mandatory metadata fields before comparing files.', 'warning');
+        return;
+    }
+    if (!estimatedCost) {
+        showNotification('Est. Cost is mandatory.', 'warning');
+        return;
+    }
+    if (!behaviourSignals || !neuroscienceSignals || !contextThreads || !knowledgeBank) {
+        showNotification('Please fill all synthetic simulation numeric fields.', 'warning');
         return;
     }
     if (!camelCasePhrase.test(publisherName)) {
@@ -3519,6 +3539,22 @@ async function compareFiles() {
     }
     if (!/^\d+$/.test(numberOfQuestions) || Number(numberOfQuestions) <= 0) {
         showNotification('No. of Questions must be a positive number.', 'warning');
+        return;
+    }
+    if (!/^\d+$/.test(behaviourSignals) || Number(behaviourSignals) <= 0) {
+        showNotification('Behaviour Signals must be a positive number.', 'warning');
+        return;
+    }
+    if (!/^\d+$/.test(neuroscienceSignals) || Number(neuroscienceSignals) <= 0) {
+        showNotification('Neuroscience Signals must be a positive number.', 'warning');
+        return;
+    }
+    if (!/^\d+$/.test(contextThreads) || Number(contextThreads) <= 0) {
+        showNotification('Context Threads must be a positive number.', 'warning');
+        return;
+    }
+    if (!/^\d+$/.test(knowledgeBank) || Number(knowledgeBank) <= 0) {
+        showNotification('Knowledge Bank must be a positive number.', 'warning');
         return;
     }
     
@@ -3557,6 +3593,11 @@ async function compareFiles() {
         formData.append('geography', geography);
         formData.append('sample_size', sampleSize);
         formData.append('number_of_questions', numberOfQuestions);
+        formData.append('estimated_cost', estimatedCost);
+        formData.append('behaviour_signals', behaviourSignals);
+        formData.append('neuroscience_signals', neuroscienceSignals);
+        formData.append('context_threads', contextThreads);
+        formData.append('knowledge_bank', knowledgeBank);
         if (surveyId) {
             formData.append('survey_id', surveyId);
         }

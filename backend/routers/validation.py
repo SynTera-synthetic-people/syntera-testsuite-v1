@@ -506,6 +506,15 @@ def _normalize_country_name(value: Optional[str]) -> Optional[str]:
         return txt
     return primary
 
+def _normalize_cost_display(value: Optional[str]) -> str:
+    raw = str(value or "").strip()
+    if not raw:
+        return "$2499"
+    digits = re.sub(r"[^\d]", "", raw)
+    if not digits:
+        return "$2499"
+    return f"${digits}"
+
 
 def _coerce_respondent_count(value: Any) -> Optional[int]:
     if value is None:
@@ -613,7 +622,7 @@ def _ensure_profile_defaults(
     expected_synthetic = {
         "sample_size": default_sample_size,
         **_synthetic_random_defaults(),
-        "economics": {"cost_display": "$999", "time_display": "3-4 hrs", "effort_display": "1-2 hrs"},
+        "economics": {"cost_display": "$2499", "time_display": "3-4 hrs", "effort_display": "1-2 hrs"},
         "statistics": {},
     }
 
@@ -1145,6 +1154,11 @@ async def compare_files(
     geography: str = Form(..., description="Country / geography"),
     sample_size: str = Form(..., description="Sample size (numeric)"),
     number_of_questions: str = Form(..., description="No. of questions (numeric)"),
+    estimated_cost: str = Form("$2499", description="Synthetic simulation estimated cost display"),
+    behaviour_signals: str = Form(..., description="Behaviour signals (numeric)"),
+    neuroscience_signals: str = Form(..., description="Neuroscience signals (numeric)"),
+    context_threads: str = Form(..., description="Context threads (numeric)"),
+    knowledge_bank: str = Form(..., description="Knowledge bank (numeric)"),
     link_orphan_market_research: bool = Form(
         True,
         description="If true and this survey has no MR row yet, attach the latest unlinked Market Research extraction.",
@@ -1163,6 +1177,11 @@ async def compare_files(
     geography_clean = _normalize_country_name(geography) or str(geography or "").strip()
     sample_size_int = _require_positive_int_field("Sample Size", sample_size)
     questions_int = _require_positive_int_field("No. of Questions", number_of_questions)
+    behaviour_signals_int = _require_positive_int_field("Behaviour Signals", behaviour_signals)
+    neuroscience_signals_int = _require_positive_int_field("Neuroscience Signals", neuroscience_signals)
+    context_threads_int = _require_positive_int_field("Context Threads", context_threads)
+    knowledge_bank_int = _require_positive_int_field("Knowledge Bank", knowledge_bank)
+    estimated_cost_clean = _normalize_cost_display(estimated_cost)
 
     if not _is_camel_case_phrase(publisher_clean):
         raise HTTPException(status_code=400, detail="Publisher Name must be in Camel Case.")
@@ -1416,6 +1435,27 @@ async def compare_files(
         )
         profile.human_study = sanitize_for_json(existing_human)
         flag_modified(profile, "human_study")
+        existing_synth = dict(profile.synthetic_study) if isinstance(profile.synthetic_study, dict) else {}
+        existing_synth.update(
+            {
+                "sample_size": sample_size_int,
+                "actions_data_points": behaviour_signals_int,
+                "neuroscience_data_points": neuroscience_signals_int,
+                "contextual_layer_data_points": context_threads_int,
+                "contextual_conversation_threads": context_threads_int,
+                "contextual_sources_inferred": knowledge_bank_int,
+            }
+        )
+        econ = dict(existing_synth.get("economics") or {})
+        econ["cost_display"] = estimated_cost_clean
+        econ.setdefault("time_display", "3-4 hrs")
+        econ.setdefault("effort_display", "1-2 hrs")
+        existing_synth["economics"] = econ
+        profile.synthetic_study = sanitize_for_json(existing_synth)
+        flag_modified(profile, "synthetic_study")
+        survey.actions_data_points = behaviour_signals_int
+        survey.neuroscience_data_points = neuroscience_signals_int
+        survey.contextual_layer_data_points = context_threads_int
         db.commit()
         db.refresh(survey)
 
