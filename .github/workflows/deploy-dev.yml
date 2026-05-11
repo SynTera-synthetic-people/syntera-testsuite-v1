@@ -1,8 +1,9 @@
 name: Deploy to Dev Server
 
-# Manual trigger
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - main  
 
 concurrency:
   group: production-deploy
@@ -36,5 +37,3 @@ jobs:
           '${{ secrets.DEV_APP_DIR }}' \
           '${{ secrets.DEV_APP_PORT }}' \
           'main'"
-
-
