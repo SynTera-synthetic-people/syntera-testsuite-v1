@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import math
 import re
-from collections import defaultdict
 from difflib import SequenceMatcher
 from typing import Any, Optional
 
@@ -130,6 +129,7 @@ def pair_categorical_response_options(
     human_counts: dict[str, Any],
     *,
     min_score: float = 0.44,
+    only_paired: bool = False,
 ) -> list[dict[str, Any]]:
     """
     Align synthetic vs human option labels for one question (wording may differ).
@@ -192,6 +192,9 @@ def pair_categorical_response_options(
             }
         )
 
+    if only_paired:
+        return rows
+
     for i, sk in enumerate(syn_keys):
         if i in used_s:
             continue
@@ -241,29 +244,8 @@ def pair_survey_questions_for_comparison(
     used_r: set[int] = set()
     out: list[tuple[dict[str, Any], dict[str, Any], float]] = []
 
-    syn_by_id: defaultdict[str, list[int]] = defaultdict(list)
-    for i, sq in enumerate(syn_q_data):
-        sid = normalize_survey_question_id(sq.get("question_id"))
-        if sid:
-            syn_by_id[sid].append(i)
-    real_by_id: defaultdict[str, list[int]] = defaultdict(list)
-    for j, rq in enumerate(real_q_data):
-        rid = normalize_survey_question_id(rq.get("question_id"))
-        if rid:
-            real_by_id[rid].append(j)
-
-    for qid in set(syn_by_id.keys()) & set(real_by_id.keys()):
-        for i in syn_by_id[qid]:
-            if i in used_s:
-                continue
-            for j in real_by_id[qid]:
-                if j in used_r:
-                    continue
-                sq, rq = syn_q_data[i], real_q_data[j]
-                used_s.add(i)
-                used_r.add(j)
-                out.append((sq, rq, 1.0))
-                break
+    # Do not pair by question number alone: exports often use Q1..Qn on both sides while
+    # the actual question order/content differs. Pairing must be driven by text + option overlap.
 
     candidates: list[tuple[float, int, int]] = []
     for i, sq in enumerate(syn_q_data):

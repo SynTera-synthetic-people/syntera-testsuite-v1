@@ -789,7 +789,7 @@ class FileParser:
                 if not opt or opt.lower() == "nan":
                     continue
                 cnt = _coerce_count(r[cnt_col])
-                if pd.isna(cnt) or float(cnt) <= 0:
+                if pd.isna(cnt):
                     continue
                 fv = float(cnt)
                 response_counts[opt] = fv
