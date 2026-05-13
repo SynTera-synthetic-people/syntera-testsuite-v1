@@ -123,7 +123,7 @@ def _classify_question_category(question_text: Any) -> str:
     """
     Semantic category mapping based on Test Lab's survey signal framework:
     Attribute, Behavior, Knowledge, Preference, Evaluation, Emotion,
-    Reason / Explanation, Intent.
+    Reasoning, Intent.
     """
     t = str(question_text or "").strip().lower()
     if not t:
@@ -133,7 +133,7 @@ def _classify_question_category(question_text: Any) -> str:
         return any(tok in t for tok in tokens)
 
     if has_any(("why ", "reason", "main reason", "because", "driver", "explain")):
-        return "Reason / Explanation"
+        return "Reasoning"
     if has_any(("likely", "plan", "intend", "intention", "future", "next ", "willing", "probability")):
         return "Intent"
     if has_any(("feel", "feeling", "worried", "worry", "anxious", "anxiety", "confidence", "excited", "concerned")):

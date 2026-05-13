@@ -3023,13 +3023,14 @@ function displaySemilatticeStyleResults(data, surveyId, targetDiv) {
         const accentColor = acc01 != null ? matchScoreAccentColor(acc01) : '#6b7280';
         const categoryOrder = [
             'Attribute', 'Behavior', 'Knowledge', 'Preference',
-            'Evaluation', 'Emotion', 'Reason / Explanation', 'Intent'
+            'Evaluation', 'Emotion', 'Reasoning', 'Intent'
         ];
         const categoryBuckets = new Map();
         questionComparisons.forEach((q) => {
             const s = Number(q?.match_score);
             if (!Number.isFinite(s)) return;
-            const cat = String(q?.question_category || q?.type || 'Evaluation').trim() || 'Evaluation';
+            const catRaw = String(q?.question_category || q?.type || 'Evaluation').trim() || 'Evaluation';
+            const cat = catRaw === 'Reason / Explanation' ? 'Reasoning' : catRaw;
             const prev = categoryBuckets.get(cat) || { sum: 0, n: 0 };
             prev.sum += s;
             prev.n += 1;
