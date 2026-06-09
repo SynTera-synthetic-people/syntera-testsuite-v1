@@ -328,6 +328,14 @@
                                 <input type="file" id="file-real" accept=".xlsx,.xls,.csv" />
                                 <small class="file-info" id="file-real-info">No file selected</small>
                             </label>
+                            <label class="field-label">Questionnaire 3 (LLM Output/File C) <span class="field-hint">(optional)</span>
+                                <input type="file" id="file-llm" accept=".xlsx,.xls,.csv" />
+                                <small class="file-info" id="file-llm-info">No file selected</small>
+                                <small class="help-text">CSV columns: <code>Sr No., Question name, option name, response count</code>. When provided, an extra Real vs LLM Output comparison is generated for the same Survey ID.</small>
+                            </label>
+                            <label class="field-label">LLM Output Sample Size <span class="field-hint">(optional)</span>
+                                <input id="file-llm-sample-size" type="text" inputmode="numeric" placeholder="Numeric only" />
+                            </label>
                             <label class="field-label">Survey ID (optional)
                                 <input id="file-survey-id" type="text" placeholder="Paste survey ID from Surveys panel (leave empty to create new)" />
                             </label>

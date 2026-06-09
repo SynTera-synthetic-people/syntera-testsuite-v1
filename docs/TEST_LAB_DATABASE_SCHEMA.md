@@ -25,6 +25,12 @@ erDiagram
         float avg_prediction_accuracy
         float avg_relationship_strength
         int checks_passed
+        float llm_accuracy_score
+        float llm_avg_similarity
+        float llm_directional_alignment
+        float llm_avg_prediction_accuracy
+        float llm_avg_relationship_strength
+        int llm_checks_passed
         string confidence_tier
         string validation_status
         timestamptz validated_at
@@ -32,6 +38,8 @@ erDiagram
         jsonb survey_questions
         jsonb synthetic_responses
         jsonb real_responses
+        jsonb llm_output
+        jsonb llm_responses
         jsonb test_suite_report
         timestamptz created_at
         timestamptz updated_at
@@ -45,6 +53,7 @@ erDiagram
         string scenario
         jsonb human_study
         jsonb synthetic_study
+        jsonb llm_study
         jsonb verdict
         jsonb metadata
         timestamptz created_at
@@ -104,6 +113,8 @@ These exist in code and production DB for product needs; document them here when
 | Table | Purpose |
 |-------|---------|
 | `test_lab_surveys` | Extra scalar metrics (`avg_similarity`, `directional_alignment`, …) and `test_suite_report` JSONB for engine output, question-level comparisons, and embedded `study_metrics`. |
+| `test_lab_surveys` (LLM Output / File C) | `llm_output` + `llm_responses` JSONB mirror `synthetic_personas`/`survey_questions` and the response arrays for the optional **LLM Output (File C)** upload. `llm_accuracy_score`, `llm_avg_similarity`, `llm_directional_alignment`, `llm_avg_prediction_accuracy`, `llm_avg_relationship_strength`, `llm_checks_passed` hold the **Real (File B) vs LLM Output (File C)** comparison metrics. `test_suite_report.llm_question_comparisons` / `llm_unmatched_questions` / `llm_overall_accuracy` store the per-question comparison. |
+| `test_lab_profiles` (LLM Output) | `llm_study` JSONB mirrors `human_study` / `synthetic_study` for the LLM Output (File C) study block (source file, sample size, question count, accuracy). |
 | `test_lab_reports` | Optional `TestLabReport` model: stable render snapshot per survey (see `survey.py`). Created in `init_db` if missing. |
 | `market_research_extractions` | Separate feature; not part of the Test Lab ERD above. |
 

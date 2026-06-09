@@ -22,7 +22,7 @@ from ml_engine.survey_pairing import (
 )
 from database.connection import get_db
 from backend.models.survey import Survey, ValidationRun, TestLabProfile, TestLabLead, TestLabVerdict, MarketResearchExtraction
-from backend.utils.json_helpers import sanitize_for_json
+from backend.utils.json_helpers import sanitize_for_json, migrate_signal_category_labels, test_suite_report_has_legacy_reason_label
 
 logger = logging.getLogger(__name__)
 
@@ -151,17 +151,41 @@ def _classify_question_category(question_text: Any) -> str:
     return "Evaluation"
 
 
+def _aggregate_option_totals(option_counts: dict[str, Any]) -> float:
+    return sum(float(v or 0) for v in (option_counts or {}).values())
+
+
+def _infer_multi_select_from_aggregate_counts(
+    syn_filtered: dict[str, Any],
+    real_filtered: dict[str, Any],
+    *,
+    sample_size_hint: Optional[int],
+) -> bool:
+    """True when summed option totals exceed sample size (select-all-that-apply style)."""
+    if not sample_size_hint or sample_size_hint <= 0:
+        return False
+    tol = float(sample_size_hint) * 1.02
+    return _aggregate_option_totals(syn_filtered) > tol or _aggregate_option_totals(real_filtered) > tol
+
+
 def _build_question_comparisons_from_question_lists(
     syn_q_data: list[dict[str, Any]],
     real_q_data: list[dict[str, Any]],
     *,
     pair_min_score: float = 0.42,
+    sample_size_hint: Optional[int] = None,
 ) -> list[dict[str, Any]]:
     """
     Pair synthetic vs real questions and build per-question comparison rows.
 
     Only **paired** (common) questions are returned—questions that appear in both surveys
     with sufficient semantic match. Unpaired items are omitted to avoid misleading rows.
+
+    Single-choice (strict): same number of options on both sides; all options text-paired.
+
+    Multi-select / partial overlap: when summed category totals exceed sample size (hint),
+    or synthetic/human option lists differ, compare only **options that pair on both sides**
+    (at least two pairs) so multi-select and slightly misaligned exports still appear.
     """
     question_comparisons: list[dict[str, Any]] = []
     paired = pair_survey_questions_for_comparison(syn_q_data, real_q_data, min_score=pair_min_score)
@@ -182,9 +206,6 @@ def _build_question_comparisons_from_question_lists(
             option_comparisons: list[dict[str, Any]] = []
 
             if has_categorical_data:
-                # Only show options that exist on both sides with a confident label match.
-                # Skip the whole question if option sets do not fully align (different counts
-                # or wording that does not pair), so counts are never compared across unrelated options.
                 raw_option_comparisons = pair_categorical_response_options(
                     syn_filtered, real_filtered, min_score=0.52, only_paired=True
                 )
@@ -197,11 +218,31 @@ def _build_question_comparisons_from_question_lists(
                 ]
                 syn_opt_n = len(syn_filtered)
                 real_opt_n = len(real_filtered)
-                if (
-                    syn_opt_n != real_opt_n
-                    or len(option_comparisons) != syn_opt_n
-                    or len(option_comparisons) != real_opt_n
-                ):
+                n_pairs = len(option_comparisons)
+                is_multi_aggregate = _infer_multi_select_from_aggregate_counts(
+                    syn_filtered, real_filtered, sample_size_hint=sample_size_hint
+                )
+                strict_ok = (
+                    syn_opt_n == real_opt_n
+                    and n_pairs == syn_opt_n
+                    and n_pairs == real_opt_n
+                )
+                partial_overlap = False
+                if not strict_ok and n_pairs >= 2 and (is_multi_aggregate or syn_opt_n != real_opt_n):
+                    partial_overlap = True
+                if strict_ok:
+                    comparison_note = None
+                    question_type_base = (
+                        "Multi-Select" if is_multi_aggregate else "Single-Choice"
+                    )
+                elif partial_overlap:
+                    comparison_note = (
+                        "Multi-select style or overlapping options: comparing "
+                        f"{n_pairs} option(s) that appear on both sides; unmatched options omitted."
+                    )
+                    question_type_base = "Multi-Select"
+                    # synthetic_response_counts / real_response_counts still hold full blobs for tooling
+                else:
                     continue
                 total_diff = 0.0
                 total_sum = 0.0
@@ -214,16 +255,21 @@ def _build_question_comparisons_from_question_lists(
                 syn_total = sum(float(v or 0) for v in syn_filtered.values())
                 real_total = sum(float(v or 0) for v in real_filtered.values())
 
-                question_type = "Single-Choice"
-                option_keys = [str(k) for k in syn_filtered.keys()]
-                try:
-                    numeric_keys = [int(k) for k in option_keys if k.isdigit()]
-                    if numeric_keys and min(numeric_keys) >= 1 and max(numeric_keys) <= 10:
-                        question_type = "Rating Scale"
-                    else:
+                if question_type_base == "Single-Choice":
+                    question_type = "Single-Choice"
+                    option_keys = [str(k) for k in syn_filtered.keys()]
+                    try:
+                        numeric_keys = [int(k) for k in option_keys if k.isdigit()]
+                        if numeric_keys and min(numeric_keys) >= 1 and max(numeric_keys) <= 10:
+                            question_type = "Rating Scale"
+                        else:
+                            question_type = "Categorical"
+                    except Exception:
                         question_type = "Categorical"
-                except Exception:
-                    question_type = "Categorical"
+                else:
+                    question_type = "Multi-Select"
+                multi_select_flag = bool(partial_overlap or is_multi_aggregate)
+                comparison_note_out = comparison_note
             else:
                 syn_mean_val = syn_counts.get("MEAN") or syn_q.get("mean") or 0
                 syn_std_val = syn_counts.get("STD") or syn_q.get("std") or 0
@@ -246,7 +292,8 @@ def _build_question_comparisons_from_question_lists(
                 syn_total = float(syn_mean_val or 0)
                 real_total = float(real_mean_val or 0)
                 question_type = "Statistical Summary"
-
+                multi_select_flag = False
+                comparison_note_out = None
             if match_score is None or (isinstance(match_score, float) and math.isnan(match_score)):
                 match_score = 0.0
             match_score = max(0.0, min(1.0, float(match_score)))
@@ -264,8 +311,7 @@ def _build_question_comparisons_from_question_lists(
                             }
                         )
 
-            question_comparisons.append(
-                {
+            row_out: dict[str, Any] = {
                     "question_id": str(q_id),
                     "paired_real_question_id": str(rid),
                     "pairing_confidence": float(round(pair_conf, 4)),
@@ -280,13 +326,224 @@ def _build_question_comparisons_from_question_lists(
                     "match_score": float(match_score),
                     "status": "Compared",
                     "type": question_type,
+                    "multi_select": multi_select_flag,
                     "option_comparisons": option_comparisons,
                     "synthetic_response_counts": dict(syn_filtered) if has_categorical_data else {},
                     "real_response_counts": dict(real_filtered) if has_categorical_data else {},
                 }
-            )
+            if comparison_note_out:
+                row_out["comparison_note"] = comparison_note_out
+            question_comparisons.append(row_out)
 
     return question_comparisons
+
+
+def _remap_option_row_to_real_llm(row: dict[str, Any]) -> dict[str, Any]:
+    """
+    Convert a synthetic/real option-comparison row (from pair_categorical_response_options,
+    where arg1=real, arg2=llm) into the real/llm naming used by the Real-vs-LLM comparison.
+    """
+    return {
+        "option": row.get("option"),
+        "real_option": row.get("synthetic_option"),
+        "llm_option": row.get("human_option"),
+        "real_count": float(row.get("synthetic_count", 0) or 0),
+        "llm_count": float(row.get("real_count", 0) or 0),
+    }
+
+
+def _build_llm_question_comparisons_from_question_lists(
+    real_q_data: list[dict[str, Any]],
+    llm_q_data: list[dict[str, Any]],
+    *,
+    pair_min_score: float = 0.42,
+    sample_size_hint: Optional[int] = None,
+) -> list[dict[str, Any]]:
+    """
+    Pair Real (File B) vs LLM Output (File C) questions and build per-question comparison rows.
+
+    Mirrors `_build_question_comparisons_from_question_lists` but emits Real-vs-LLM naming
+    (real_count / llm_count / real_option / llm_option, real_total / llm_total, etc.) so the
+    frontend can render a dedicated Real vs LLM Output comparison without clashing with the
+    Synthetic-vs-Real keys.
+
+    `pair_categorical_response_options(arg1, arg2)` is called with arg1=real, arg2=llm and the
+    emitted synthetic_*/real_* keys are remapped to real_*/llm_* respectively.
+    """
+    question_comparisons: list[dict[str, Any]] = []
+    paired = pair_survey_questions_for_comparison(real_q_data, llm_q_data, min_score=pair_min_score)
+
+    for real_q, llm_q, pair_conf in paired:
+        rid = normalize_survey_question_id(real_q.get("question_id")) or str(real_q.get("question_id") or "")
+        lid = normalize_survey_question_id(llm_q.get("question_id")) or str(llm_q.get("question_id") or "")
+
+        if not (real_q and llm_q):
+            continue
+
+        real_counts = real_q.get("response_counts", {})
+        llm_counts = llm_q.get("response_counts", {})
+
+        stat_keys = {"MEAN", "MEDIAN", "STD", "TOTAL_RESPONSES"}
+        real_filtered = {k: v for k, v in real_counts.items() if str(k).upper() not in stat_keys}
+        llm_filtered = {k: v for k, v in llm_counts.items() if str(k).upper() not in stat_keys}
+
+        has_categorical_data = len(real_filtered) > 0 and len(llm_filtered) > 0
+        option_comparisons: list[dict[str, Any]] = []
+
+        if has_categorical_data:
+            raw_option_comparisons = pair_categorical_response_options(
+                real_filtered, llm_filtered, min_score=0.52, only_paired=True
+            )
+            option_comparisons = [
+                _remap_option_row_to_real_llm(row)
+                for row in raw_option_comparisons
+                if isinstance(row, dict)
+                and row.get("synthetic_option") is not None
+                and row.get("human_option") is not None
+            ]
+            real_opt_n = len(real_filtered)
+            llm_opt_n = len(llm_filtered)
+            n_pairs = len(option_comparisons)
+            is_multi_aggregate = _infer_multi_select_from_aggregate_counts(
+                real_filtered, llm_filtered, sample_size_hint=sample_size_hint
+            )
+            strict_ok = real_opt_n == llm_opt_n and n_pairs == real_opt_n and n_pairs == llm_opt_n
+            partial_overlap = False
+            if not strict_ok and n_pairs >= 2 and (is_multi_aggregate or real_opt_n != llm_opt_n):
+                partial_overlap = True
+            if strict_ok:
+                comparison_note = None
+                question_type_base = "Multi-Select" if is_multi_aggregate else "Single-Choice"
+            elif partial_overlap:
+                comparison_note = (
+                    "Multi-select style or overlapping options: comparing "
+                    f"{n_pairs} option(s) that appear on both sides; unmatched options omitted."
+                )
+                question_type_base = "Multi-Select"
+            else:
+                continue
+            total_diff = 0.0
+            total_sum = 0.0
+            for row in option_comparisons:
+                rv = float(row.get("real_count", 0) or 0)
+                lv = float(row.get("llm_count", 0) or 0)
+                total_diff += abs(rv - lv)
+                total_sum += rv + lv
+            match_score = 1.0 - (total_diff / (total_sum + 1e-9)) if total_sum > 0 else 0.0
+            real_total = sum(float(v or 0) for v in real_filtered.values())
+            llm_total = sum(float(v or 0) for v in llm_filtered.values())
+
+            if question_type_base == "Single-Choice":
+                option_keys = [str(k) for k in real_filtered.keys()]
+                try:
+                    numeric_keys = [int(k) for k in option_keys if k.isdigit()]
+                    if numeric_keys and min(numeric_keys) >= 1 and max(numeric_keys) <= 10:
+                        question_type = "Rating Scale"
+                    else:
+                        question_type = "Categorical"
+                except Exception:
+                    question_type = "Categorical"
+            else:
+                question_type = "Multi-Select"
+            multi_select_flag = bool(partial_overlap or is_multi_aggregate)
+            comparison_note_out = comparison_note
+        else:
+            real_mean_val = real_counts.get("MEAN") or real_q.get("mean") or 0
+            real_std_val = real_counts.get("STD") or real_q.get("std") or 0
+            llm_mean_val = llm_counts.get("MEAN") or llm_q.get("mean") or 0
+            llm_std_val = llm_counts.get("STD") or llm_q.get("std") or 0
+
+            mean_diff = abs(float(real_mean_val or 0) - float(llm_mean_val or 0))
+            std_diff = abs(float(real_std_val or 0) - float(llm_std_val or 0))
+            avg_mean = (abs(float(real_mean_val or 0)) + abs(float(llm_mean_val or 0))) / 2
+            avg_std = (abs(float(real_std_val or 0)) + abs(float(llm_std_val or 0))) / 2
+            norm_mean_diff = mean_diff / (avg_mean + 1e-9) if avg_mean > 0 else 0.0
+            norm_std_diff = std_diff / (avg_std + 1e-9) if avg_std > 0 else 0.0
+            avg_error = (norm_mean_diff + norm_std_diff) / 2.0
+            match_score = max(0.0, 1.0 - min(avg_error, 1.0))
+
+            real_total = float(real_mean_val or 0)
+            llm_total = float(llm_mean_val or 0)
+            question_type = "Statistical Summary"
+            multi_select_flag = False
+            comparison_note_out = None
+
+        if match_score is None or (isinstance(match_score, float) and math.isnan(match_score)):
+            match_score = 0.0
+        match_score = max(0.0, min(1.0, float(match_score)))
+
+        if not has_categorical_data:
+            for stat_key in ["MEAN", "MEDIAN", "STD"]:
+                real_val = real_counts.get(stat_key) or 0
+                llm_val = llm_counts.get(stat_key) or 0
+                if real_val or llm_val:
+                    option_comparisons.append(
+                        {
+                            "option": stat_key,
+                            "real_count": float(real_val or 0),
+                            "llm_count": float(llm_val or 0),
+                        }
+                    )
+
+        row_out: dict[str, Any] = {
+            "question_id": str(rid),
+            "paired_llm_question_id": str(lid),
+            "pairing_confidence": float(round(pair_conf, 4)),
+            "question_name": real_q.get("question_name") or llm_q.get("question_name") or str(rid),
+            "question_category": _classify_question_category(
+                real_q.get("question_name") or llm_q.get("question_name") or str(rid)
+            ),
+            "real_total": float(real_total) if real_total else 0.0,
+            "llm_total": float(llm_total) if llm_total else 0.0,
+            "real_mean": float(real_q.get("mean", 0) or 0),
+            "llm_mean": float(llm_q.get("mean", 0) or 0),
+            "match_score": float(match_score),
+            "status": "Compared",
+            "type": question_type,
+            "multi_select": multi_select_flag,
+            "option_comparisons": option_comparisons,
+            "real_response_counts": dict(real_filtered) if has_categorical_data else {},
+            "llm_response_counts": dict(llm_filtered) if has_categorical_data else {},
+        }
+        if comparison_note_out:
+            row_out["comparison_note"] = comparison_note_out
+        question_comparisons.append(row_out)
+
+    return question_comparisons
+
+
+def _build_llm_unmatched_questions_summary(
+    real_q_data: list[dict[str, Any]],
+    llm_q_data: list[dict[str, Any]],
+    *,
+    pair_min_score: float = 0.52,
+) -> dict[str, Any]:
+    """List questions present only on one side (Real vs LLM) after semantic pairing."""
+    paired = pair_survey_questions_for_comparison(real_q_data, llm_q_data, min_score=pair_min_score)
+    paired_real_ids = {id(rq) for rq, _, _ in paired}
+    paired_llm_ids = {id(lq) for _, lq, _ in paired}
+
+    real_only = []
+    for q in real_q_data or []:
+        if id(q) in paired_real_ids:
+            continue
+        qid = normalize_survey_question_id(q.get("question_id")) or str(q.get("question_id") or "")
+        real_only.append({"question_id": str(qid), "question_name": str(q.get("question_name") or qid)})
+
+    llm_only = []
+    for q in llm_q_data or []:
+        if id(q) in paired_llm_ids:
+            continue
+        qid = normalize_survey_question_id(q.get("question_id")) or str(q.get("question_id") or "")
+        llm_only.append({"question_id": str(qid), "question_name": str(q.get("question_name") or qid)})
+
+    return {
+        "real_only": real_only,
+        "llm_only": llm_only,
+        "paired_count": len(paired),
+        "real_total": len(real_q_data or []),
+        "llm_total": len(llm_q_data or []),
+    }
 
 
 def _only_common_question_comparisons(rows: list[Any]) -> list[dict[str, Any]]:
@@ -1128,7 +1385,9 @@ async def get_results(survey_id: str, db: Session = Depends(get_db)):
     if not unmatched_questions and syn_stored and real_stored:
         unmatched_questions = _build_unmatched_questions_summary(syn_stored, real_stored)
     if len(qc) == 0 and syn_stored and real_stored:
-        qc = _build_question_comparisons_from_question_lists(syn_stored, real_stored)
+        qc = _build_question_comparisons_from_question_lists(
+            syn_stored, real_stored, sample_size_hint=survey.total_personas
+        )
         qc = sanitize_for_json(qc)
         merged = dict(rep) if isinstance(survey.test_suite_report, dict) else {}
         merged["question_comparisons"] = qc
@@ -1163,7 +1422,14 @@ async def get_results(survey_id: str, db: Session = Depends(get_db)):
         db.commit()
         db.refresh(survey)
 
+    if isinstance(survey.test_suite_report, dict) and test_suite_report_has_legacy_reason_label(survey.test_suite_report):
+        survey.test_suite_report = migrate_signal_category_labels(dict(survey.test_suite_report))
+        flag_modified(survey, "test_suite_report")
+        db.commit()
+        db.refresh(survey)
+
     rep = survey.test_suite_report if isinstance(survey.test_suite_report, dict) else {}
+    qc = _only_common_question_comparisons(rep.get("question_comparisons") or [])
     results_out: Any = survey.test_suite_report
     if isinstance(rep, dict):
         results_out = {
@@ -1171,6 +1437,12 @@ async def get_results(survey_id: str, db: Session = Depends(get_db)):
             "question_comparisons": qc,
             "unmatched_questions": sanitize_for_json(unmatched_questions),
         }
+
+    llm_qc_raw = rep.get("llm_question_comparisons") if isinstance(rep, dict) else None
+    llm_qc = _only_common_question_comparisons(llm_qc_raw) if isinstance(llm_qc_raw, list) else []
+    llm_unmatched = (
+        rep.get("llm_unmatched_questions") if isinstance(rep, dict) and isinstance(rep.get("llm_unmatched_questions"), dict) else {}
+    )
 
     result = {
         "survey_id": survey_id,
@@ -1182,6 +1454,9 @@ async def get_results(survey_id: str, db: Session = Depends(get_db)):
         "recommendations": rep.get("recommendations", []) if isinstance(rep, dict) else [],
         "question_comparisons": qc,
         "unmatched_questions": sanitize_for_json(unmatched_questions),
+        "llm_question_comparisons": llm_qc,
+        "llm_unmatched_questions": sanitize_for_json(llm_unmatched),
+        "llm_overall_accuracy": sanitize_for_json(getattr(survey, "llm_accuracy_score", None)),
     }
     
     # Add survey metadata
@@ -1218,6 +1493,12 @@ async def get_results(survey_id: str, db: Session = Depends(get_db)):
         "avg_prediction_accuracy": sanitize_for_json(getattr(survey, "avg_prediction_accuracy", None)),
         "avg_relationship_strength": sanitize_for_json(getattr(survey, "avg_relationship_strength", None)),
         "checks_passed": survey.checks_passed,
+        "llm_accuracy_score": sanitize_for_json(getattr(survey, "llm_accuracy_score", None)),
+        "llm_avg_similarity": sanitize_for_json(getattr(survey, "llm_avg_similarity", None)),
+        "llm_directional_alignment": sanitize_for_json(getattr(survey, "llm_directional_alignment", None)),
+        "llm_avg_prediction_accuracy": sanitize_for_json(getattr(survey, "llm_avg_prediction_accuracy", None)),
+        "llm_avg_relationship_strength": sanitize_for_json(getattr(survey, "llm_avg_relationship_strength", None)),
+        "llm_checks_passed": getattr(survey, "llm_checks_passed", None),
     }
     
     # Add file info if available
@@ -1248,6 +1529,10 @@ async def get_results(survey_id: str, db: Session = Depends(get_db)):
 async def compare_files(
     synthetic_file: UploadFile = File(..., description="Synthetic/Questionnaire 1 file (Excel or CSV)"),
     real_file: UploadFile = File(..., description="Real/Questionnaire 2 file (Excel or CSV)"),
+    llm_file: Optional[UploadFile] = File(
+        None,
+        description="Optional LLM Output/Questionnaire 3 (File C) CSV: Sr No., Question name, option name, response count",
+    ),
     survey_id: Optional[str] = Form(None, description="Optional: Link to existing survey"),
     survey_title: str = Form(..., description="Survey title in Camel Case"),
     publisher_name: str = Form(..., description="Publisher name in Camel Case"),
@@ -1256,6 +1541,7 @@ async def compare_files(
     geography: str = Form(..., description="Country / geography"),
     sample_size: str = Form(..., description="Sample size (numeric)"),
     number_of_questions: str = Form(..., description="No. of questions (numeric)"),
+    llm_sample_size: Optional[str] = Form(None, description="Optional LLM Output (File C) sample size (numeric)"),
     estimated_cost: str = Form("$2499", description="Synthetic simulation estimated cost display"),
     behaviour_signals: str = Form(..., description="Behaviour signals (numeric)"),
     neuroscience_signals: str = Form(..., description="Neuroscience signals (numeric)"),
@@ -1312,7 +1598,22 @@ async def compare_files(
         except Exception as e:
             logger.error(f"Error parsing real file {real_file.filename}: {str(e)}", exc_info=True)
             raise HTTPException(status_code=400, detail=f"Error parsing real file '{real_file.filename}': {str(e)}")
-        
+
+        # Optional LLM Output (File C). Parse only when a file is actually attached.
+        llm_data: Optional[dict[str, Any]] = None
+        has_llm_file = llm_file is not None and bool(getattr(llm_file, "filename", None))
+        if has_llm_file:
+            llm_content = await llm_file.read()
+            logger.info(f"Parsing LLM Output file: {llm_file.filename} ({len(llm_content)} bytes)")
+            try:
+                llm_data = file_parser.parse_file(llm_content, llm_file.filename)
+            except Exception as e:
+                logger.error(f"Error parsing LLM Output file {llm_file.filename}: {str(e)}", exc_info=True)
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Error parsing LLM Output file '{llm_file.filename}': {str(e)}",
+                )
+
         logger.info(f"Parsed synthetic: {len(synthetic_data.get('numeric_columns', []))} numeric columns, {synthetic_data.get('total_rows', 0)} rows")
         logger.info(f"Parsed real: {len(real_data.get('numeric_columns', []))} numeric columns, {real_data.get('total_rows', 0)} rows")
         
@@ -1382,6 +1683,21 @@ async def compare_files(
             },
             "question_data": real_data.get("question_data", []),
         }
+        llm_q_data: list[dict[str, Any]] = []
+        if llm_data is not None:
+            llm_responses = file_parser.extract_response_array(llm_data, method=extraction_method)
+            survey.llm_responses = llm_responses
+            survey.llm_output = {
+                "source_file": llm_file.filename,
+                "file_metadata": {
+                    "total_rows": llm_data["total_rows"],
+                    "total_columns": llm_data["total_columns"],
+                    "numeric_columns": llm_data["numeric_columns"],
+                },
+                "question_data": llm_data.get("question_data", []),
+            }
+            llm_q_data = llm_data.get("question_data", [])
+            logger.info("Parsed LLM Output: %s questions, %s response values", len(llm_q_data), len(llm_responses))
 
         # Generate question-by-question comparison BEFORE running main comparison
         question_comparisons = []
@@ -1395,11 +1711,26 @@ async def compare_files(
                 len(syn_q_data),
                 len(real_q_data),
             )
-            question_comparisons = _build_question_comparisons_from_question_lists(syn_q_data, real_q_data)
+            question_comparisons = _build_question_comparisons_from_question_lists(
+                syn_q_data, real_q_data, sample_size_hint=sample_size_int
+            )
             unmatched_questions = _build_unmatched_questions_summary(syn_q_data, real_q_data)
             logger.info("Generated %s question comparisons (semantic pairing)", len(question_comparisons))
         else:
             logger.warning(f"Missing question_data: synthetic={len(syn_q_data)} questions, real={len(real_q_data)} questions")
+
+        # Real (File B) vs LLM Output (File C) question-by-question comparison.
+        llm_question_comparisons: list[dict[str, Any]] = []
+        llm_unmatched_questions: dict[str, Any] = {}
+        if real_q_data and llm_q_data:
+            llm_question_comparisons = _build_llm_question_comparisons_from_question_lists(
+                real_q_data, llm_q_data, sample_size_hint=sample_size_int
+            )
+            llm_unmatched_questions = _build_llm_unmatched_questions_summary(real_q_data, llm_q_data)
+            logger.info(
+                "Generated %s Real-vs-LLM question comparisons (semantic pairing)",
+                len(llm_question_comparisons),
+            )
 
         # Run comparison (this will set test_suite_report)
         result = _run_comparison(survey, synthetic_responses, real_responses, db)
@@ -1428,18 +1759,42 @@ async def compare_files(
                     db.commit()
                     db.refresh(survey)
         
+        # Real (File B) vs LLM Output (File C): overall accuracy = average of per-question match scores.
+        llm_overall_accuracy: Optional[float] = None
+        if llm_question_comparisons:
+            result["llm_question_comparisons"] = llm_question_comparisons
+            llm_scores = [
+                float(q.get("match_score", 0))
+                for q in llm_question_comparisons
+                if q.get("match_score") is not None and q.get("status") == "Compared"
+            ]
+            if llm_scores:
+                llm_overall_accuracy = max(0.0, min(1.0, sum(llm_scores) / len(llm_scores)))
+                result["llm_overall_accuracy"] = llm_overall_accuracy
+                survey.llm_accuracy_score = llm_overall_accuracy
+                survey.llm_avg_similarity = llm_overall_accuracy
+                logger.info(
+                    "LLM Output overall accuracy from %s questions: %.1f%%",
+                    len(llm_scores),
+                    llm_overall_accuracy * 100,
+                )
+
         # Add file information to result
         result["file_info"] = {
             "synthetic_file": synthetic_file.filename,
             "real_file": real_file.filename,
+            "llm_file": llm_file.filename if has_llm_file else None,
             "synthetic_responses_count": len(synthetic_responses),
             "real_responses_count": len(real_responses),
             "extraction_method": extraction_method,
             "synthetic_question_count": len(synthetic_data.get("question_data", [])),
             "real_question_count": len(real_data.get("question_data", [])),
+            "llm_question_count": len(llm_q_data),
         }
         if unmatched_questions:
             result["unmatched_questions"] = sanitize_for_json(unmatched_questions)
+        if llm_unmatched_questions:
+            result["llm_unmatched_questions"] = sanitize_for_json(llm_unmatched_questions)
         
         # Store question comparisons in survey test_suite_report
         if question_comparisons:
@@ -1481,6 +1836,7 @@ async def compare_files(
             # Sanitize the entire updated_report before storing
             original_qc_count = len(updated_report.get("question_comparisons", []))
             updated_report = sanitize_for_json(updated_report)
+            updated_report = migrate_signal_category_labels(updated_report)
             after_sanitize_qc_count = len(updated_report.get("question_comparisons", [])) if isinstance(updated_report, dict) else 0
             logger.info(f"After sanitization: question_comparisons count - before: {original_qc_count}, after: {after_sanitize_qc_count}")
             
@@ -1504,6 +1860,30 @@ async def compare_files(
             
             if len(stored_qc) == 0:
                 logger.error(f"CRITICAL: Question comparisons were NOT persisted to database! Expected {len(sanitized_qc)} but got 0")
+
+        # Persist Real-vs-LLM comparison into test_suite_report (independent of synthetic-vs-real).
+        if llm_question_comparisons:
+            db.refresh(survey)
+            base_report = dict(survey.test_suite_report) if isinstance(survey.test_suite_report, dict) else {}
+            base_report["llm_question_comparisons"] = sanitize_for_json(llm_question_comparisons)
+            if llm_unmatched_questions:
+                base_report["llm_unmatched_questions"] = sanitize_for_json(llm_unmatched_questions)
+            if llm_overall_accuracy is not None:
+                base_report["llm_overall_accuracy"] = llm_overall_accuracy
+            survey.test_suite_report = base_report
+            flag_modified(survey, "test_suite_report")
+            db.commit()
+            db.refresh(survey)
+            stored_llm = (
+                survey.test_suite_report.get("llm_question_comparisons", [])
+                if isinstance(survey.test_suite_report, dict)
+                else []
+            )
+            logger.info(
+                "Verified storage: %s Real-vs-LLM comparisons stored for survey %s",
+                len(stored_llm),
+                survey.id,
+            )
 
         db.refresh(survey)
         qc_for_sync = question_comparisons if question_comparisons else (
@@ -1558,6 +1938,23 @@ async def compare_files(
         survey.actions_data_points = behaviour_signals_int
         survey.neuroscience_data_points = neuroscience_signals_int
         survey.contextual_layer_data_points = context_threads_int
+
+        # LLM Output (File C) study block + survey metric, mirroring human_study / synthetic_study.
+        if has_llm_file:
+            llm_sample_size_int = _coerce_respondent_count(llm_sample_size)
+            existing_llm = dict(profile.llm_study) if isinstance(profile.llm_study, dict) else {}
+            existing_llm.update(
+                {
+                    "source_file": llm_file.filename,
+                    "total_questions": len(llm_q_data),
+                }
+            )
+            if llm_sample_size_int is not None:
+                existing_llm["sample_size"] = llm_sample_size_int
+            if llm_overall_accuracy is not None:
+                existing_llm["accuracy_score"] = llm_overall_accuracy
+            profile.llm_study = sanitize_for_json(existing_llm)
+            flag_modified(profile, "llm_study")
         db.commit()
         db.refresh(survey)
 
@@ -1731,6 +2128,7 @@ def _serialize_test_lab_profile(survey_id: str, profile: TestLabProfile) -> dict
         "scenario": profile.scenario,
         "human_study": profile.human_study or {},
         "synthetic_study": profile.synthetic_study or {},
+        "llm_study": profile.llm_study or {},
         "verdict": profile.verdict or {},
         "metadata": profile.extra_data or {},
         "created_at": profile.created_at.isoformat() if profile.created_at else None,

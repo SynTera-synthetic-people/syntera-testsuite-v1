@@ -1,7 +1,49 @@
 """JSON Serialization Helpers - Handle NaN and inf values"""
-import json
 import math
 from typing import Any, Dict
+
+# Legacy / mistaken labels → canonical Test Lab signal name
+_LEGACY_REASON_SIGNAL_LABELS = frozenset({"Reason / Explanation", "Reason"})
+
+
+def normalize_signal_category_label(value: Any) -> str:
+    """Canonical survey-signal category for reason-style questions."""
+    s = str(value or "").strip()
+    if s in _LEGACY_REASON_SIGNAL_LABELS:
+        return "Reasoning"
+    return s
+
+
+def migrate_signal_category_labels(obj: Any) -> Any:
+    """
+    Recursively rename legacy reason categories to "Reasoning" on question_category
+    and any string "category" field (e.g. avgSimilarityByCategory rows).
+    """
+    if isinstance(obj, dict):
+        out: Dict[str, Any] = {}
+        for k, v in obj.items():
+            if k in ("question_category", "category") and isinstance(v, str):
+                out[k] = normalize_signal_category_label(v)
+            else:
+                out[k] = migrate_signal_category_labels(v)
+        return out
+    if isinstance(obj, list):
+        return [migrate_signal_category_labels(x) for x in obj]
+    return obj
+
+
+def test_suite_report_has_legacy_reason_label(obj: Any) -> bool:
+    """True if any question_category or category string still uses a legacy reason label."""
+    if isinstance(obj, dict):
+        for k, v in obj.items():
+            if k in ("question_category", "category") and isinstance(v, str) and v in _LEGACY_REASON_SIGNAL_LABELS:
+                return True
+            if test_suite_report_has_legacy_reason_label(v):
+                return True
+        return False
+    if isinstance(obj, list):
+        return any(test_suite_report_has_legacy_reason_label(x) for x in obj)
+    return False
 
 
 def sanitize_for_json(obj: Any) -> Any:
@@ -64,12 +106,24 @@ def survey_to_dict(survey) -> Dict[str, Any]:
                 "checks_passed": survey.checks_passed,
             }
         ),
+        "llm_accuracy_score": sanitize_for_json(getattr(survey, "llm_accuracy_score", None)),
+        "llm_avg_similarity": sanitize_for_json(getattr(survey, "llm_avg_similarity", None)),
+        "llm_directional_alignment": sanitize_for_json(getattr(survey, "llm_directional_alignment", None)),
+        "llm_avg_prediction_accuracy": sanitize_for_json(getattr(survey, "llm_avg_prediction_accuracy", None)),
+        "llm_avg_relationship_strength": sanitize_for_json(getattr(survey, "llm_avg_relationship_strength", None)),
+        "llm_checks_passed": getattr(survey, "llm_checks_passed", None),
         "validation_status": survey.validation_status,
         "synthetic_personas": sanitize_for_json(survey.synthetic_personas),
         "survey_questions": sanitize_for_json(survey.survey_questions),
         "synthetic_responses": sanitize_for_json(survey.synthetic_responses),
         "real_responses": sanitize_for_json(survey.real_responses),
-        "test_suite_report": sanitize_for_json(survey.test_suite_report),
+        "llm_output": sanitize_for_json(getattr(survey, "llm_output", None)),
+        "llm_responses": sanitize_for_json(getattr(survey, "llm_responses", None)),
+        "test_suite_report": sanitize_for_json(
+            migrate_signal_category_labels(survey.test_suite_report)
+            if isinstance(survey.test_suite_report, dict)
+            else survey.test_suite_report
+        ),
     }
     
     # Add datetime fields as ISO strings
@@ -101,8 +155,11 @@ def _slim_test_suite_report_for_list(report: Any) -> Any:
     """Report fields needed for dashboard/reports cards; omit heavy engine-only blobs."""
     if not isinstance(report, dict):
         return sanitize_for_json(report)
+    report = migrate_signal_category_labels(dict(report))
     keys = (
         "question_comparisons",
+        "llm_question_comparisons",
+        "llm_overall_accuracy",
         "tests",
         "test_summary",
         "study_metrics",
@@ -153,9 +210,12 @@ def survey_to_summary_dict(survey) -> Dict[str, Any]:
                 "checks_passed": survey.checks_passed,
             }
         ),
+        "llm_accuracy_score": sanitize_for_json(getattr(survey, "llm_accuracy_score", None)),
+        "llm_avg_similarity": sanitize_for_json(getattr(survey, "llm_avg_similarity", None)),
         "validation_status": survey.validation_status,
         "synthetic_personas": _slim_questionnaire_blob(survey.synthetic_personas, "_question_data_count"),
         "survey_questions": _slim_questionnaire_blob(survey.survey_questions, "_question_data_count"),
+        "llm_output": _slim_questionnaire_blob(getattr(survey, "llm_output", None), "_question_data_count"),
         "test_suite_report": _slim_test_suite_report_for_list(survey.test_suite_report),
     }
 

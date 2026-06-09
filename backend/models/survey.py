@@ -32,12 +32,24 @@ class Survey(Base):
     avg_prediction_accuracy = Column(Float, nullable=True)
     avg_relationship_strength = Column(Float, nullable=True)
     checks_passed = Column(Integer, nullable=True)
+    # LLM Output (File C) comparison metrics — Real/File B vs LLM Output/File C.
+    # Parallels the Synthetic-vs-Real survey-level scalars above.
+    llm_accuracy_score = Column(Float, nullable=True)
+    llm_avg_similarity = Column(Float, nullable=True)
+    llm_directional_alignment = Column(Float, nullable=True)
+    llm_avg_prediction_accuracy = Column(Float, nullable=True)
+    llm_avg_relationship_strength = Column(Float, nullable=True)
+    llm_checks_passed = Column(Integer, nullable=True)
     confidence_tier = Column(String(10), nullable=True)
     validation_status = Column(String(20), default="NOT_TESTED")
     synthetic_personas = Column(JSON)
     survey_questions = Column(JSON)
     synthetic_responses = Column(JSON)
     real_responses = Column(JSON, nullable=True)
+    # LLM Output (File C): source_file + question_data blob, and the extracted response array.
+    # Parallels synthetic_personas/survey_questions (blobs) and synthetic_responses/real_responses (arrays).
+    llm_output = Column(JSON, nullable=True)
+    llm_responses = Column(JSON, nullable=True)
     test_suite_report = Column(JSON, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     validated_at = Column(DateTime(timezone=True), nullable=True)
@@ -64,6 +76,8 @@ class TestLabProfile(Base):
     scenario = Column(String(120), nullable=True, index=True)
     human_study = Column(JSON, nullable=True)
     synthetic_study = Column(JSON, nullable=True)
+    # LLM Output (File C) study block — parallels human_study / synthetic_study.
+    llm_study = Column(JSON, nullable=True)
     verdict = Column(JSON, nullable=True)
     extra_data = Column("metadata", JSON, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())

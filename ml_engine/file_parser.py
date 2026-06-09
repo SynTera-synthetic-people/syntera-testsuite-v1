@@ -190,6 +190,13 @@ class FileParser:
             if not is_data_shell_format:
                 df = FileParser._normalize_aggregate_headers(df)
 
+            # LLM Output (File C) explicit schema: Sr No., Question name, option name, response count.
+            # Each row is one option; questions are grouped by "Question name".
+            if not is_data_shell_format:
+                file_c_parsed = FileParser._try_parse_file_c_llm_export(df, filename)
+                if file_c_parsed is not None:
+                    return file_c_parsed
+
             # Aggregated export: one row per option, repeated question number / text forward-filled
             # (e.g. "Q No., Question Description, Options, Value from report" or "... , Count")
             if not is_data_shell_format:
@@ -534,6 +541,138 @@ class FileParser:
             key = re.sub(r"\s+", "", str(c).strip().lower())
             out[key] = str(c)
         return out
+
+    @staticmethod
+    def _try_parse_file_c_llm_export(df: pd.DataFrame, filename: str) -> Optional[Dict[str, Any]]:
+        """
+        Parse the LLM Output (File C) schema:
+
+            Sr No. | Question name | option name | response count
+
+        Each row is one option of one question. Questions are grouped by the
+        "Question name" column (the "Sr No." column is a row serial and is ignored
+        for grouping). Returns the same shape as parse_file()/the aggregate parser
+        so the comparison engine and question pairing work unchanged.
+        """
+        if df is None or df.empty or len(df.columns) < 3:
+            return None
+
+        lookup = FileParser._column_lookup(df)  # normalized header -> original name
+        aliases_q_name = ("questionname", "question", "questiondescription", "questiontext", "question_name")
+        aliases_opt = ("optionname", "option", "options", "answer", "response", "option_name")
+        aliases_cnt = ("responsecount", "response_count", "count", "responses", "frequency", "n", "value")
+
+        def pick(cands: tuple[str, ...]) -> Optional[str]:
+            for a in cands:
+                if a in lookup:
+                    return lookup[a]
+            return None
+
+        qname_col = pick(aliases_q_name)
+        opt_col = pick(aliases_opt)
+        cnt_col = pick(aliases_cnt)
+
+        # This explicit parser only fires when all three core columns are present by
+        # name. Anything looser falls through to the generic aggregate parser.
+        if not (qname_col and opt_col and cnt_col):
+            return None
+        if opt_col == qname_col or cnt_col in {qname_col, opt_col}:
+            return None
+
+        work = df[[qname_col, opt_col, cnt_col]].copy()
+        work[qname_col] = work[qname_col].ffill()
+        work = work.dropna(how="all")
+        if len(work) < 1:
+            return None
+
+        def _coerce_count(v: Any) -> float:
+            try:
+                if v is None or (isinstance(v, float) and math.isnan(v)):
+                    return float("nan")
+                if isinstance(v, (int, float)):
+                    return float(v)
+                s = str(v).strip()
+                if not s:
+                    return float("nan")
+                s = s.replace(",", "").replace(" ", "")
+                s = re.sub(r"[^0-9.\-]", "", s)
+                if not s or s in {"-", ".", "-."}:
+                    return float("nan")
+                return float(s)
+            except (TypeError, ValueError):
+                return float("nan")
+
+        question_data: list[dict[str, Any]] = []
+        all_responses: list[float] = []
+        response_totals: list[float] = []
+        q_seq = 0
+
+        for qname_val, g in work.groupby(qname_col, sort=False):
+            qname = str(qname_val).strip()
+            if not qname or qname.lower() == "nan":
+                continue
+            q_seq += 1
+            q_id = f"Q{q_seq}"
+            response_counts: dict[str, float] = {}
+            individual: list[float] = []
+            q_codes: dict[str, int] = {}
+            for _, r in g.iterrows():
+                opt = str(r[opt_col]).strip()
+                if not opt or opt.lower() == "nan":
+                    continue
+                cnt = _coerce_count(r[cnt_col])
+                if pd.isna(cnt):
+                    continue
+                fv = float(cnt)
+                # Accumulate in case an option label repeats within a question.
+                response_counts[opt] = response_counts.get(opt, 0.0) + fv
+                response_totals.append(fv)
+                try:
+                    opt_num = float(opt)
+                    individual.extend([opt_num] * int(fv))
+                except (TypeError, ValueError):
+                    if opt not in q_codes:
+                        q_codes[opt] = len(q_codes) + 1
+                    individual.extend([float(q_codes[opt])] * int(fv))
+
+            if not response_counts:
+                continue
+            q_counts = pd.Series(list(response_counts.values()))
+            individual = individual[: min(len(individual), 500000)]
+            question_data.append(
+                {
+                    "question_id": q_id,
+                    "question_name": qname,
+                    "response_totals": float(q_counts.sum()),
+                    "response_counts": {str(k): float(v) for k, v in response_counts.items()},
+                    "individual_responses": individual,
+                    "mean": float(q_counts.mean()) if len(q_counts) > 0 else 0.0,
+                    "std": float(q_counts.std()) if len(q_counts) > 1 else 0.0,
+                }
+            )
+            all_responses.extend([float(x) for x in individual])
+
+        if len(question_data) < 1:
+            return None
+
+        logger.info(
+            "Detected LLM Output (File C) export in %s (%s questions)",
+            filename,
+            len(question_data),
+        )
+
+        return {
+            "filename": filename,
+            "total_rows": len(df),
+            "total_columns": len(df.columns),
+            "numeric_columns": [cnt_col],
+            "response_totals": [float(x) for x in response_totals if x is not None],
+            "all_responses": [float(x) for x in all_responses if x is not None],
+            "question_data": question_data,
+            "dataframe_preview": df.head(10).to_dict("records") if len(df) > 0 else [],
+            "column_names": df.columns.tolist(),
+            "format": "file_c_llm_output",
+        }
 
     @staticmethod
     def _try_parse_aggregate_option_row_export(df: pd.DataFrame, filename: str) -> Optional[Dict[str, Any]]:

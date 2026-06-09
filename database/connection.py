@@ -37,6 +37,7 @@ async def init_db():
             "ALTER TABLE test_lab_profiles ADD COLUMN IF NOT EXISTS scenario VARCHAR(120)",
             "ALTER TABLE test_lab_profiles ADD COLUMN IF NOT EXISTS human_study JSONB",
             "ALTER TABLE test_lab_profiles ADD COLUMN IF NOT EXISTS synthetic_study JSONB",
+            "ALTER TABLE test_lab_profiles ADD COLUMN IF NOT EXISTS llm_study JSONB",
             "ALTER TABLE test_lab_profiles ADD COLUMN IF NOT EXISTS verdict JSONB",
             'ALTER TABLE test_lab_profiles ADD COLUMN IF NOT EXISTS "metadata" JSONB',
         ]
@@ -80,6 +81,15 @@ async def init_db():
             "ALTER TABLE test_lab_surveys ADD COLUMN IF NOT EXISTS avg_prediction_accuracy DOUBLE PRECISION",
             "ALTER TABLE test_lab_surveys ADD COLUMN IF NOT EXISTS avg_relationship_strength DOUBLE PRECISION",
             "ALTER TABLE test_lab_surveys ADD COLUMN IF NOT EXISTS checks_passed INTEGER",
+            # LLM Output (File C) comparison columns — Real/File B vs LLM Output/File C.
+            "ALTER TABLE test_lab_surveys ADD COLUMN IF NOT EXISTS llm_output JSONB",
+            "ALTER TABLE test_lab_surveys ADD COLUMN IF NOT EXISTS llm_responses JSONB",
+            "ALTER TABLE test_lab_surveys ADD COLUMN IF NOT EXISTS llm_accuracy_score DOUBLE PRECISION",
+            "ALTER TABLE test_lab_surveys ADD COLUMN IF NOT EXISTS llm_avg_similarity DOUBLE PRECISION",
+            "ALTER TABLE test_lab_surveys ADD COLUMN IF NOT EXISTS llm_directional_alignment DOUBLE PRECISION",
+            "ALTER TABLE test_lab_surveys ADD COLUMN IF NOT EXISTS llm_avg_prediction_accuracy DOUBLE PRECISION",
+            "ALTER TABLE test_lab_surveys ADD COLUMN IF NOT EXISTS llm_avg_relationship_strength DOUBLE PRECISION",
+            "ALTER TABLE test_lab_surveys ADD COLUMN IF NOT EXISTS llm_checks_passed INTEGER",
         ]
         try:
             with engine.begin() as conn:

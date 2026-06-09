@@ -1623,6 +1623,13 @@ function escapeHtml(s) {
     return div.innerHTML;
 }
 
+/** Align with backend: legacy reason labels → "Reasoning". */
+function normalizeSurveySignalCategoryLabel(cat) {
+    const s = String(cat || '').trim() || 'Evaluation';
+    if (s === 'Reason / Explanation' || s === 'Reason') return 'Reasoning';
+    return s;
+}
+
 function formatStudyValidatedAt(d) {
     if (d == null || d === '') return '—';
     const dt = new Date(d);
@@ -2957,6 +2964,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             file ? `${file.name} (${(file.size / 1024).toFixed(1)} KB)` : 'No file selected';
     });
 
+    document.getElementById('file-llm')?.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        const info = document.getElementById('file-llm-info');
+        if (info) info.textContent = file ? `${file.name} (${(file.size / 1024).toFixed(1)} KB)` : 'No file selected';
+    });
+
     document.getElementById('market-research-submit')?.addEventListener('click', runMarketResearchReverseEngineer);
 
     document.getElementById('market-research-load-sample')?.addEventListener('click', loadSamplePdfText);
@@ -3016,6 +3029,49 @@ function displaySemilatticeStyleResults(data, surveyId, targetDiv) {
         const unmatchedQuestions = data.unmatched_questions || (data.results || {}).unmatched_questions || {};
         const synthOnly = Array.isArray(unmatchedQuestions.synthetic_only) ? unmatchedQuestions.synthetic_only : [];
         const humanOnly = Array.isArray(unmatchedQuestions.human_only) ? unmatchedQuestions.human_only : [];
+
+        // Real (File B) vs LLM Output (File C) comparison (optional third file).
+        let llmQuestionComparisons = commonQuestionsOnly(data.llm_question_comparisons);
+        if (llmQuestionComparisons.length === 0) {
+            const results = data.results || {};
+            llmQuestionComparisons = commonQuestionsOnly(results.llm_question_comparisons);
+        }
+        const llmOverallAcc01 = normalizeAccuracy01(data.llm_overall_accuracy ?? survey.llm_accuracy_score);
+        const hasLlm = llmQuestionComparisons.length > 0;
+
+        // Join Real-vs-LLM rows back onto the Synthetic-vs-Real rows so the main
+        // question-by-question table can show a third (LLM) bar per option and a
+        // second match score (Humans vs LLM). Both comparisons key on the real question.
+        const normOptLabel = (s) => String(s == null ? '' : s)
+            .trim().toLowerCase().replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim();
+        const llmByQid = new Map();
+        const llmByName = new Map();
+        llmQuestionComparisons.forEach((lr) => {
+            const optMap = new Map();
+            (lr.option_comparisons || []).forEach((o) => {
+                const key = normOptLabel(o.real_option != null ? o.real_option : o.option);
+                if (key) optMap.set(key, Number(o.llm_count || 0));
+            });
+            const entry = {
+                match_score: lr.match_score != null ? Number(lr.match_score) : null,
+                optMap,
+                llm_total: Number(lr.llm_total || 0),
+            };
+            if (lr.question_id != null) llmByQid.set(String(lr.question_id), entry);
+            const nm = normOptLabel(lr.question_name);
+            if (nm) llmByName.set(nm, entry);
+        });
+        const findLlmEntry = (q) => {
+            if (!hasLlm || !q) return null;
+            if (q.paired_real_question_id != null && llmByQid.has(String(q.paired_real_question_id))) {
+                return llmByQid.get(String(q.paired_real_question_id));
+            }
+            if (q.question_id != null && llmByQid.has(String(q.question_id))) {
+                return llmByQid.get(String(q.question_id));
+            }
+            const nm = normOptLabel(q.question_name);
+            return nm && llmByName.has(nm) ? llmByName.get(nm) : null;
+        };
         
         const acc01 = normalizeAccuracy01(data.overall_accuracy ?? data.accuracy);
         const accuracyValue = acc01 != null ? acc01 : 0;
@@ -3030,7 +3086,7 @@ function displaySemilatticeStyleResults(data, surveyId, targetDiv) {
             const s = Number(q?.match_score);
             if (!Number.isFinite(s)) return;
             const catRaw = String(q?.question_category || q?.type || 'Evaluation').trim() || 'Evaluation';
-            const cat = catRaw === 'Reason / Explanation' ? 'Reasoning' : catRaw;
+            const cat = normalizeSurveySignalCategoryLabel(catRaw);
             const prev = categoryBuckets.get(cat) || { sum: 0, n: 0 };
             prev.sum += s;
             prev.n += 1;
@@ -3122,9 +3178,14 @@ function displaySemilatticeStyleResults(data, surveyId, targetDiv) {
                     <div class="model-detail-value">${escapeHtml(String(humanFromProfile.sample_size))}</div>
                 </div>` : ''}
                 <div class="model-detail-item">
-                    <div class="model-detail-label">Overall File Accuracy</div>
+                    <div class="model-detail-label">Overall File Accuracy${hasLlm ? ' (Humans vs Synthetic)' : ''}</div>
                     <div class="model-detail-value" style="color: ${accentColor}">${accuracy}%</div>
                 </div>
+                ${hasLlm ? `
+                <div class="model-detail-item">
+                    <div class="model-detail-label">Overall File Accuracy (Humans vs LLM)</div>
+                    <div class="model-detail-value" style="color: ${llmOverallAcc01 != null ? matchScoreAccentColor(llmOverallAcc01) : '#6b7280'}">${llmOverallAcc01 != null ? (llmOverallAcc01 * 100).toFixed(1) + '%' : '—'}</div>
+                </div>` : ''}
             </div>
         </div>
     `;
@@ -3249,7 +3310,7 @@ function displaySemilatticeStyleResults(data, surveyId, targetDiv) {
                                 <th>Question</th>
                                 <th>Options Comparison</th>
                                 <th>Type</th>
-                                <th>Match Score</th>
+                                ${hasLlm ? `<th>Match (Humans vs Synthetic)</th><th>Match (Humans vs LLM)</th>` : `<th>Match Score</th>`}
                             </tr>
                         </thead>
                         <tbody>
@@ -3259,27 +3320,41 @@ function displaySemilatticeStyleResults(data, surveyId, targetDiv) {
                                 const matchPercent = qScore != null && !Number.isNaN(qScore) ? (qScore * 100).toFixed(1) : '—';
                                 const optionComparisons = q.option_comparisons || [];
                                 
-                                // Bar chart: Y = options, X = count; Humans = green, Synthetic = red; count beside each bar
+                                // Bar chart: Y = options, X = count; Humans = green, Synthetic = red, LLM = blue; count beside each bar
                                 const HUMAN_COLOR = '#22c55e';
                                 const SYNTHETIC_COLOR = '#ef4444';
+                                const LLM_COLOR = '#3b82f6';
+                                const llmEntry = findLlmEntry(q);
+                                const llmScore = llmEntry && llmEntry.match_score != null ? Number(llmEntry.match_score) : null;
+                                const llmAccent = llmScore != null && !Number.isNaN(llmScore) ? matchScoreAccentColor(llmScore) : '#6b7280';
+                                const llmMatchPercent = llmScore != null && !Number.isNaN(llmScore) ? (llmScore * 100).toFixed(1) : '—';
                                 let optionsHtml = '';
                                 if (optionComparisons.length > 0) {
-                                    const maxCount = Math.max(1, ...optionComparisons.flatMap(opt => [opt.real_count || 0, opt.synthetic_count || 0]));
+                                    const llmCountFor = (opt) => {
+                                        if (!llmEntry) return 0;
+                                        const k = normOptLabel(opt.human_option != null ? opt.human_option : opt.option);
+                                        return k && llmEntry.optMap.has(k) ? Number(llmEntry.optMap.get(k) || 0) : 0;
+                                    };
+                                    const maxCount = Math.max(1, ...optionComparisons.flatMap(opt => [opt.real_count || 0, opt.synthetic_count || 0, llmCountFor(opt)]));
                                     optionsHtml = `
-                                        <div class="q-bar-chart" role="img" aria-label="Humans vs Synthetic comparison">
+                                        <div class="q-bar-chart" role="img" aria-label="Humans vs Synthetic vs LLM comparison">
                                             <div class="q-bar-chart-legend">
                                                 <span class="q-bar-legend-item" style="background:${HUMAN_COLOR}"></span> Humans
                                                 <span class="q-bar-legend-item" style="background:${SYNTHETIC_COLOR}"></span> Synthetic
+                                                ${llmEntry ? `<span class="q-bar-legend-item" style="background:${LLM_COLOR}"></span> LLM Output` : ''}
                                             </div>
                                             <div class="q-bar-chart-y-axis-label">Option</div>
                                             <div class="q-bar-chart-bars">
                                                 ${optionComparisons.map(opt => {
                                                     const synCount = opt.synthetic_count || 0;
                                                     const realCount = opt.real_count || 0;
+                                                    const llmCount = llmCountFor(opt);
                                                     const realPct = Math.round((realCount / maxCount) * 100);
                                                     const synPct = Math.round((synCount / maxCount) * 100);
+                                                    const llmPct = Math.round((llmCount / maxCount) * 100);
                                                     const realDisplay = Math.round(realCount);
                                                     const synDisplay = Math.round(synCount);
+                                                    const llmDisplay = Math.round(llmCount);
                                                     const humOpt = opt.human_option != null ? String(opt.human_option) : '';
                                                     const synOpt = opt.synthetic_option != null ? String(opt.synthetic_option) : '';
                                                     const rowLabel = escapeHtml(String(opt.option || humOpt || synOpt || '—'));
@@ -3298,6 +3373,11 @@ function displaySemilatticeStyleResults(data, surveyId, targetDiv) {
                                                                     <div class="q-bar q-bar-synthetic" style="width:${synPct}%; background:${SYNTHETIC_COLOR};" title="Synthetic: ${synDisplay}"></div>
                                                                     <span class="q-bar-count-inline synthetic">${synDisplay}</span>
                                                                 </div>
+                                                                ${llmEntry ? `
+                                                                <div class="q-bar-slot">
+                                                                    <div class="q-bar" style="width:${llmPct}%; background:${LLM_COLOR};" title="LLM Output: ${llmDisplay}"></div>
+                                                                    <span class="q-bar-count-inline" style="color:${LLM_COLOR};">${llmDisplay}</span>
+                                                                </div>` : ''}
                                                             </div>
                                                         </div>
                                                     `;
@@ -3308,16 +3388,20 @@ function displaySemilatticeStyleResults(data, surveyId, targetDiv) {
                                 } else {
                                     const synTotal = q.synthetic_total || 0;
                                     const realTotal = q.real_total || 0;
-                                    const maxCount = Math.max(realTotal, synTotal, 1);
+                                    const llmTotal = llmEntry ? Number(llmEntry.llm_total || 0) : 0;
+                                    const maxCount = Math.max(realTotal, synTotal, llmTotal, 1);
                                     const realPct = Math.round((realTotal / maxCount) * 100);
                                     const synPct = Math.round((synTotal / maxCount) * 100);
+                                    const llmPct = Math.round((llmTotal / maxCount) * 100);
                                     const realDisplay = Math.round(realTotal);
                                     const synDisplay = Math.round(synTotal);
+                                    const llmDisplay = Math.round(llmTotal);
                                     optionsHtml = `
                                         <div class="q-bar-chart">
                                             <div class="q-bar-chart-legend">
                                                 <span class="q-bar-legend-item" style="background:${HUMAN_COLOR}"></span> Humans
                                                 <span class="q-bar-legend-item" style="background:${SYNTHETIC_COLOR}"></span> Synthetic
+                                                ${llmEntry ? `<span class="q-bar-legend-item" style="background:${LLM_COLOR}"></span> LLM Output` : ''}
                                             </div>
                                             <div class="q-bar-row">
                                                 <div class="q-bar-y-label">Total</div>
@@ -3330,6 +3414,11 @@ function displaySemilatticeStyleResults(data, surveyId, targetDiv) {
                                                         <div class="q-bar q-bar-synthetic" style="width:${synPct}%; background:${SYNTHETIC_COLOR};" title="Synthetic: ${synDisplay}"></div>
                                                         <span class="q-bar-count-inline synthetic">${synDisplay}</span>
                                                     </div>
+                                                    ${llmEntry ? `
+                                                    <div class="q-bar-slot">
+                                                        <div class="q-bar" style="width:${llmPct}%; background:${LLM_COLOR};" title="LLM Output: ${llmDisplay}"></div>
+                                                        <span class="q-bar-count-inline" style="color:${LLM_COLOR};">${llmDisplay}</span>
+                                                    </div>` : ''}
                                                 </div>
                                             </div>
                                         </div>
@@ -3347,8 +3436,9 @@ function displaySemilatticeStyleResults(data, surveyId, targetDiv) {
                                                 ${optionsHtml}
                                             </div>
                                         </td>
-                                        <td class="type-cell">${q.question_category || q.type || 'Evaluation'}</td>
+                                        <td class="type-cell">${escapeHtml(normalizeSurveySignalCategoryLabel(q.question_category || q.type || 'Evaluation'))}</td>
                                         <td class="match-score-cell" style="color: ${qAccent}; font-weight: 600;">${matchPercent === '—' ? '—' : matchPercent + '%'}</td>
+                                        ${hasLlm ? `<td class="match-score-cell" style="color: ${llmAccent}; font-weight: 600;">${llmMatchPercent === '—' ? '—' : llmMatchPercent + '%'}</td>` : ''}
                                     </tr>
                                 `;
                             }).join('')}
@@ -3498,6 +3588,8 @@ function closeMobileMenu() {
 async function compareFiles() {
     const syntheticFile = document.getElementById('file-synthetic')?.files[0];
     const realFile = document.getElementById('file-real')?.files[0];
+    const llmFile = document.getElementById('file-llm')?.files[0];
+    const llmSampleSize = document.getElementById('file-llm-sample-size')?.value?.trim() || '';
     const surveyIdInput = document.getElementById('file-survey-id');
     const surveyId = surveyIdInput ? surveyIdInput.value.trim() : null;
     const surveyTitle = document.getElementById('file-survey-title')?.value?.trim() || '';
@@ -3568,10 +3660,25 @@ async function compareFiles() {
         showNotification('Invalid file type. Please upload Excel (.xlsx, .xls) or CSV (.csv) files only.', 'error');
         return;
     }
-    if ((syntheticFile.size || 0) > (typeof MAX_UPLOAD_FILE_BYTES !== 'undefined' ? MAX_UPLOAD_FILE_BYTES : 900 * 1024) ||
-        (realFile.size || 0) > (typeof MAX_UPLOAD_FILE_BYTES !== 'undefined' ? MAX_UPLOAD_FILE_BYTES : 900 * 1024)) {
+    const maxBytes = (typeof MAX_UPLOAD_FILE_BYTES !== 'undefined' ? MAX_UPLOAD_FILE_BYTES : 900 * 1024);
+    if ((syntheticFile.size || 0) > maxBytes || (realFile.size || 0) > maxBytes) {
         showNotification('One or both files are too large (max ~900 KB each) to avoid upload limits. Use smaller files.', 'error');
         return;
+    }
+    if (llmFile) {
+        const llmExt = llmFile.name.substring(llmFile.name.lastIndexOf('.')).toLowerCase();
+        if (!validExtensions.includes(llmExt)) {
+            showNotification('Invalid LLM Output (File C) type. Upload Excel (.xlsx, .xls) or CSV (.csv) only.', 'error');
+            return;
+        }
+        if ((llmFile.size || 0) > maxBytes) {
+            showNotification('LLM Output (File C) is too large (max ~900 KB). Use a smaller file.', 'error');
+            return;
+        }
+        if (llmSampleSize && (!/^\d+$/.test(llmSampleSize) || Number(llmSampleSize) <= 0)) {
+            showNotification('LLM Output Sample Size must be a positive number.', 'warning');
+            return;
+        }
     }
     
     // Show loading state - update button text
@@ -3587,6 +3694,10 @@ async function compareFiles() {
         const formData = new FormData();
         formData.append('synthetic_file', syntheticFile);
         formData.append('real_file', realFile);
+        if (llmFile) {
+            formData.append('llm_file', llmFile);
+            if (llmSampleSize) formData.append('llm_sample_size', llmSampleSize);
+        }
         formData.append('survey_title', surveyTitle);
         formData.append('publisher_name', publisherName);
         formData.append('industry', industry);
@@ -3798,6 +3909,8 @@ function displayValidationResults(data, surveyId, resultsDiv = null) {
     const acc01 = normalizeAccuracy01(data.overall_accuracy);
     const accuracyPct = (acc01 != null ? acc01 : 0) * 100;
     const accuracy = accuracyPct.toFixed(1);
+    const llmAcc01 = normalizeAccuracy01(data.llm_overall_accuracy ?? (data.survey && data.survey.llm_accuracy_score));
+    const hasLlmAcc = llmAcc01 != null;
 
     function qualityFromAccuracy01(a) {
         const p = (a != null ? a : 0) * 100;
@@ -3995,11 +4108,17 @@ function displayValidationResults(data, surveyId, resultsDiv = null) {
                 <h2 style="color: ${qualityInfo.color}">${qualityInfo.title}</h2>
                 <p class="main-result-description">${qualityInfo.description}</p>
                 <div class="accuracy-display">
-                    <div class="accuracy-label">Overall File Match Score</div>
+                    <div class="accuracy-label">Overall File Match Score${hasLlmAcc ? ' (Humans vs Synthetic)' : ''}</div>
                     <div class="accuracy-value" style="color: ${qualityInfo.color}">${accuracy}%</div>
                     <div class="progress-bar-container">
                         <div class="progress-bar" style="width: ${progressPercent}%; background: ${qualityInfo.color}"></div>
                     </div>
+                    ${hasLlmAcc ? `
+                    <div class="accuracy-label" style="margin-top:12px;">Overall File Match Score (Humans vs LLM)</div>
+                    <div class="accuracy-value" style="color: ${matchScoreAccentColor(llmAcc01)}">${(llmAcc01 * 100).toFixed(1)}%</div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" style="width: ${Math.round(llmAcc01 * 100)}%; background: ${matchScoreAccentColor(llmAcc01)}"></div>
+                    </div>` : ''}
                 </div>
             </div>
         </div>
